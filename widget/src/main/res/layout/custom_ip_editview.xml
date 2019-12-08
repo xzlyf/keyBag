@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <com.xz.widget.widget.AutoFocusEditView
+        android:id="@+id/ip_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:imeOptions="actionNext"
+        android:inputType="numberSigned"
+        android:maxLines="1"
+        android:nextFocusRight="@id/ip_2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="3dp"
+        android:gravity="bottom"
+        android:text="."
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.xz.widget.widget.AutoFocusEditView
+        android:id="@+id/ip_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:imeOptions="actionNext"
+
+        android:inputType="numberSigned"
+        android:maxLines="1"
+        android:nextFocusLeft="@id/ip_1"
+        android:nextFocusRight="@id/ip_3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="3dp"
+        android:gravity="bottom"
+        android:text="."
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.xz.widget.widget.AutoFocusEditView
+        android:id="@+id/ip_3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:imeOptions="actionNext"
+
+        android:inputType="numberSigned"
+        android:maxLines="1"
+        android:nextFocusLeft="@id/ip_2"
+        android:nextFocusRight="@id/ip_4" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="3dp"
+        android:gravity="bottom"
+        android:text="."
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.xz.widget.widget.AutoFocusEditView
+        android:id="@+id/ip_4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:imeOptions="actionNext"
+
+        android:inputType="numberSigned"
+        android:maxLines="1"
+        android:nextFocusLeft="@id/ip_3" />
+
+</LinearLayout>

@@ -1,0 +1,2 @@
+include ':app', ':base', ':widget', ':utils'
+rootProject.name='KeyBag'

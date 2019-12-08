@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <declare-styleable name="XButton">
+        <!--半径-->
+        <attr name="buttonRadius" format="integer" />
+        <!--背景颜色-->
+        <attr name="backgroundColor" format="color" />
+        <!--是否填充-->
+        <attr name="isFill" format="boolean" />
+        <!--边框-->
+        <attr name="buttonStrokeWidth" format="integer" />
+        <!--字体颜色-->
+        <attr name="buttonTextColor" format="color" />
+        <!--指定圆角-->
+        <attr name="whiceCirc">
+            <flag name="topLeft" value="0" />
+            <flag name="topRight" value="1" />
+            <flag name="bottomLeft" value="2" />
+            <flag name="bottomRight" value="3" />
+        </attr>
+        <!--是否反转-->
+        <attr name="isReversal" format="boolean" />
+    </declare-styleable>
+</resources>
