@@ -29,5 +29,6 @@ public class LoadActivity extends BaseActivity {
     @Override
     public void initData() {
         startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
