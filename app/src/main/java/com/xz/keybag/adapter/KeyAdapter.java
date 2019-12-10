@@ -3,6 +3,7 @@ package com.xz.keybag.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,7 +29,9 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         viewHolder.name.setText(entity.getT1());
         viewHolder.userId.setText(entity.getT2());
         viewHolder.userPsw.setText(entity.getT3());
+
     }
+
 
     @Override
     protected BaseRecyclerViewHolder createNewViewHolder(ViewGroup parent, int viewType) {
@@ -42,10 +45,15 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         TextView userId;
         @BindView(R.id.user_psw)
         TextView userPsw;
+        @BindView(R.id.state)
+        ImageView state;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+
         }
+
+
     }
 
 }

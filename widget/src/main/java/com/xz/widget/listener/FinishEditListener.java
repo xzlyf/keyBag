@@ -1,4 +1,4 @@
-package com.xz.widget.widget;
+package com.xz.widget.listener;
 
 import android.widget.EditText;
 

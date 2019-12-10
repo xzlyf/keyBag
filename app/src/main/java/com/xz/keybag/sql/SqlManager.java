@@ -10,7 +10,7 @@ public class SqlManager {
 
     private static final String TAG = "SqlManager.class";
     private static final String DB_NAME = "user.db";//数据库名称
-    private static final int DB_VERSION = 1;//数据版本
+    private static final int DB_VERSION = 3;//数据版本
     private static SqlManager mInstance;
     private static SQLiteDatabase db_write;
     private static SQLiteDatabase db_read;

@@ -1,8 +1,8 @@
 package com.xz.keybag.entity;
 
 public class KeyEntity {
-    private String t1, t2, t3, t4;
-    private int t5;
+    private String t1, t2, t3, t4,t5;
+
 
     public String getT1() {
         return t1;
@@ -36,11 +36,12 @@ public class KeyEntity {
         this.t4 = t4;
     }
 
-    public int getT5() {
+    public String getT5() {
         return t5;
     }
 
-    public void setT5(int t5) {
+    public void setT5(String t5) {
         this.t5 = t5;
     }
+
 }

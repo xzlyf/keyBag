@@ -1,4 +1,4 @@
-package com.xz.widget.widget;
+package com.xz.widget.textview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.xz.widget.listener.FinishEditListener;
 import com.xz.xzwidget.R;
 
 public class IpEditView extends LinearLayout implements FinishEditListener {

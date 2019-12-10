@@ -1,4 +1,4 @@
-package com.xz.widget.widget;
+package com.xz.widget.textview;
 
 import android.content.Context;
 import android.text.Editable;
@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.widget.EditText;
 
 import com.xz.widget.utils.KeyBoardUtil;
+import com.xz.widget.listener.FinishEditListener;
 
 /**
  * 输入完成后自动跳到下一个输入框,没有下一个就取消焦点

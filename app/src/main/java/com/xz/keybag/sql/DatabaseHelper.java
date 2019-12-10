@@ -6,13 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    //购物车数据库表
     private static final String CREATE_COMMON = "create table common (" +
             "t1 text," +
             "t2 text," +
             "t3 text," +
             "t4 text," +
-            "t5 int)";
+            "t5 text)";
+
+    private static final String CREATE_SECRET = "create table secret(" +
+            "k1 text," +
+            "k2 text," +
+            "k3 text)";
 
     public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -32,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_COMMON);
+        db.execSQL(CREATE_SECRET);
     }
 
     @Override

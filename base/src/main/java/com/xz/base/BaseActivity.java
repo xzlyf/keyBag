@@ -85,8 +85,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
                 //权限列表在Local全局类里，需要增加权限去local里增加
                 for (String s : Local.permission) {
                     if (ContextCompat.checkSelfPermission(this, s) != PackageManager.PERMISSION_GRANTED) {
-                        //没有有权
+                        //没有权限
                         noPermission = true;
+                        Logger.w(s);
                     }
                 }
 

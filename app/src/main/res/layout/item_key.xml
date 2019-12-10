@@ -19,22 +19,51 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/user_id_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="账号："
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <TextView
         android:id="@+id/user_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_10"
-        android:text="账号：xxxxxxxxxxxx"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="xxxxxxxxxxxx"
+        app:layout_constraintLeft_toRightOf="@+id/user_id_tips"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <TextView
+        android:id="@+id/user_psw_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="密码："
+        app:layout_constraintLeft_toRightOf="@+id/user_id"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
     <TextView
         android:id="@+id/user_psw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp_10"
         android:layout_marginTop="@dimen/dp_10"
-        android:text="密码：xxxxxxxxxxxx"
-        app:layout_constraintLeft_toRightOf="@+id/user_id"
+        android:text="xxxxxxxxxxxx"
+        app:layout_constraintLeft_toRightOf="@+id/user_psw_tips"
         app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <ImageView
+        android:id="@+id/state"
+        android:layout_width="@dimen/dp_18"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/dp_20"
+        android:src="@drawable/ic_show"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/user_id"
+        app:layout_constraintLeft_toRightOf="@+id/user_psw"
+        app:layout_constraintTop_toTopOf="@+id/user_id" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,5 @@ public class Local {
     public static final String[] permission = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.INTERNET
     };
 }
