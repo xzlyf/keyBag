@@ -11,6 +11,12 @@
         <item name="android:statusBarColor">@color/colorPrimary</item>
     </style>
 
+    <style name="CommonTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="menu_btn" parent="TextAppearance.AppCompat.Widget.Button">
         <item name="android:background">@color/colorText</item>
     </style>

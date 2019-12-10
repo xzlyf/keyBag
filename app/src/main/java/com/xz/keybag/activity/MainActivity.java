@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +48,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     ImageView tvAdd;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+    @BindView(R.id.btn_1)
+    Button btn_1;
     private KeyAdapter keyAdapter;
     private List<KeyEntity> mList;
 
@@ -79,6 +82,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initView();
         initRecycler();
 
+
+    }
+
+    private void initView() {
+
+        tvAdd.setOnClickListener(this);
+        tvMenu.setOnClickListener(this);
+        btn_1.setOnClickListener(this);
 
     }
 
@@ -117,13 +128,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    private void initView() {
-
-        tvAdd.setOnClickListener(this);
-        tvMenu.setOnClickListener(this);
-
-    }
-
     @Override
     public void onClick(View v) {
 
@@ -134,6 +138,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.tv_add:
                 startActivity(new Intent(MainActivity.this, AddActivity.class));
+                break;
+            case R.id.btn_1:
+                //密钥管理
+                startActivity(new Intent(MainActivity.this, KeyActivity.class));
                 break;
 
         }

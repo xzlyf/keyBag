@@ -45,7 +45,7 @@
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="密码解锁" />
+            android:text="密钥管理" />
 
         <Button
             style="@style/menu_btn"

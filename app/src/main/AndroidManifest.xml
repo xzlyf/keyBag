@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name="com.xz.base.BaseApplication"
@@ -14,15 +13,26 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.AddActivity"></activity>
-        <activity android:name=".activity.LoadActivity">
+        <activity
+            android:name=".activity.KeyActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CommonTheme" />
+        <activity
+            android:name=".activity.AddActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LoadActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"></activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
