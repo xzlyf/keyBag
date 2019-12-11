@@ -3,14 +3,11 @@ package com.xz.keybag.activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,16 +30,13 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
-import com.xz.widget.XType;
 import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -57,6 +51,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     DrawerLayout drawerLayout;
     @BindView(R.id.btn_1)
     Button btn_1;
+    @BindView(R.id.btn_2)
+    Button btn_2;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     @BindView(R.id.et_search)
@@ -183,6 +179,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btn_1:
                 //密钥管理
+                startActivity(new Intent(MainActivity.this, SecretActivity.class));
+                break;
+            case R.id.btn_2:
                 startActivity(new Intent(MainActivity.this, KeyActivity.class));
                 break;
 

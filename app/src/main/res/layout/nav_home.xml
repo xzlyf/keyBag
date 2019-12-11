@@ -4,7 +4,10 @@
     android:layout_width="@dimen/dp_250"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:background="@color/colorText">
+    android:background="@color/colorText"
+    android:focusable="true"
+    android:clickable="true">
+    <!--空白区域点击事件穿透加上clickable="true"即可防止-->
 
     <!--头部-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,40 +51,12 @@
             android:text="密钥管理" />
 
         <Button
+            android:id="@+id/btn_2"
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="密码解锁" />
 
-        <Button
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="密码解锁" />
-
-        <Button
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="密码解锁" />
-
-        <Button
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="密码解锁" />
-
-        <Button
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="密码解锁" />
-
-        <Button
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="密码解锁" />
 
 
     </LinearLayout>

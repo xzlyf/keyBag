@@ -1,25 +1,25 @@
 package com.xz.keybag.activity;
 
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
+import android.Manifest;
+import android.app.KeyguardManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
-import com.xz.keybag.constant.Local;
-import com.xz.utils.SharedPreferencesUtil;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class KeyActivity extends BaseActivity {
 
-    @BindView(R.id.secret_text)
-    TextView secretText;
-    @BindView(R.id.state)
-    ImageView state;
-    private boolean isShow;
 
     @Override
     public boolean homeAsUpEnabled() {
@@ -31,45 +31,16 @@ public class KeyActivity extends BaseActivity {
         return R.layout.activity_key;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void initData() {
-        setTitle("密钥管理");
+        setTitle("密码登录");
 
-        isShow = SharedPreferencesUtil.getBoolean(mContext, "state", "secret_state", false);
-        if (isShow) {
-            state.setImageResource(R.drawable.ic_show);
-            secretText.setText(Local.secret);
-
-        } else {
-            state.setImageResource(R.drawable.ic_hide);
-            secretText.setText("********");
-
+        if (Build.VERSION.SDK_INT < 23) {
+            Logger.w("系统不支持指纹");
+            return;
         }
 
-        state.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if (isShow) {
-                    isShow = false;
-                    state.setImageResource(R.drawable.ic_hide);
-                    secretText.setText("********");
-
-                } else {
-                    isShow = true;
-                    state.setImageResource(R.drawable.ic_show);
-                    secretText.setText(Local.secret);
-
-                }
-
-            }
-        });
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        SharedPreferencesUtil.saveBoolean(mContext, "state", "secret_state", isShow);
     }
 }
