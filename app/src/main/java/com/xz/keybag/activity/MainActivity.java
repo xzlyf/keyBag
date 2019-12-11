@@ -6,10 +6,15 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -28,9 +33,11 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.widget.XType;
+import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,6 +57,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     DrawerLayout drawerLayout;
     @BindView(R.id.btn_1)
     Button btn_1;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.et_search)
+    SearchEditView etSearch;
+
+
     private KeyAdapter keyAdapter;
     private List<KeyEntity> mList;
 
@@ -91,6 +104,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvMenu.setOnClickListener(this);
         btn_1.setOnClickListener(this);
 
+        etSearch.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                keyAdapter.getFilter().filter(s);
+            }
+        });
+
+
     }
 
     /**
@@ -125,6 +156,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
         });
+        keyAdapter.setOnItemClickListener(new OnItemClickListener<KeyEntity>() {
+            @Override
+            public void onItemClick(View view, int position, KeyEntity model) {
+                sToast(model.getT1());
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position, KeyEntity model) {
+
+            }
+        });
     }
 
 
@@ -148,7 +190,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     }
-
 
     /**
      * 异步数据读取线程类

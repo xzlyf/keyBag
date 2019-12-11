@@ -39,4 +39,13 @@
         <!--是否显示横线-->
         <attr name="showLine" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="SearchEditView">
+        <!--显示位置-->
+        <attr name="gravity">
+            <flag name="left" value="10"/>
+            <flag name="center" value="11"/>
+            <flag name="right" value="12"/>
+        </attr>
+    </declare-styleable>
 </resources>
