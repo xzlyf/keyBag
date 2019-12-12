@@ -6,4 +6,67 @@
     android:layout_height="match_parent"
     tools:context=".activity.KeyActivity">
 
+    <ImageView
+        android:id="@+id/fingerprint_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_100"
+        android:src="@drawable/ic_fingerprint"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <EditText
+        android:id="@+id/et_pwd"
+        android:layout_width="@dimen/dp_150"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:inputType="numberSigned"
+        android:maxLength="64"
+        android:maxLines="1"
+        android:hint="请输入"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/submit"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        android:layout_marginTop="@dimen/dp_35"
+        android:background="@drawable/btn_submit"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_pwd" />
+
+    <TextView
+        android:id="@+id/fingerprint_helper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp_40"
+        android:text="请验证指纹"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/sp_16"
+        app:layout_constraintBottom_toBottomOf="@id/change_psw"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/change_psw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp_40"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="密码验证"
+        android:textColor="@color/royalblue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

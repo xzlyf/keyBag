@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -99,6 +100,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvAdd.setOnClickListener(this);
         tvMenu.setOnClickListener(this);
         btn_1.setOnClickListener(this);
+        btn_2.setOnClickListener(this);
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
