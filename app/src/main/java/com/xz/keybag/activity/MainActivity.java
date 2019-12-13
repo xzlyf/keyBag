@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
+import dalvik.annotation.TestTarget;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -196,7 +197,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 异步数据读取线程类
      */
     private class ReadDataCommon extends Thread {
-
         @Override
         public void run() {
             super.run();

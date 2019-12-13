@@ -5,15 +5,21 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.orhanobut.logger.Logger;
 import com.xz.base.BaseRecyclerAdapter;
 import com.xz.base.BaseRecyclerViewHolder;
 import com.xz.keybag.R;
 import com.xz.keybag.entity.KeyEntity;
+import com.xz.utils.CopyUtil;
+import com.xz.utils.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +30,12 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
 
 
     private List<KeyEntity> filterDatas;
+    private CopyUtil copyUtil;
 
     public KeyAdapter(Context context) {
         super(context);
         this.filterDatas = mList;
+        copyUtil = new CopyUtil(context);
     }
 
     @Override
@@ -43,6 +51,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         viewHolder.name.setText(entity.getT1());
         viewHolder.userId.setText(entity.getT2());
         viewHolder.userPsw.setText(entity.getT3());
+        viewHolder.endTime.setText(TimeUtil.getSimMilliDate("yyyy.MM.dd HH:mm", Long.valueOf(entity.getT5())));
 
     }
 
@@ -93,7 +102,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
     }
 
 
-    class ViewHolder extends BaseRecyclerViewHolder implements View.OnClickListener {
+    class ViewHolder extends BaseRecyclerViewHolder implements View.OnClickListener, View.OnLongClickListener {
         @BindView(R.id.name)
         TextView name;
         @BindView(R.id.user_id)
@@ -102,20 +111,53 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         TextView userPsw;
         @BindView(R.id.state)
         ImageView state;
+        @BindView(R.id.end_time)
+        TextView endTime;
+        @BindView(R.id.root_layout)
+        ConstraintLayout rootLayout;
+        @BindView(R.id.layout_2)
+        FrameLayout layout2;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            
-            itemView.setOnClickListener(this);
+
+            rootLayout.setOnClickListener(this);
+            rootLayout.setOnLongClickListener(this);
+            userId.setOnClickListener(this);
+            userPsw.setOnClickListener(this);
+
+
 
         }
 
 
         @Override
         public void onClick(View v) {
-            if (mOnItemClickListener != null) {
-                mOnItemClickListener.onItemClick(v, getLayoutPosition(), filterDatas.get(getLayoutPosition()));
+            switch (v.getId()) {
+                case R.id.root_layout:
+                    if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onItemClick(v, getLayoutPosition(), filterDatas.get(getLayoutPosition()));
+                    }
+                    break;
+                case R.id.user_id:
+                    copyUtil.copyToClicp(userId.getText().toString());
+                    Toast.makeText(mContext, "已复制账号", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.user_psw:
+                    copyUtil.copyToClicp(userPsw.getText().toString());
+                    Toast.makeText(mContext, "已复制密码", Toast.LENGTH_SHORT).show();
+                    break;
             }
+
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            ViewGroup viewGroup = (ViewGroup) v;
+            int childWidth = viewGroup.getChildAt(1).getWidth();
+            rootLayout.offsetLeftAndRight(-childWidth);
+            layout2.offsetLeftAndRight(-childWidth);
+            return true;
         }
     }
 

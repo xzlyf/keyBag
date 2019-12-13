@@ -85,6 +85,7 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
 
                     tipsDialog.show();
 
+
                 } else {
                     finish();
                 }
@@ -112,7 +113,7 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
         String t5 = String.valueOf(System.currentTimeMillis());
 
         if (!checkEmpty(t1, t2, t3, t5)) {
-            sToast("不可为空！");
+            sToast("名称,账号和密码不可为空！");
             return;
         }
 
@@ -154,14 +155,17 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
     private boolean hasContent() {
         if (!name.getText().toString().trim().equals("")) {
             return true;
-        } else if (!user.getText().toString().trim().equals("")) {
-            return true;
-        } else if (!psw.getText().toString().trim().equals("")) {
-            return true;
-        } else if (!note.getText().toString().trim().equals("")) {
-            return true;
-        } else {
-            return false;
         }
+        if (!user.getText().toString().trim().equals("")) {
+            return true;
+        }
+        if (!psw.getText().toString().trim().equals("")) {
+            return true;
+        }
+        if (!note.getText().toString().trim().equals("")) {
+            return true;
+        }
+        return false;
+
     }
 }
