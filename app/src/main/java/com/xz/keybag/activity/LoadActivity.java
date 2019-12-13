@@ -4,31 +4,57 @@ import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
-import android.os.Bundle;
+import android.database.Cursor;
 import android.os.Handler;
+import android.os.Message;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
+import com.xz.keybag.sql.EOD;
+import com.xz.keybag.sql.SqlManager;
+import com.xz.utils.KeyBoardUtil;
+import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class LoadActivity extends BaseActivity {
 
     @BindView(R.id.change_psw)
     TextView changePsw;
     @BindView(R.id.fingerprint_icon)
-    ImageView fingerprintIcon;
+    ImageView fg_icon;
     @BindView(R.id.tx)
     TextView tx;
+    @BindView(R.id.et_input)
+    EditText etInput;
+    @BindView(R.id.submit)
+    ImageView submit;
+    @BindView(R.id.psw_tips)
+    TextView pwdTips;
     private FingerprintHelper fingerprintHelper;
-    private float shakeDegrees = 1f;
+    private float shakeDegrees = 3f;
     private ObjectAnimator objectAnimator;
+    private ObjectAnimator objectAnimator2;
+    private int mode;
+    private final int SEND_HINT = 1001;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (msg.what == SEND_HINT) {
+                pwdTips.setText("默认密码0000，及时修改");
+            }
+        }
+    };
 
     @Override
     public boolean homeAsUpEnabled() {
@@ -42,16 +68,21 @@ public class LoadActivity extends BaseActivity {
 
     @Override
     public void initData() {
+        if (getIntent() != null) {
+            mode = getIntent().getIntExtra("mode", 0);
+        }
+        new ReadThread().start();
+        etInput.setVisibility(View.GONE);
+        submit.setVisibility(View.GONE);
+        pwdTips.setVisibility(View.GONE);
 
         objectAnimator = ObjectAnimator.ofPropertyValuesHolder(tx, rotateValuesHolder);
         objectAnimator.setDuration(1500);
+        objectAnimator2 = ObjectAnimator.ofPropertyValuesHolder(pwdTips, rotateValuesHolder);
+        objectAnimator2.setDuration(1500);
 
-        changePsw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                killMySelf();
-            }
-        });
+        changePsw.setOnClickListener(stateOnClickListener);
+        submit.setOnClickListener(check);
         fingerprintHelper = FingerprintHelper.getInstance(mContext);
         fingerprintHelper.setOnAuthResultListener(new OnAuthResultListener() {
             @Override
@@ -82,6 +113,8 @@ public class LoadActivity extends BaseActivity {
             @Override
             public void onDeviceNotSupport() {
                 tx.setText("设备不支持指纹识别\n请使用密码校验");
+                fg_icon.setVisibility(View.GONE);
+                changePwdState();
             }
 
         });
@@ -90,6 +123,12 @@ public class LoadActivity extends BaseActivity {
     }
 
     private void killMySelf() {
+        //判断模式，打开对应的活动
+        if (mode == 1) {
+            startActivity(new Intent(mContext, KeyActivity.class));
+            finish();
+            return;
+        }
         startActivity(new Intent(mContext, MainActivity.class));
         overridePendingTransition(R.anim.translation_finish, R.anim.translation_create);
         new Handler().postDelayed(new Runnable() {
@@ -105,6 +144,18 @@ public class LoadActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         fingerprintHelper.stopListener();
+    }
+
+    /**
+     * 切换至密码输入状态
+     */
+    private void changePwdState() {
+        changePsw.setVisibility(View.GONE);
+        etInput.setVisibility(View.VISIBLE);
+        submit.setVisibility(View.VISIBLE);
+        pwdTips.setVisibility(View.VISIBLE);
+        etInput.requestFocus();
+        KeyBoardUtil.showKeyBoard(etInput);
     }
 
 
@@ -124,5 +175,64 @@ public class LoadActivity extends BaseActivity {
             Keyframe.ofFloat(0.9f, -shakeDegrees),
             Keyframe.ofFloat(1.0f, 0f)
     );
+
+    /**
+     * 切换至密码输入状态
+     */
+    private View.OnClickListener stateOnClickListener = v -> changePwdState();
+
+    /**
+     * 检查密码
+     */
+    private View.OnClickListener check = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String temp = etInput.getText().toString().trim();
+            if (temp.equals("")) {
+                return;
+            }
+
+            temp = MD5Util.getMD5(temp);
+            if (temp.equals(Local.User.loginPwd)) {
+                killMySelf();
+            } else {
+                pwdTips.setText("密码错误");
+                objectAnimator2.start();
+            }
+
+        }
+    };
+
+    /**
+     * 主线程执行输出提示语句
+     *
+     * @param msg
+     */
+    private void setHint(String msg) {
+        Message message = handler.obtainMessage();
+        message.what = SEND_HINT;
+        message.obj = msg;
+        handler.sendMessage(message);
+    }
+
+
+    class ReadThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+
+
+            Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
+            //如果游标为空则返回false
+            if (!cursor.moveToFirst()) {
+                setHint("默认密码0000，及时修改");
+                Local.User.loginPwd = MD5Util.getMD5("0000");
+                return;
+            }
+
+            Local.User.loginPwd = EOD.decrypt(cursor.getString(cursor.getColumnIndex("p2")), Local.SECRET_PWD);
+            cursor.close();
+        }
+    }
 
 }

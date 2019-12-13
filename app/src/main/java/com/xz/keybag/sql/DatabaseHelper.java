@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_COMMON = "create table common (" +
@@ -17,6 +18,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "k1 text," +
             "k2 text," +
             "k3 text)";
+    private static final String CREATE_DBASE = "create table dbase(" +
+            "p1 text," +
+            "p2 text," +
+            "p3 text)";
+
 
     public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -37,6 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_COMMON);
         db.execSQL(CREATE_SECRET);
+        db.execSQL(CREATE_DBASE);
+
     }
 
     @Override

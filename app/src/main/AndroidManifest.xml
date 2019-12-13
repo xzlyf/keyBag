@@ -17,7 +17,9 @@
         <activity
             android:name=".activity.KeyActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CommonTheme" />
+            android:theme="@style/CommonTheme" >
+
+        </activity>
         <activity
             android:name=".activity.SecretActivity"
             android:screenOrientation="portrait"
@@ -27,7 +29,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoadActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

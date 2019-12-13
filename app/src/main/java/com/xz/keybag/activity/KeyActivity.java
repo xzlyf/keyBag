@@ -1,35 +1,45 @@
 package com.xz.keybag.activity;
 
+import android.content.ContentValues;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
-import com.xz.keybag.fingerprint.FingerprintHelper;
-import com.xz.keybag.fingerprint.OnAuthResultListener;
+import com.xz.keybag.constant.Local;
+import com.xz.keybag.sql.EOD;
+import com.xz.keybag.sql.SqlManager;
+import com.xz.utils.MD5Util;
+import com.xz.utils.RandomString;
+
+import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class KeyActivity extends BaseActivity implements View.OnClickListener {
-    @BindView(R.id.fingerprint_icon)
-    ImageView tv_icon;
-    @BindView(R.id.fingerprint_helper)
-    TextView tv_info;
-    @BindView(R.id.change_psw)
-    TextView changePsw;
-    @BindView(R.id.et_pwd)
-    EditText etPwd;
-    @BindView(R.id.submit)
-    ImageView submit;
 
-    private FingerprintHelper fingerprintHelper;
+    @BindView(R.id.old_pwd)
+    EditText oldPwd;
+    @BindView(R.id.old_layout)
+    TextInputLayout oldLayout;
+    @BindView(R.id.new_pwd)
+    EditText newPwd;
+    @BindView(R.id.new_layout)
+    TextInputLayout newLayout;
+    @BindView(R.id.new_pwd_repeat)
+    EditText newPwdRepeat;
+    @BindView(R.id.new_layout_repeat)
+    TextInputLayout newLayoutRepeat;
+    @BindView(R.id.input_layout)
+    LinearLayout inputLayout;
+    @BindView(R.id.submit)
+    TextView submit;
 
     @Override
     public boolean homeAsUpEnabled() {
@@ -43,105 +53,78 @@ public class KeyActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initData() {
-        setTitle("密码登录");
-        initView();
-        fingerprintHelper = FingerprintHelper.getInstance(mContext);
-        fingerprintHelper.setOnAuthResultListener(new OnAuthResultListener() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "onSuccess: ");
-                tv_info.setText("验证成功");
+        setTitle("管理");
 
-            }
-
-            @Override
-            public void onHelper(String msg) {
-                Log.d(TAG, "onHelper: " + msg);
-                tv_info.setText(msg);
-            }
-
-            @Override
-            public void onFailed(String msg) {
-                Log.d(TAG, "onFailed: " + msg);
-                tv_info.setText(msg);
-            }
-
-            @Override
-            public void onAuthenticationFailed(String msg) {
-                Log.d(TAG, "onAuthenticationFailed: " + msg);
-                tv_info.setText(msg);
-
-            }
-
-            @Override
-            public void onDeviceNotSupport() {
-                Log.d(TAG, "onDeviceNotSupport: ");
-            }
-        });
-        fingerprintHelper.startListening();
-
-
-    }
-
-    private void initView() {
-        changePsw.setOnClickListener(this);
         submit.setOnClickListener(this);
 
-        etPwd.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().length()>0){
-                    submit.setVisibility(View.VISIBLE);
-                }else{
-                    submit.setVisibility(View.GONE);
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        fingerprintHelper.stopListener();
     }
 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.change_psw:
-                etPwd.setVisibility(View.VISIBLE);
-                break;
-
-            case R.id.submit:
-
-                check();
-
-                break;
+        String pwd = newPwdRepeat.getText().toString().trim();
+        if (!checkEmpty()) {
+            return;
         }
-    }
-
-    /**
-     * 检查验证
-     */
-    private void check() {
-        String tx = etPwd.getText().toString().trim();
-        if (tx.equals("")) {
-            tv_info.setText("密码不可为空");
+        if (!TextUtils.equals(newPwd.getText().toString().trim(), pwd)) {
+            newLayoutRepeat.setError("密码不一致");
             return;
         }
 
+        if (!MD5Util.getMD5(oldPwd.getText().toString().trim()).equals(Local.User.loginPwd)) {
+            oldPwd.setText("");
+            oldLayout.setError("旧密码不正确");
+            return;
+        }
 
+        String md5Pwd = MD5Util.getMD5(pwd);
+
+        oldPwd.setText("");
+        newPwd.setText("");
+        newPwdRepeat.setText("");
+        oldLayout.setError("");
+        newLayout.setError("");
+        newLayoutRepeat.setError("");
+
+
+        //先清空数据表
+        SqlManager.deleteAll(mContext, "dbase");
+
+        ContentValues values = new ContentValues();
+        values.put("p1", RandomString.getRandomString(16));
+        values.put("p2", EOD.encrypt(md5Pwd, Local.SECRET_PWD));
+        values.put("p3", RandomString.getRandomString(16, true));
+        long i =SqlManager.insert(mContext, "dbase", values);
+        if (i==-1){
+            sToast("修改失败");
+            return;
+        }
+        Local.User.loginPwd = md5Pwd;
+        sToast("修改成功");
+
+    }
+
+
+    private boolean checkEmpty() {
+        if (TextUtils.isEmpty(oldPwd.getText())) {
+            oldLayout.setError("不可为空");
+            return false;
+        } else {
+            oldLayout.setError("");
+        }
+        if (TextUtils.isEmpty(newPwd.getText())) {
+            newLayout.setError("不可为空");
+            return false;
+        } else {
+            newLayout.setError("");
+        }
+        if (TextUtils.isEmpty(newPwdRepeat.getText())) {
+            newLayoutRepeat.setError("不可为空");
+            return false;
+        } else {
+            newLayoutRepeat.setError("");
+        }
+        return true;
 
     }
 }

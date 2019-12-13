@@ -10,7 +10,7 @@ public class SqlManager {
 
     private static final String TAG = "SqlManager.class";
     private static final String DB_NAME = "user.db";//数据库名称
-    private static final int DB_VERSION = 3;//数据版本
+    private static final int DB_VERSION = 9;//数据版本
     private static SqlManager mInstance;
     private static SQLiteDatabase db_write;
     private static SQLiteDatabase db_read;
@@ -18,7 +18,7 @@ public class SqlManager {
     private SqlManager(Context context) {
         DatabaseHelper dbHelper = new DatabaseHelper(context, DB_NAME, null, DB_VERSION);
         db_write = dbHelper.getWritableDatabase();
-        db_read = dbHelper.getReadableDatabase();
+        //db_read = dbHelper.getReadableDatabase();
     }
 
     private static SqlManager getInstance(Context context) {
@@ -62,6 +62,16 @@ public class SqlManager {
     }
 
     /**
+     * 删除所有数据
+     *
+     * @return 如果传入一个whereClause，则影响的行数，否则为0。
+     * 删除所有行并获得一个count pass“1”作为whereClause。
+     */
+    private int _deleteAll(String table) {
+        return db_write.delete(table, null, null);
+    }
+
+    /**
      * sql语句操作
      *
      * @param sql
@@ -93,6 +103,10 @@ public class SqlManager {
 
     public static int delete(Context context, String table, String whereClause, String[] whereArgs) {
         return getInstance(context)._delete(table, whereClause, whereArgs);
+    }
+
+    public static int deleteAll(Context context, String table) {
+        return getInstance(context)._deleteAll(table);
     }
 
     public static Cursor queryAll(Context context, String table) {
