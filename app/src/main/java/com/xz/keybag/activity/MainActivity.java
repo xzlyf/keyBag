@@ -244,12 +244,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //如果游标为空则返回false
             if (!cursor.moveToFirst()) {
                 //用户第一次运行创建一个随机密钥
+                String secret = RandomString.getRandomString(8, true);
                 ContentValues values = new ContentValues();
-                values.put("k1", RandomString.getRandomString(8, true));
+                values.put("k1", secret);
                 values.put("k2", RandomString.getRandomString(16));
                 values.put("k3", 0);
                 SqlManager.insert(mContext, "secret", values);//插入数据
-                return null;
+                return secret;
             }
             SecretEntity entity = new SecretEntity();
             entity.setK1(cursor.getString(cursor.getColumnIndex("k1")));

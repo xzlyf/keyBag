@@ -4,11 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_yuanjiao"
+    android:id="@+id/root_layout"
     android:orientation="horizontal"
     android:padding="@dimen/dp_10">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/root_layout"
+        android:id="@+id/layout_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -105,8 +107,15 @@
         android:id="@+id/layout_2"
         android:layout_width="@dimen/dp_50"
         android:layout_height="match_parent"
-        android:background="@color/gray1">
+        android:padding="@dimen/dp_10">
 
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/dp_5"
+            android:src="@drawable/ic_delete" />
     </FrameLayout>
+
 
 </LinearLayout>

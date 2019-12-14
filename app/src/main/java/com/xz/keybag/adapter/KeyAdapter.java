@@ -1,12 +1,14 @@
 package com.xz.keybag.adapter;
 
 import android.content.Context;
+import android.media.Image;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +19,10 @@ import com.orhanobut.logger.Logger;
 import com.xz.base.BaseRecyclerAdapter;
 import com.xz.base.BaseRecyclerViewHolder;
 import com.xz.keybag.R;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.KeyEntity;
+import com.xz.keybag.sql.EOD;
+import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.CopyUtil;
 import com.xz.utils.TimeUtil;
 
@@ -114,19 +119,25 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         @BindView(R.id.end_time)
         TextView endTime;
         @BindView(R.id.root_layout)
-        ConstraintLayout rootLayout;
+        LinearLayout rootLayout;
         @BindView(R.id.layout_2)
         FrameLayout layout2;
+        @BindView(R.id.layout_1)
+        ConstraintLayout layout1;
+        @BindView(R.id.delete)
+        ImageView delete;
+        private ViewGroup viewGroup;
+        private int childWidth;
+        private boolean isOpen = false;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            rootLayout.setOnClickListener(this);
-            rootLayout.setOnLongClickListener(this);
+            layout1.setOnClickListener(this);
+            layout1.setOnLongClickListener(this);
             userId.setOnClickListener(this);
             userPsw.setOnClickListener(this);
-
-
+            delete.setOnClickListener(this);
 
         }
 
@@ -134,7 +145,13 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.root_layout:
+                case R.id.layout_1:
+                    if (isOpen) {
+                        isOpen = false;
+                        layout1.offsetLeftAndRight(childWidth);
+                        layout2.offsetLeftAndRight(childWidth);
+                        return;
+                    }
                     if (mOnItemClickListener != null) {
                         mOnItemClickListener.onItemClick(v, getLayoutPosition(), filterDatas.get(getLayoutPosition()));
                     }
@@ -147,15 +164,28 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
                     copyUtil.copyToClicp(userPsw.getText().toString());
                     Toast.makeText(mContext, "已复制密码", Toast.LENGTH_SHORT).show();
                     break;
+                case R.id.delete:
+                    int position = getLayoutPosition();
+                    String t1 = EOD.encrypt(mList.get(position).getT1(), Local.secret);
+                    String t2 = EOD.encrypt(mList.get(position).getT2(), Local.secret);
+                    String t3 = EOD.encrypt(mList.get(position).getT3(), Local.secret);
+                    SqlManager.delete(mContext, Local.TABLE_COMMON, "t1=? and t2=? and t3 = ?", new String[]{t1, t2, t3});
+                    mList.remove(position);
+                    notifyDataSetChanged();
+                    Toast.makeText(mContext, "已删除", Toast.LENGTH_SHORT).show();
+                    break;
             }
 
         }
 
         @Override
         public boolean onLongClick(View v) {
-            ViewGroup viewGroup = (ViewGroup) v;
-            int childWidth = viewGroup.getChildAt(1).getWidth();
-            rootLayout.offsetLeftAndRight(-childWidth);
+            if (viewGroup == null) {
+                viewGroup = rootLayout;
+                childWidth = viewGroup.getChildAt(1).getWidth();
+            }
+            isOpen = true;
+            layout1.offsetLeftAndRight(-childWidth);
             layout2.offsetLeftAndRight(-childWidth);
             return true;
         }
