@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
 
     <application
         android:name="com.xz.base.BaseApplication"
@@ -15,11 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".activity.DetailActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
             android:name=".activity.KeyActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CommonTheme" >
-
-        </activity>
+            android:theme="@style/CommonTheme" />
         <activity
             android:name=".activity.SecretActivity"
             android:screenOrientation="portrait"

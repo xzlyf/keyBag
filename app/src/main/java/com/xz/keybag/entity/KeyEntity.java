@@ -1,7 +1,9 @@
 package com.xz.keybag.entity;
 
-public class KeyEntity {
-    private String t1, t2, t3, t4,t5;
+import java.io.Serializable;
+
+public class KeyEntity implements Serializable {
+    private String t1, t2, t3, t4, t5;
 
 
     public String getT1() {

@@ -32,6 +32,7 @@ import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.widget.textview.SearchEditView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -140,23 +141,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         keyAdapter.setOnItemClickListener(new OnItemClickListener<KeyEntity>() {
             @Override
             public void onItemClick(View view, int position, KeyEntity model) {
-                if (position == 0) {
-                    //显示
-
-                } else if (position == 1) {
-                    //隐藏
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position, KeyEntity model) {
-
-            }
-        });
-        keyAdapter.setOnItemClickListener(new OnItemClickListener<KeyEntity>() {
-            @Override
-            public void onItemClick(View view, int position, KeyEntity model) {
-                sToast(model.getT1());
+                startActivity(new Intent(MainActivity.this, DetailActivity.class).putExtra("model", model));
             }
 
             @Override
@@ -183,7 +168,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(MainActivity.this, SecretActivity.class));
                 break;
             case R.id.btn_2:
-                startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode",1));
+                startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode", 1));
                 break;
 
         }
