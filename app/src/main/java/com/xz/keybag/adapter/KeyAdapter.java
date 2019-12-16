@@ -184,6 +184,12 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
                 viewGroup = rootLayout;
                 childWidth = viewGroup.getChildAt(1).getWidth();
             }
+            if (isOpen) {
+                isOpen = false;
+                layout1.offsetLeftAndRight(childWidth);
+                layout2.offsetLeftAndRight(childWidth);
+                return true;
+            }
             isOpen = true;
             layout1.offsetLeftAndRight(-childWidth);
             layout2.offsetLeftAndRight(-childWidth);
