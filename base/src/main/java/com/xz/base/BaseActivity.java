@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -94,18 +93,18 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
                 if (noPermission) {
 
                     AlertDialog dialog = new AlertDialog.Builder(this)
-                            .setTitle("温馨提示")
-                            .setMessage("请允许我使用以下权限，以确保程序正确运行！")
-                            .setPositiveButton("同意", new DialogInterface.OnClickListener() {
+                            .setTitle(getString(R.string.string_tips))
+                            .setMessage(getString(R.string.string_premission))
+                            .setPositiveButton(getString(R.string.string_agreed), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     ActivityCompat.requestPermissions(BaseActivity.this, Local.permission, 456);
                                 }
                             })
-                            .setNegativeButton("不同意", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getString(R.string.string_sidagree), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    lToast("程序可能出现数据保存不成功、闪退等异常!");
+                                    lToast(getString(R.string.string_error));
                                 }
                             })
                             .create();
@@ -202,7 +201,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
             xzTipsDialog = new XzTipsDialog.Builder(this)
                     .setTitle(title)
                     .setContent(msg)
-                    .setCancelOnclickListener("好的", new XOnClickListener() {
+                    .setCancelOnclickListener(getString(R.string.string_right), new XOnClickListener() {
                         @Override
                         public void onClick(int viewId, String s, int position) {
                             dDialog();

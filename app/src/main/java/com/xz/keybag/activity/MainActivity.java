@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -38,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
-import dalvik.annotation.TestTarget;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -204,14 +202,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             String secret = getSecret();
             Local.secret = secret;
             if (secret == null) {
-                Logger.i("密钥初始化");
+                Logger.i(getString(R.string.string_1));
                 return;
             }
 
             Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_COMMON);
             //如果游标为空则返回false
             if (!cursor.moveToFirst()) {
-                Logger.i("无存档");
+                Logger.i(getString(R.string.string_2));
                 return;
             }
             KeyEntity entity;

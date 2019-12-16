@@ -1,6 +1,7 @@
 package com.xz.base;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -67,6 +68,13 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseRe
     public void removeAll() {
         mList.clear();
         notifyDataSetChanged();
+    }
+
+    /**
+     * 获取字符串资源文件
+     */
+    public String getString(int resId){
+        return mContext.getResources().getString(resId);
     }
 
     @Override

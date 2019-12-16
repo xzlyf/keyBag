@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">钥匙包</string>
+    <string name="string_1">密钥初始化</string>
+    <string name="string_2">无存档</string>
+    <string name="string_3">默认密码0000，及时修改</string>
+    <string name="string_4">设备不支持指纹识别 请使用密码校验</string>
+    <string name="string_5">密码错误</string>
+    <string name="string_6">已复制账号</string>
+    <string name="string_7">已复制密码</string>
+    <string name="string_8">已删除</string>
+    <string name="string_9">不保存且退出？</string>
+    <string name="string_10">不保存</string>
+    <string name="string_11">让我想想</string>
+    <string name="string_12">名称,账号和密码不可为空！</string>
+    <string name="string_13">存储失败</string>
+    <string name="string_14">已存储</string>
+    <string name="string_15">密钥管理</string>
+    <string name="string_16">管理</string>
+    <string name="string_17">密码不一致</string>
+    <string name="string_18">旧密码不正确</string>
+    <string name="string_19">修改失败</string>
+    <string name="string_20">修改成功</string>
+    <string name="string_21">不可为空</string>
 </resources>

@@ -31,7 +31,7 @@ public class SecretActivity extends BaseActivity {
 
     @Override
     public void initData() {
-        setTitle("密钥管理");
+        setTitle(R.string.string_15);
 
         isShow = SharedPreferencesUtil.getBoolean(mContext, "state", "secret_state", false);
         if (isShow) {

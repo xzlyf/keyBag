@@ -124,22 +124,13 @@ public class SqlManager {
     //=============================增
         ContentValues values = new ContentValues();
         values.put("id", "906836");
-        values.put("goodsid", "GoodsId");
-        values.put("goodsname", "联想笔记本电脑通用键盘保护贴膜");
-        values.put("goodslink", "https://detail.tmall.com/item.htm?id=530483020458");
-        values.put("actlink", "https://uland.taobao.com/quan/detail?sellerId=2074630256&activityId=38ba9f89b2df4eac9b1d037951d2ef47");
-        values.put("imgurl", "https://img.alicdn.com/imgextra/i3/2074630256/TB24QnynpXXXXavXpXXXXXXXXXX_!!2074630256.jpg");
-        values.put("actmoney", "1");
-        values.put("previos", "6.8");
-        values.put("later", "5.8");
         SqlManager.insert(mContext,"cart",values);//插入数据
 
 
         //=============================改
         ContentValues values1 = new ContentValues();
         values.put("id", "666666");//需要更新的数据
-        //更新数据，更新goodsname为“联想笔记本电脑通用键盘保护贴膜”行的id中的数据
-        SqlManager.update(mContext, "cart", values, "goodsname = ?", new String[]{"联想笔记本电脑通用键盘保护贴膜"});
+        SqlManager.update(mContext, "cart", values, "goodsname = ?", new String[]{"xxxxxxxxxxxx"});
 
 
         //=============================删
@@ -154,9 +145,6 @@ public class SqlManager {
             do {
                 Logger.w(cursor.getString(cursor.getColumnIndex("id")) + "\n" +
                         cursor.getString(cursor.getColumnIndex("goodsid")) + "\n" +
-                        cursor.getString(cursor.getColumnIndex("goodsname")) + "\n" +
-                        cursor.getString(cursor.getColumnIndex("goodslink")) + "\n" +
-                        cursor.getString(cursor.getColumnIndex("actlink")) + "\n" +
                         cursor.getString(cursor.getColumnIndex("imgurl"))
                 );
             } while (cursor.moveToNext());

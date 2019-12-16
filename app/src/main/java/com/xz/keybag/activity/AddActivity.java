@@ -12,7 +12,6 @@ import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
-import com.xz.utils.RandomString;
 import com.xz.widget.dialog.XOnClickListener;
 import com.xz.widget.dialog.XzTipsDialog;
 
@@ -64,10 +63,10 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
 
                     if (tipsDialog == null) {
                         tipsDialog = new XzTipsDialog.Builder(mContext)
-                                .setContent("\n\n  不保存且退出？\n\n")
+                                .setContent(getString(R.string.string_9))
                                 .setSubmitBtnBackground(0)
                                 .setSubmitTextColor(Color.GRAY)
-                                .setSubmitOnClickListener("不保存", new XOnClickListener() {
+                                .setSubmitOnClickListener(getString(R.string.string_10), new XOnClickListener() {
                                     @Override
                                     public void onClick(int viewId, String s, int position) {
                                         finish();
@@ -75,7 +74,7 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
                                 })
                                 .setCancelBtnBackground(0)
                                 .setCancelTextColor(Color.GRAY)
-                                .setCancelOnclickListener("让我想想", new XOnClickListener() {
+                                .setCancelOnclickListener(getString(R.string.string_11), new XOnClickListener() {
                                     @Override
                                     public void onClick(int viewId, String s, int position) {
                                     }
@@ -113,7 +112,7 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
         String t5 = String.valueOf(System.currentTimeMillis());
 
         if (!checkEmpty(t1, t2, t3, t5)) {
-            sToast("名称,账号和密码不可为空！");
+            sToast(getString(R.string.string_12));
             return;
         }
 
@@ -125,9 +124,9 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
         values.put("t5", EOD.encrypt(t5, Local.secret));
         long i = SqlManager.insert(mContext, "common", values);//插入数据
         if (i == -1) {
-            sToast("存储失败");
+            sToast(getString(R.string.string_13));
         } else {
-            sToast("已存储");
+            sToast(getString(R.string.string_14));
             finish();
         }
     }

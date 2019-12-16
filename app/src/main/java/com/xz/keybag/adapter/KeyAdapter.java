@@ -158,11 +158,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
                     break;
                 case R.id.user_id:
                     copyUtil.copyToClicp(userId.getText().toString());
-                    Toast.makeText(mContext, "已复制账号", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, getString(R.string.string_6), Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.user_psw:
                     copyUtil.copyToClicp(userPsw.getText().toString());
-                    Toast.makeText(mContext, "已复制密码", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, getString(R.string.string_7), Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.delete:
                     int position = getLayoutPosition();
@@ -172,7 +172,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
                     SqlManager.delete(mContext, Local.TABLE_COMMON, "t1=? and t2=? and t3 = ?", new String[]{t1, t2, t3});
                     mList.remove(position);
                     notifyDataSetChanged();
-                    Toast.makeText(mContext, "已删除", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
                     break;
             }
 

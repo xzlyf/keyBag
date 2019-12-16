@@ -53,7 +53,7 @@ public class KeyActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initData() {
-        setTitle("管理");
+        setTitle(R.string.string_16);
 
         submit.setOnClickListener(this);
 
@@ -67,13 +67,13 @@ public class KeyActivity extends BaseActivity implements View.OnClickListener {
             return;
         }
         if (!TextUtils.equals(newPwd.getText().toString().trim(), pwd)) {
-            newLayoutRepeat.setError("密码不一致");
+            newLayoutRepeat.setError(getString(R.string.string_17));
             return;
         }
 
         if (!MD5Util.getMD5(oldPwd.getText().toString().trim()).equals(Local.User.loginPwd)) {
             oldPwd.setText("");
-            oldLayout.setError("旧密码不正确");
+            oldLayout.setError(getString(R.string.string_18));
             return;
         }
 
@@ -96,30 +96,30 @@ public class KeyActivity extends BaseActivity implements View.OnClickListener {
         values.put("p3", RandomString.getRandomString(16, true));
         long i =SqlManager.insert(mContext, "dbase", values);
         if (i==-1){
-            sToast("修改失败");
+            sToast(getString(R.string.string_19));
             return;
         }
         Local.User.loginPwd = md5Pwd;
-        sToast("修改成功");
+        sToast(getString(R.string.string_20));
 
     }
 
 
     private boolean checkEmpty() {
         if (TextUtils.isEmpty(oldPwd.getText())) {
-            oldLayout.setError("不可为空");
+            oldLayout.setError(getString(R.string.string_21));
             return false;
         } else {
             oldLayout.setError("");
         }
         if (TextUtils.isEmpty(newPwd.getText())) {
-            newLayout.setError("不可为空");
+            newLayout.setError(getString(R.string.string_21));
             return false;
         } else {
             newLayout.setError("");
         }
         if (TextUtils.isEmpty(newPwdRepeat.getText())) {
-            newLayoutRepeat.setError("不可为空");
+            newLayoutRepeat.setError(getString(R.string.string_21));
             return false;
         } else {
             newLayoutRepeat.setError("");

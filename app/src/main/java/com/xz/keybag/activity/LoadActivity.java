@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
@@ -51,7 +50,7 @@ public class LoadActivity extends BaseActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == SEND_HINT) {
-                pwdTips.setText("默认密码0000，及时修改");
+                pwdTips.setText((String)msg.obj);
             }
         }
     };
@@ -112,7 +111,7 @@ public class LoadActivity extends BaseActivity {
 
             @Override
             public void onDeviceNotSupport() {
-                tx.setText("设备不支持指纹识别\n请使用密码校验");
+                tx.setText(R.string.string_4);
                 fg_icon.setVisibility(View.GONE);
                 changePwdState();
             }
@@ -196,7 +195,7 @@ public class LoadActivity extends BaseActivity {
             if (temp.equals(Local.User.loginPwd)) {
                 killMySelf();
             } else {
-                pwdTips.setText("密码错误");
+                pwdTips.setText(R.string.string_5);
                 objectAnimator2.start();
             }
 
@@ -225,7 +224,7 @@ public class LoadActivity extends BaseActivity {
             Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
             //如果游标为空则返回false
             if (!cursor.moveToFirst()) {
-                setHint("默认密码0000，及时修改");
+                setHint(getString(R.string.string_3));
                 Local.User.loginPwd = MD5Util.getMD5("0000");
                 return;
             }
