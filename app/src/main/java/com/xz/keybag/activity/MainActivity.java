@@ -54,6 +54,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     Button btn_1;
     @BindView(R.id.btn_2)
     Button btn_2;
+    @BindView(R.id.btn_3)
+    Button btn_3;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     @BindView(R.id.et_search)
@@ -164,12 +166,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(MainActivity.this, AddActivity.class));
                 break;
             case R.id.btn_1:
-                //密钥管理
                 startActivity(new Intent(MainActivity.this, SecretActivity.class));
                 break;
             case R.id.btn_2:
                 startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode", 1));
                 break;
+            case R.id.btn_3:
+                startActivity(new Intent(MainActivity.this, TransmitActivity.class));
+
+                break;
+
 
         }
 
