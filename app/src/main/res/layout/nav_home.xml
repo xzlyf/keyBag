@@ -62,7 +62,7 @@
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="密码搬家" />
+            android:text="备份/导入" />
 
 
     </LinearLayout>

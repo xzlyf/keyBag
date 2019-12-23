@@ -103,6 +103,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvMenu.setOnClickListener(this);
         btn_1.setOnClickListener(this);
         btn_2.setOnClickListener(this);
+        btn_3.setOnClickListener(this);
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
@@ -143,7 +144,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         keyAdapter.setOnItemClickListener(new OnItemClickListener<KeyEntity>() {
             @Override
             public void onItemClick(View view, int position, KeyEntity model) {
-                startActivity(new Intent(MainActivity.this, DetailActivity.class).putExtra("model", model));
+                startActivity(new Intent(MainActivity.this, DetailActivity.class)
+                        .putExtra("model", model));
             }
 
             @Override
@@ -172,6 +174,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode", 1));
                 break;
             case R.id.btn_3:
+                startActivity(new Intent(MainActivity.this, BackupActivity.class));
                 break;
 
 

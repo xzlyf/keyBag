@@ -24,4 +24,5 @@
     <string name="string_22">配置错误</string>
     <string name="string_23">资料修改失败</string>
     <string name="string_24">修改成功</string>
+    <string name="string_25">密钥异常</string>
 </resources>
