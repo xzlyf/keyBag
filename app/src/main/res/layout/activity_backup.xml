@@ -6,4 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".activity.BackupActivity">
 
+
+    <Button
+        android:id="@+id/wlan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="热点传输"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
