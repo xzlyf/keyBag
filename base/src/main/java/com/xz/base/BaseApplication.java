@@ -24,7 +24,7 @@ public class BaseApplication extends Application {
     private void initLog() {
         Logger.init("xzlyf")    //LOG TAG默认是PRETTYLOGGER
                 .methodCount(2)                 // 决定打印多少行（每一行代表一个方法）默认：2
-                .methodOffset(2);             // 默认：0
+                .methodOffset(0);             // 默认：0 方法偏移
     }
 
     public static BaseApplication getInstance() {
