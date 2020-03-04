@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.MD5Util;
+import com.xz.utils.network.NetInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +44,7 @@ import java.util.Scanner;
 
 import butterknife.BindView;
 
-public class BackupActivity extends BaseActivity implements View.OnClickListener {
+public class BackupActivity extends BaseActivity {
 
 
     @BindView(R.id.select_layout)
@@ -89,11 +91,9 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initView() {
-        btnSend.setOnClickListener(this);
-        btnReceive.setOnClickListener(this);
-        //始终保持滚动到底部
-        ScrollView scrollView = findViewById(R.id.scroll_msg);
-        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+        btnSend.setOnClickListener(controlListener);
+        btnReceive.setOnClickListener(controlListener);
+
 
         //默认状态
         labelTips.setVisibility(View.VISIBLE);
@@ -104,27 +104,22 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
 
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_send:
-                if (isShow == 1) {
-                    hideSelectLayout(v);
-                    checkPermission();
-                } else if (isShow == 0) {
-                    showSelectLayout(v);
-                }
-                break;
-            case R.id.btn_receive:
-                if (isShow == 1) {
-                    hideSelectLayout(v);
-                    checkPermission();
-                } else if (isShow == 0) {
-                    showSelectLayout(v);
-                }
-                break;
+    /**
+     * 发送接收按钮事件
+     */
+    private View.OnClickListener controlListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (isShow == 1) {
+                hideSelectLayout(v);
+                checkPermission();
+            } else if (isShow == 0) {
+                StopSocket();
+                showSelectLayout(v);
+                appendMsg("关闭部署");
+            }
         }
-    }
+    };
 
     /**
      * 隐藏选择界面
@@ -238,10 +233,8 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
             //判断是哪个模式进来的
             if (isSR == 0) {
                 btnSend.setText("权限不足");
-                //showSelectLayout(btnSend);
             } else if (isSR == 1) {
                 btnReceive.setText("权限不足");
-                //showSelectLayout(btnReceive);
             }
             return;
         }
@@ -249,19 +242,73 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
         new SendServers().start();
     }
 
+    /**
+     * 停止socket
+     */
+    private void StopSocket() {
+        if (!isMainThread()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    StopSocket();
+                }
+            });
+            return;
+        }
+
+        if (is != null) {
+            try {
+                is.close();
+                appendMsg("输入流off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("输入流error");
+
+            }
+        }
+        if (out != null) {
+            try {
+                out.close();
+                appendMsg("输出流off");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("输出流error");
+            }
+        }
+        if (server != null) {
+            try {
+                server.close();
+                appendMsg("服务端off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("服务端error");
+
+            }
+        }
+
+        if (isSR == 1) {
+            showSelectLayout(btnReceive);
+        } else if (isShow == 0) {
+            showSelectLayout(btnSend);
+        }
+    }
 
     private ServerSocket server;
     private Socket socket;
+    private OutputStream out = null;
+    private InputStream is = null;
 
     /**
      * ServerSocket=========================================================================
      */
     private class SendServers extends Thread {
         //默认端口，随机分配
-        int[] ports = {5555, 6666, 7777, 8888, 9999, 29766, 6024, 7096, 8686, 9696, 2324, 6430, 14538};
+        int[] ports = {29766, 6024, 7096, 8686, 9696, 2324, 6430, 14538};
 
         //无连接超时
         final int TIME_OUT = 5 * 60 * 1000;
+//        final int TIME_OUT = 5 * 1000;
 
         /**
          * 使用 socket.shutdownInput可以通知服务器关闭输入流
@@ -277,24 +324,32 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
         private void doConnect() {
             appendMsg("开始创建服务端");
             Random random = new Random();
-            int port = ports[random.nextInt(ports.length - 1)];
+//            int port = ports[random.nextInt(ports.length - 1)];
+            int port = 45678;
             try {
                 server = new ServerSocket(port);
                 server.setSoTimeout(TIME_OUT);//超时时间
                 appendMsg("创建成功，等待接入...");
-                appendMsg("本机ip：" + server.getLocalSocketAddress());
+                appendMsg("本机ip：" + (NetInfo.isWifiEnabled(mContext) ? NetInfo.getIpInWifi(mContext) : NetInfo.getIpInGPRS() + "（非WIFI）"));
                 appendMsg("端口：" + server.getLocalPort());
                 socket = server.accept();
                 appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
                 new InputThread().start();
                 new OutputThread().start();
+
+
             } catch (SocketException e) {
+                e.printStackTrace();
                 appendMsg("超时，将关闭");
+                StopSocket();
+
 
             } catch (IOException e) {
                 appendMsg("创建失败，3秒后再次创建...");
                 SystemClock.sleep(3000);//3秒后再次创建
                 doConnect();
+            } catch (Exception e) {
+                appendMsg("致命错误：" + e.getMessage());
             }
 
         }
@@ -306,7 +361,6 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
         @Override
         public void run() {
             super.run();
-            InputStream is = null;
             try {
                 is = socket.getInputStream();
                 byte[] buff = new byte[1024];
@@ -321,17 +375,6 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
             }
 
 
-            try {
-                if (is != null) {
-                    is.close();
-                    appendMsg("接收关闭");
-                }
-            } catch (IOException e) {
-                appendMsg("输入流关闭异常");
-                e.printStackTrace();
-            }
-
-
         }
     }
 
@@ -339,19 +382,13 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
         @Override
         public void run() {
             super.run();
-            OutputStream out = null;
+
             try {
                 if (socket != null) {
                     out = socket.getOutputStream();
                     String in = "Hello world";
                     out.write(("server saying: " + in).getBytes());
                     out.flush();// 清空缓存区的内容
-                    //try {
-                    //    socket.shutdownOutput();
-                    //    out.close();
-                    //} catch (IOException e) {
-                    //    e.printStackTrace();
-                    //}
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -445,5 +482,15 @@ public class BackupActivity extends BaseActivity implements View.OnClickListener
         message.obj = msg + "\n";
         handler.sendMessage(message);
     }
+
+    /**
+     * 是否在主线程
+     *
+     * @return
+     */
+    private boolean isMainThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
+    }
+
 
 }

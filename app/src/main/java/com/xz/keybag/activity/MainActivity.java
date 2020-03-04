@@ -30,9 +30,9 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.utils.network.NetInfo;
 import com.xz.widget.textview.SearchEditView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
