@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -29,20 +31,25 @@ import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.MD5Util;
+import com.xz.utils.hardware.SystemInfoUtil;
 import com.xz.utils.network.NetInfo;
+import com.xz.widget.textview.IpEditView;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Random;
-import java.util.Scanner;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class BackupActivity extends BaseActivity {
 
@@ -57,10 +64,24 @@ public class BackupActivity extends BaseActivity {
     TextView labelTips;
     @BindView(R.id.tv_msg)
     TextView tvMsg;
+    @BindView(R.id.et_ip)
+    IpEditView etIp;
+    @BindView(R.id.et_port)
+    EditText etPort;
+    @BindView(R.id.input_layout)
+    LinearLayout inputLayout;
+    @BindView(R.id.scroll_msg)
+    ScrollView scrollMsg;
+    @BindView(R.id.btn_connect)
+    Button btnConnect;
 
     private int isShow = 1;//页面状态  //0隐藏 1展开
     private int isSR = -1;//socket模式  //0发送 1接收 -1未选择
     private final int MSG = 110;
+    private final String REGEX_IP = "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
+            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$";
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -68,6 +89,9 @@ public class BackupActivity extends BaseActivity {
             switch (msg.what) {
                 case MSG:
                     tvMsg.append((String) msg.obj);
+                    //始终滚动到底部
+                    //scrollMsg.scrollTo(0, tvMsg.getBottom());
+                    tvMsg.scrollTo(0, tvMsg.getBottom());
                     break;
             }
 
@@ -93,9 +117,47 @@ public class BackupActivity extends BaseActivity {
     private void initView() {
         btnSend.setOnClickListener(controlListener);
         btnReceive.setOnClickListener(controlListener);
+        btnConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //测试关闭
+                /*
 
+                //空检测
+                if (etPort.getText().toString().trim().equals("") || etIp.getIp().trim().equals("")) {
+                    return;
+                }
+
+                //ip检测
+                String host = etIp.getIp();
+                if (!host.matches(REGEX_IP)) {
+                    sToast("ip格式错误");
+                    return;
+                }
+                //端口检测
+                int port;
+                try {
+                    port = Integer.valueOf(etPort.getText().toString().trim());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    sToast("端口异常");
+                    return;
+                }
+                if (!(port > 1024 && port <= 65535)) {
+                    sToast("端口范围:1024-65535");
+                    return;
+                }
+                */
+                String host = "192.168.1.72";
+                int port = 6666;
+                btnConnect.setEnabled(false);
+                appendMsg("正在连接" + host + ":" + port);
+                new SocketClient(host, port).start();
+            }
+        });
 
         //默认状态
+        inputLayout.setVisibility(View.GONE);
         labelTips.setVisibility(View.VISIBLE);
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) selectLayout.getLayoutParams();
         lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -134,6 +196,7 @@ public class BackupActivity extends BaseActivity {
         } else if (v.getId() == R.id.btn_receive) {
             isSR = 1;//切换模式
             btnSend.setVisibility(View.GONE);
+            inputLayout.setVisibility(View.VISIBLE);
         }
         v.setBackgroundResource(R.drawable.btn_rect_3);
         ((Button) v).setText("正在部署...");
@@ -168,26 +231,13 @@ public class BackupActivity extends BaseActivity {
             btnReceive.setBackgroundResource(R.drawable.btn_rect_2);
             btnReceive.setText("接收");
             btnSend.setVisibility(View.VISIBLE);
+            inputLayout.setVisibility(View.GONE);
         }
 
         labelTips.setVisibility(View.VISIBLE);
 
     }
 
-    /**
-     * 播放动画
-     *
-     * @param view
-     */
-    private void beginDelayedTransition(ViewGroup view) {
-
-        TransitionSet mSet = new AutoTransition();
-        //设置动画持续时间
-        mSet.setDuration(300);
-        mSet.setInterpolator(new DecelerateInterpolator(0.8f));
-        // 开始播放
-        TransitionManager.beginDelayedTransition(view, mSet);
-    }
 
     /**
      * 检查权限
@@ -224,80 +274,39 @@ public class BackupActivity extends BaseActivity {
 
 
     /**
-     * 创建serverSocket
+     * 创建服务
      *
      * @param hasPermission
      */
     private void createSocket(boolean hasPermission) {
-        if (!hasPermission) {
-            //判断是哪个模式进来的
-            if (isSR == 0) {
+        //判断是哪个模式进来的
+        if (isSR == 0) {
+            if (!hasPermission) {
                 btnSend.setText("权限不足");
-            } else if (isSR == 1) {
+            } else {
+                new SendServers().start();
+            }
+        } else if (isSR == 1) {
+            if (!hasPermission) {
                 btnReceive.setText("权限不足");
             }
-            return;
         }
 
-        new SendServers().start();
     }
 
-    /**
-     * 停止socket
-     */
-    private void StopSocket() {
-        if (!isMainThread()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    StopSocket();
-                }
-            });
-            return;
-        }
-
-        if (is != null) {
-            try {
-                is.close();
-                appendMsg("输入流off");
-            } catch (IOException e) {
-                e.printStackTrace();
-                appendMsg("输入流error");
-
-            }
-        }
-        if (out != null) {
-            try {
-                out.close();
-                appendMsg("输出流off");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                appendMsg("输出流error");
-            }
-        }
-        if (server != null) {
-            try {
-                server.close();
-                appendMsg("服务端off");
-            } catch (IOException e) {
-                e.printStackTrace();
-                appendMsg("服务端error");
-
-            }
-        }
-
-        if (isSR == 1) {
-            showSelectLayout(btnReceive);
-        } else if (isShow == 0) {
-            showSelectLayout(btnSend);
-        }
-    }
 
     private ServerSocket server;
     private Socket socket;
     private OutputStream out = null;
     private InputStream is = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
+    }
+
 
     /**
      * ServerSocket=========================================================================
@@ -357,6 +366,9 @@ public class BackupActivity extends BaseActivity {
 
     }
 
+    /**
+     * 输入流
+     */
     private class InputThread extends Thread {
         @Override
         public void run() {
@@ -378,6 +390,9 @@ public class BackupActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 输出流
+     */
     private class OutputThread extends Thread {
         @Override
         public void run() {
@@ -395,6 +410,113 @@ public class BackupActivity extends BaseActivity {
             }
         }
     }
+
+    /**
+     * 客户端
+     */
+    private class SocketClient extends Thread {
+        final int TIME_OUT = 3*10*1000;
+        String host;
+        int port;
+
+        SocketClient(String host, int port) {
+            this.host = host;
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            try {
+                socket = new Socket();
+                SocketAddress socketAddress = new InetSocketAddress(host,port);
+                socket.connect(socketAddress,TIME_OUT);
+            } catch (UnknownHostException e) {
+                e.getStackTrace();
+                appendMsg("连接失败：无法确定主机的IP地址");
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("连接断开");
+                return;
+            }
+
+            //获取必要信息
+            String hrefMsg = getInfo();
+
+            Logger.w(hrefMsg);
+
+        }
+
+        /**
+         * 读取必要信息
+         *
+         * @return
+         */
+        private String getInfo() {
+
+            return SystemInfoUtil.getSystemMake()
+                    + "_" + SystemInfoUtil.getSystemModel()
+                    + "_" + SystemInfoUtil.getDeviceBrand()
+                    + "_" + SystemInfoUtil.getSystemVersion()
+                    + "_" + SystemInfoUtil.getIMEI(mContext);
+
+        }
+    }
+
+
+    /**
+     * 停止socket服务
+     */
+    private void StopSocket() {
+        if (!isMainThread()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    StopSocket();
+                }
+            });
+            return;
+        }
+
+        if (is != null) {
+            try {
+                is.close();
+                appendMsg("输入流off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("输入流error");
+
+            }
+        }
+        if (out != null) {
+            try {
+                out.close();
+                appendMsg("输出流off");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("输出流error");
+            }
+        }
+        if (server != null) {
+            try {
+                server.close();
+                appendMsg("服务端off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("服务端error");
+
+            }
+        }
+
+        if (isSR == 1) {
+            showSelectLayout(btnReceive);
+        } else if (isShow == 0) {
+            showSelectLayout(btnSend);
+        }
+    }
+
 
     /**
      * 本地数据读取===============================================================================
@@ -475,6 +597,21 @@ public class BackupActivity extends BaseActivity {
      * 工具类=================================================================================
      */
 
+
+    /**
+     * 播放动画
+     *
+     * @param view
+     */
+    private void beginDelayedTransition(ViewGroup view) {
+
+        TransitionSet mSet = new AutoTransition();
+        //设置动画持续时间
+        mSet.setDuration(300);
+        mSet.setInterpolator(new DecelerateInterpolator(0.8f));
+        // 开始播放
+        TransitionManager.beginDelayedTransition(view, mSet);
+    }
 
     private void appendMsg(String msg) {
         Message message = handler.obtainMessage();

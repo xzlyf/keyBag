@@ -51,7 +51,7 @@
             android:background="@drawable/background_yuanjiao_3"
             android:paddingStart="5dp"
             android:paddingEnd="10dp"
-            android:text="❗在同一个WIFI环境下进行操作"
+            android:text="！在同一个WIFI环境下进行操作"
             android:textColor="@color/primary_text"
             android:visibility="gone" />
     </LinearLayout>
@@ -62,6 +62,68 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:id="@+id/input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_40"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/dp_20"
+                android:background="@drawable/background_yuanjiao_3"
+                android:paddingStart="5dp"
+                android:paddingEnd="10dp"
+                android:text="！输入IP端口连接发送端 "
+                android:textColor="@color/primary_text"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.xz.widget.textview.IpEditView
+                    android:id="@+id/et_ip"
+                    android:layout_width="@dimen/dp_220"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":"
+                    android:textColor="@color/primary_text"
+                    android:textSize="22sp" />
+
+                <EditText
+                    android:id="@+id/et_port"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:inputType="numberSigned"
+                    android:maxLength="5"
+                    android:maxLines="1" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_connect"
+                android:layout_width="@dimen/dp_100"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_40"
+                android:layout_marginBottom="@dimen/dp_10"
+                android:background="@drawable/btn_connect"
+                android:text="连接"
+                android:textColor="@color/white" />
+
+
+        </LinearLayout>
+
         <ScrollView
             android:id="@+id/scroll_msg"
             android:layout_width="match_parent"
@@ -70,10 +132,11 @@
             <TextView
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp" />
+                android:overScrollMode="never" />
         </ScrollView>
     </LinearLayout>
 
