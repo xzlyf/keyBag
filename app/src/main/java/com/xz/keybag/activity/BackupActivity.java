@@ -46,6 +46,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 import butterknife.BindView;
@@ -74,6 +75,8 @@ public class BackupActivity extends BaseActivity {
     ScrollView scrollMsg;
     @BindView(R.id.btn_connect)
     Button btnConnect;
+    @BindView(R.id.btn_break)
+    Button btnBreak;
 
     private int isShow = 1;//页面状态  //0隐藏 1展开
     private int isSR = -1;//socket模式  //0发送 1接收 -1未选择
@@ -155,8 +158,20 @@ public class BackupActivity extends BaseActivity {
                 new SocketClient(host, port).start();
             }
         });
+        //断开按钮
+        btnBreak.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                stopSocket();
+                btnBreak.setVisibility(View.GONE);
+                btnConnect.setEnabled(true);
+                btnConnect.setVisibility(View.VISIBLE);
+            }
+        });
 
         //默认状态
+        btnBreak.setVisibility(View.GONE);
         inputLayout.setVisibility(View.GONE);
         labelTips.setVisibility(View.VISIBLE);
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) selectLayout.getLayoutParams();
@@ -176,7 +191,7 @@ public class BackupActivity extends BaseActivity {
                 hideSelectLayout(v);
                 checkPermission();
             } else if (isShow == 0) {
-                StopSocket();
+                stopSocket();
                 showSelectLayout(v);
                 appendMsg("关闭部署");
             }
@@ -350,7 +365,7 @@ public class BackupActivity extends BaseActivity {
             } catch (SocketException e) {
                 e.printStackTrace();
                 appendMsg("超时，将关闭");
-                StopSocket();
+                stopSocket();
 
 
             } catch (IOException e) {
@@ -394,6 +409,7 @@ public class BackupActivity extends BaseActivity {
      * 输出流
      */
     private class OutputThread extends Thread {
+
         @Override
         public void run() {
             super.run();
@@ -401,23 +417,40 @@ public class BackupActivity extends BaseActivity {
             try {
                 if (socket != null) {
                     out = socket.getOutputStream();
-                    String in = "Hello world";
-                    out.write(("server saying: " + in).getBytes());
-                    out.flush();// 清空缓存区的内容
                 }
+            } catch (SocketException e) {
+                e.printStackTrace();
+                appendMsg(e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg(e.getMessage());
+            }
+
+
+        }
+
+
+        void send(String data) {
+            try {
+                out.write(data.getBytes(Charset.forName("UTF-8")));
+                out.flush();// 清空缓存区的内容
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
+
+
     }
 
     /**
      * 客户端
      */
     private class SocketClient extends Thread {
-        final int TIME_OUT = 3*10*1000;
+        final int TIME_OUT = 3 * 10 * 1000;
         String host;
         int port;
+
 
         SocketClient(String host, int port) {
             this.host = host;
@@ -429,8 +462,8 @@ public class BackupActivity extends BaseActivity {
             super.run();
             try {
                 socket = new Socket();
-                SocketAddress socketAddress = new InetSocketAddress(host,port);
-                socket.connect(socketAddress,TIME_OUT);
+                SocketAddress socketAddress = new InetSocketAddress(host, port);
+                socket.connect(socketAddress, TIME_OUT);
             } catch (UnknownHostException e) {
                 e.getStackTrace();
                 appendMsg("连接失败：无法确定主机的IP地址");
@@ -441,39 +474,53 @@ public class BackupActivity extends BaseActivity {
                 return;
             }
 
-            //获取必要信息
-            String hrefMsg = getInfo();
+            appendMsg("连接成功");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    btnConnect.setVisibility(View.GONE);
+                    btnBreak.setVisibility(View.VISIBLE);
+                }
+            });
 
-            Logger.w(hrefMsg);
+            //开启输出流
+            OutputThread ot = new OutputThread();
+            ot.start();
+            try {
+                ot.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //发送必要信息
+            ot.send(SystemInfoUtil.getInfo(mContext));
+            SystemClock.sleep(1000);
+            ot.send("ready");
+            try {
+                socket.shutdownOutput();
+                ot.interrupt();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //开启输入流
+            InputThread it = new InputThread();
+            it.start();
 
         }
 
-        /**
-         * 读取必要信息
-         *
-         * @return
-         */
-        private String getInfo() {
 
-            return SystemInfoUtil.getSystemMake()
-                    + "_" + SystemInfoUtil.getSystemModel()
-                    + "_" + SystemInfoUtil.getDeviceBrand()
-                    + "_" + SystemInfoUtil.getSystemVersion()
-                    + "_" + SystemInfoUtil.getIMEI(mContext);
-
-        }
     }
 
 
     /**
      * 停止socket服务
      */
-    private void StopSocket() {
+    private void stopSocket() {
         if (!isMainThread()) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    StopSocket();
+                    stopSocket();
                 }
             });
             return;
@@ -497,6 +544,16 @@ public class BackupActivity extends BaseActivity {
             } catch (IOException e) {
                 e.printStackTrace();
                 appendMsg("输出流error");
+            }
+        }
+        if (socket != null) {
+            try {
+                socket.close();
+                appendMsg("客户端off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("客户端error");
+
             }
         }
         if (server != null) {
