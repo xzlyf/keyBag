@@ -30,6 +30,7 @@ import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.utils.ArrayUtil;
 import com.xz.utils.MD5Util;
 import com.xz.utils.hardware.SystemInfoUtil;
 import com.xz.utils.network.NetInfo;
@@ -47,6 +48,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Random;
 
 import butterknife.BindView;
@@ -151,8 +153,8 @@ public class BackupActivity extends BaseActivity {
                     return;
                 }
                 */
-                String host = "192.168.1.72";
-                int port = 6666;
+                String host = "192.168.0.102";
+                int port = 45678;
                 btnConnect.setEnabled(false);
                 appendMsg("正在连接" + host + ":" + port);
                 new SocketClient(host, port).start();
@@ -357,11 +359,6 @@ public class BackupActivity extends BaseActivity {
                 appendMsg("本机ip：" + (NetInfo.isWifiEnabled(mContext) ? NetInfo.getIpInWifi(mContext) : NetInfo.getIpInGPRS() + "（非WIFI）"));
                 appendMsg("端口：" + server.getLocalPort());
                 socket = server.accept();
-                appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
-                new InputThread().start();
-                new OutputThread().start();
-
-
             } catch (SocketException e) {
                 e.printStackTrace();
                 appendMsg("超时，将关闭");
@@ -375,6 +372,45 @@ public class BackupActivity extends BaseActivity {
             } catch (Exception e) {
                 appendMsg("致命错误：" + e.getMessage());
             }
+            appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
+
+            //输出流
+            OutputThread ot = new OutputThread();
+            ot.start();
+            try {
+                ot.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            ot.send("欢迎加入");
+
+            //输入流
+            InputThread it = new InputThread();
+            it.start();
+            it.callBack(new ReadCallBack() {
+                @Override
+                public void respond(String data) {
+                    appendMsg("数据：" + data);
+                    if (data.equals("ready")) {
+                        appendMsg("服务端准备好了！");
+
+                        LocalDataThread getDataThread = new LocalDataThread();
+                        getDataThread.start();
+                        getDataThread.callBack(new ReadCallBack() {
+                            @Override
+                            public void respond(String Data) {
+
+                                ot.send(Data);
+                                SystemClock.sleep(1000);
+                                ot.send("over");
+                                appendMsg("传输完毕");
+
+                            }
+                        });
+                    }
+                }
+            });
+
 
         }
 
@@ -385,6 +421,9 @@ public class BackupActivity extends BaseActivity {
      * 输入流
      */
     private class InputThread extends Thread {
+        private ReadCallBack callBackListener;
+        private StringBuffer sBuffer = new StringBuffer();
+
         @Override
         public void run() {
             super.run();
@@ -394,8 +433,10 @@ public class BackupActivity extends BaseActivity {
                 int len = 0;
                 appendMsg("---开始接收数据---");
                 while ((len = is.read(buff)) != -1) {
-                    appendMsg("数据：" + new String(buff, 0, len));
+//                    appendMsg("数据：" + new String(buff, 0, len));
+                    callBackListener.respond(new String(buff, 0, len));
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 appendMsg("数据接收异常:" + e.getMessage());
@@ -403,7 +444,12 @@ public class BackupActivity extends BaseActivity {
 
 
         }
+
+        public void callBack(ReadCallBack callBack) {
+            this.callBackListener = callBack;
+        }
     }
+
 
     /**
      * 输出流
@@ -418,9 +464,6 @@ public class BackupActivity extends BaseActivity {
                 if (socket != null) {
                     out = socket.getOutputStream();
                 }
-            } catch (SocketException e) {
-                e.printStackTrace();
-                appendMsg(e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
                 appendMsg(e.getMessage());
@@ -438,6 +481,22 @@ public class BackupActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
+        }
+
+
+        /**
+         * 待测试
+         */
+        /**
+         * 切割长度
+         * @param b
+         * @return
+         */
+        public List<byte[]> optByte(byte[] b) {
+            if (b.length > 255) {
+                return ArrayUtil.optByte(255,b);
+            }
+            return null;
         }
 
 
@@ -578,15 +637,14 @@ public class BackupActivity extends BaseActivity {
     /**
      * 本地数据读取===============================================================================
      */
-    private class ReadThread extends Thread {
+    private class LocalDataThread extends Thread {
+        private ReadCallBack callBackListener;
+
         @Override
         public void run() {
             super.run();
 
-            if (Local.secret == null) {
-                Logger.w(getString(R.string.string_25));
-                return;
-            }
+
             Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_COMMON);
             //如果游标为空则返回false
             if (!cursor.moveToFirst()) {
@@ -611,14 +669,20 @@ public class BackupActivity extends BaseActivity {
             cursor.close();
             Logger.w(builder.toString());
 
-            try {
+            /*try {
                 save(builder);
                 Logger.w("成功");
             } catch (IOException e) {
                 e.printStackTrace();
                 Logger.w("失败");
-            }
+            }*/
 
+            callBackListener.respond(builder.toString());
+
+        }
+
+        public void callBack(ReadCallBack callBack) {
+            this.callBackListener = callBack;
         }
 
         private String save(StringBuilder builder) throws IOException {
@@ -683,7 +747,12 @@ public class BackupActivity extends BaseActivity {
      * @return
      */
     private boolean isMainThread() {
+
         return Looper.getMainLooper() == Looper.myLooper();
+    }
+
+    interface ReadCallBack {
+        void respond(String Data);
     }
 
 
