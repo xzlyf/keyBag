@@ -4,22 +4,30 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Rect;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.transition.AutoTransition;
@@ -33,6 +41,7 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.ArrayUtil;
 import com.xz.utils.MD5Util;
+import com.xz.utils.ViewUtil;
 import com.xz.utils.hardware.SystemInfoUtil;
 import com.xz.utils.network.NetInfo;
 import com.xz.widget.textview.IpEditView;
@@ -81,7 +90,13 @@ public class BackupActivity extends BaseActivity {
     Button btnConnect;
     @BindView(R.id.btn_break)
     Button btnBreak;
+    @BindView(R.id.img_down)
+    ImageView imgDonw;
 
+    //状态栏高度
+    private int stateBarHeight;
+    //标题栏高度
+    private int contentHeight;
     private int isShow = 1;//页面状态  //0隐藏 1展开
     private int isSR = -1;//socket模式  //0发送 1接收 -1未选择
     private final int MSG = 110;
@@ -182,6 +197,57 @@ public class BackupActivity extends BaseActivity {
         lp.width = LinearLayout.LayoutParams.MATCH_PARENT;
         selectLayout.setLayoutParams(lp);
 
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) selectLayout.getLayoutParams();
+
+
+        imgDonw.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        Log.d(TAG, "onTouch: x:" + event.getRawX() + "  y:" + event.getY());
+
+                        layoutParams.height = ((int) event.getRawY() - stateBarHeight - contentHeight);
+                        selectLayout.setLayoutParams(layoutParams);
+
+
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        //需要滑动至屏幕一半才完全展开
+                        if (event.getRawY() >= ViewUtil.getScreenSizeV2(BackupActivity.this)[1] / 2) {
+                            layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
+                            selectLayout.setLayoutParams(layoutParams);
+                            beginDelayedTransition(selectLayout);
+                        } else {
+                            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                            selectLayout.setLayoutParams(layoutParams);
+                            beginDelayedTransition(selectLayout);
+
+                            if (isSR == 0) {
+                                showSelectLayout(btnSend);
+                            } else if (isShow == 1) {
+                                showSelectLayout(btnReceive);
+                            }
+
+                            stopSocket();
+
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
+    }
+
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        contentHeight = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
+        //状态栏高度
+        stateBarHeight = ViewUtil.getStatusBarHeight(mContext);
     }
 
     /**
@@ -581,10 +647,10 @@ public class BackupActivity extends BaseActivity {
                 @Override
                 public void respond(String data) {
                     appendMsg(data);
-                    if (data.equals("over")){
+                    if (data.equals("over")) {
                         dataWriteThread.setResData(dataCache.toString());
                         dataWriteThread.start();
-                    }else{
+                    } else {
                         dataCache.append(data);
                     }
                 }
@@ -632,15 +698,15 @@ public class BackupActivity extends BaseActivity {
      * 停止socket服务
      */
     private void stopSocket() {
-        if (!isMainThread()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    stopSocket();
-                }
-            });
-            return;
-        }
+        //if (!isMainThread()) {
+        //    runOnUiThread(new Runnable() {
+        //        @Override
+        //        public void run() {
+        //            stopSocket();
+        //        }
+        //    });
+        //    return;
+        //}
 
         if (is != null) {
             try {
@@ -683,11 +749,13 @@ public class BackupActivity extends BaseActivity {
             }
         }
 
-        if (isSR == 1) {
-            showSelectLayout(btnReceive);
-        } else if (isShow == 0) {
-            showSelectLayout(btnSend);
-        }
+        appendMsg("已释放资源");
+
+        //if (isSR == 1) {
+        //    showSelectLayout(btnReceive);
+        //} else if (isShow == 0) {
+        //    showSelectLayout(btnSend);
+        //}
     }
 
 
