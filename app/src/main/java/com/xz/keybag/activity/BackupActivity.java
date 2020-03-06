@@ -1,6 +1,7 @@
 package com.xz.keybag.activity;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
@@ -48,6 +49,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 
@@ -95,8 +97,7 @@ public class BackupActivity extends BaseActivity {
                 case MSG:
                     tvMsg.append((String) msg.obj);
                     //始终滚动到底部
-                    //scrollMsg.scrollTo(0, tvMsg.getBottom());
-                    tvMsg.scrollTo(0, tvMsg.getBottom());
+                    tvMsg.scrollTo(0, tvMsg.getMeasuredHeight());
                     break;
             }
 
@@ -153,7 +154,7 @@ public class BackupActivity extends BaseActivity {
                     return;
                 }
                 */
-                String host = "192.168.0.102";
+                String host = "192.168.1.157";
                 int port = 45678;
                 btnConnect.setEnabled(false);
                 appendMsg("正在连接" + host + ":" + port);
@@ -301,7 +302,7 @@ public class BackupActivity extends BaseActivity {
             if (!hasPermission) {
                 btnSend.setText("权限不足");
             } else {
-                new SendServers().start();
+                new SocketServers().start();
             }
         } else if (isSR == 1) {
             if (!hasPermission) {
@@ -317,6 +318,8 @@ public class BackupActivity extends BaseActivity {
     private OutputStream out = null;
     private InputStream is = null;
 
+    private final int SEND_SIZE = 128;//限制传输和接收大小
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -328,13 +331,14 @@ public class BackupActivity extends BaseActivity {
     /**
      * ServerSocket=========================================================================
      */
-    private class SendServers extends Thread {
+    private class SocketServers extends Thread {
+        LocalDataReadThread getDataThread;
+        OutputThread ot;
+        InputThread it;
         //默认端口，随机分配
         int[] ports = {29766, 6024, 7096, 8686, 9696, 2324, 6430, 14538};
-
-        //无连接超时
+        //超时
         final int TIME_OUT = 5 * 60 * 1000;
-//        final int TIME_OUT = 5 * 1000;
 
         /**
          * 使用 socket.shutdownInput可以通知服务器关闭输入流
@@ -374,40 +378,44 @@ public class BackupActivity extends BaseActivity {
             }
             appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
 
+
             //输出流
-            OutputThread ot = new OutputThread();
+            ot = new OutputThread();
             ot.start();
             try {
                 ot.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ot.send("欢迎加入");
 
             //输入流
-            InputThread it = new InputThread();
+            it = new InputThread();
             it.start();
+            appendMsg("开始接收数据");
             it.callBack(new ReadCallBack() {
                 @Override
                 public void respond(String data) {
                     appendMsg("数据：" + data);
                     if (data.equals("ready")) {
                         appendMsg("服务端准备好了！");
-
-                        LocalDataThread getDataThread = new LocalDataThread();
                         getDataThread.start();
-                        getDataThread.callBack(new ReadCallBack() {
-                            @Override
-                            public void respond(String Data) {
 
-                                ot.send(Data);
-                                SystemClock.sleep(1000);
-                                ot.send("over");
-                                appendMsg("传输完毕");
-
-                            }
-                        });
                     }
+                }
+            });
+
+            //读取数据
+            getDataThread = new LocalDataReadThread();
+            getDataThread.callBack(new ReadCallBack() {
+                @Override
+                public void respond(String Data) {
+
+                    ot.send(Data);
+                    SystemClock.sleep(2000);
+                    ot.send("over");
+                    appendMsg("传输完毕");
+
+
                 }
             });
 
@@ -422,16 +430,14 @@ public class BackupActivity extends BaseActivity {
      */
     private class InputThread extends Thread {
         private ReadCallBack callBackListener;
-        private StringBuffer sBuffer = new StringBuffer();
 
         @Override
         public void run() {
             super.run();
             try {
                 is = socket.getInputStream();
-                byte[] buff = new byte[1024];
+                byte[] buff = new byte[SEND_SIZE];
                 int len = 0;
-                appendMsg("---开始接收数据---");
                 while ((len = is.read(buff)) != -1) {
 //                    appendMsg("数据：" + new String(buff, 0, len));
                     callBackListener.respond(new String(buff, 0, len));
@@ -474,27 +480,50 @@ public class BackupActivity extends BaseActivity {
 
 
         void send(String data) {
+
+            List<byte[]> base = optByte(data.getBytes());
             try {
-                out.write(data.getBytes(Charset.forName("UTF-8")));
-                out.flush();// 清空缓存区的内容
+                if (base != null) {
+                    //分段输出
+                    //for (byte[] b : base) {
+                    //    out.write(b);
+                    //    out.flush();
+                    //    SystemClock.sleep(200);
+                    //}
+
+                    //分段输出
+                    DecimalFormat df = new DecimalFormat("#0.00");
+                    int total = base.size();
+                    for (int i = 0; i < base.size(); i++) {
+
+                        out.write(base.get(i));
+                        out.flush();
+                        SystemClock.sleep(200);
+                        appendMsg("已传输：" + df.format((((float) i / (float) total) * 100)) + "%");
+                    }
+
+                } else {
+                    //一次性写入
+                    out.write(data.getBytes(Charset.forName("UTF-8")));
+                    out.flush();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+
         }
 
-
-        /**
-         * 待测试
-         */
         /**
          * 切割长度
+         * 不可操作 SEND_SIZE 长度进行传输
+         *
          * @param b
          * @return
          */
         public List<byte[]> optByte(byte[] b) {
-            if (b.length > 255) {
-                return ArrayUtil.optByte(255,b);
+            if (b.length > SEND_SIZE) {
+                return ArrayUtil.optByte(SEND_SIZE, b);
             }
             return null;
         }
@@ -503,13 +532,16 @@ public class BackupActivity extends BaseActivity {
     }
 
     /**
-     * 客户端
+     * 客户端 client
      */
     private class SocketClient extends Thread {
         final int TIME_OUT = 3 * 10 * 1000;
         String host;
         int port;
-
+        LocalDataWriteThread dataWriteThread = new LocalDataWriteThread();
+        InputThread it = new InputThread();
+        OutputThread ot = new OutputThread();
+        StringBuffer dataCache = new StringBuffer();
 
         SocketClient(String host, int port) {
             this.host = host;
@@ -542,8 +574,36 @@ public class BackupActivity extends BaseActivity {
                 }
             });
 
+            //开启输入流
+            it.start();
+            appendMsg("开始接收数据");
+            it.callBack(new ReadCallBack() {
+                @Override
+                public void respond(String data) {
+                    appendMsg(data);
+                    if (data.equals("over")){
+                        dataWriteThread.setResData(dataCache.toString());
+                        dataWriteThread.start();
+                    }else{
+                        dataCache.append(data);
+                    }
+                }
+            });
+
+            dataWriteThread.addCallback(new WriteCallBack() {
+                @Override
+                public void success(int num) {
+                    appendMsg("数据存储完毕");
+                    stopSocket();
+                }
+
+                @Override
+                public void failed() {
+
+                }
+            });
             //开启输出流
-            OutputThread ot = new OutputThread();
+
             ot.start();
             try {
                 ot.join();
@@ -561,9 +621,6 @@ public class BackupActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
-            //开启输入流
-            InputThread it = new InputThread();
-            it.start();
 
         }
 
@@ -637,8 +694,10 @@ public class BackupActivity extends BaseActivity {
     /**
      * 本地数据读取===============================================================================
      */
-    private class LocalDataThread extends Thread {
+    private class LocalDataReadThread extends Thread {
         private ReadCallBack callBackListener;
+        private StringBuffer buffer = new StringBuffer();
+        //private int num = 0;
 
         @Override
         public void run() {
@@ -653,31 +712,48 @@ public class BackupActivity extends BaseActivity {
             }
             String rowSeparator = "#";
             String lineSeparator = "@";
-            StringBuilder builder = new StringBuilder();
             do {
-                builder.append(cursor.getString(cursor.getColumnIndex("t1")));
-                builder.append(rowSeparator);
-                builder.append(cursor.getString(cursor.getColumnIndex("t2")));
-                builder.append(rowSeparator);
-                builder.append(cursor.getString(cursor.getColumnIndex("t3")));
-                builder.append(rowSeparator);
-                builder.append(cursor.getString(cursor.getColumnIndex("t4")));
-                builder.append(rowSeparator);
-                builder.append(cursor.getString(cursor.getColumnIndex("t5")));
-                builder.append(lineSeparator);
+                buffer.append(cursor.getString(cursor.getColumnIndex("t1")));
+                buffer.append(rowSeparator);
+                buffer.append(cursor.getString(cursor.getColumnIndex("t2")));
+                buffer.append(rowSeparator);
+                buffer.append(cursor.getString(cursor.getColumnIndex("t3")));
+                buffer.append(rowSeparator);
+                buffer.append(cursor.getString(cursor.getColumnIndex("t4")));
+                buffer.append(rowSeparator);
+                buffer.append(cursor.getString(cursor.getColumnIndex("t5")));
+                buffer.append(lineSeparator);
+                //num++;
             } while (cursor.moveToNext());
             cursor.close();
-            Logger.w(builder.toString());
 
-            /*try {
-                save(builder);
-                Logger.w("成功");
-            } catch (IOException e) {
-                e.printStackTrace();
-                Logger.w("失败");
-            }*/
+            callBackListener.respond(buffer.toString());
 
-            callBackListener.respond(builder.toString());
+            //runOnUiThread(new Runnable() {
+            //    @Override
+            //    public void run() {
+            //        XzTipsDialog xzTipsDialog = new XzTipsDialog.Builder(mContext)
+            //                .setContent("共" + num + "条数据，是否确定传输")
+            //                .setSubmitOnClickListener("确定", new XOnClickListener() {
+            //                    @Override
+            //                    public void onClick(int viewId, String s, int position) {
+            //                        callBackListener.respond(buffer.toString());
+            //
+            //                    }
+            //                })
+            //                .setCancelOnclickListener("取消", new XOnClickListener() {
+            //                    @Override
+            //                    public void onClick(int viewId, String s, int position) {
+            //                        buffer.delete(0, buffer.length());
+            //                        appendMsg("取消传输");
+            //                    }
+            //                })
+            //                .create();
+            //        xzTipsDialog.setCancelable(false);
+            //        xzTipsDialog.show();
+            //    }
+            //});
+
 
         }
 
@@ -713,6 +789,54 @@ public class BackupActivity extends BaseActivity {
 
     }
 
+    /**
+     * 向本地写入数据==========================================================================
+     */
+    private class LocalDataWriteThread extends Thread {
+        private String resData;
+        private WriteCallBack callBackListener;
+
+
+        @Override
+        public void run() {
+            super.run();
+
+            //解析数据
+            String[] line = resData.split("@");
+            String[][] row = new String[line.length][5];
+            for (int i = 0; i < line.length; i++) {
+
+                for (int j = 0; j < 5; j++) {
+                    row[i] = line[i].split("#");
+                }
+            }
+
+            //开始存储数据，不清空原来数据
+            ContentValues values = new ContentValues();
+            for (int i = 0; i < line.length; i++) {
+                values.clear();
+                values.put("t1", row[i][0]);
+                values.put("t2", row[i][1]);
+                values.put("t3", row[i][2]);
+                values.put("t4", row[i][3]);
+                values.put("t5", row[i][4]);
+                SqlManager.insert(mContext, "common", values);//插入数据
+            }
+
+            callBackListener.success(line.length);
+        }
+
+        void setResData(String resData) {
+            this.resData = resData;
+
+        }
+
+
+        void addCallback(WriteCallBack callBack) {
+            this.callBackListener = callBack;
+        }
+
+    }
 
     /**
      * 工具类=================================================================================
@@ -751,8 +875,14 @@ public class BackupActivity extends BaseActivity {
         return Looper.getMainLooper() == Looper.myLooper();
     }
 
-    interface ReadCallBack {
+    private interface ReadCallBack {
         void respond(String Data);
+    }
+
+    private interface WriteCallBack {
+        void success(int num);
+
+        void failed();
     }
 
 
