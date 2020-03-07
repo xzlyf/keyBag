@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/dp_10"
-            android:text="永远相信\n美好的事情即将发生"
+            android:text="你个大头虾\n成日忘记密码"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16"
             android:textStyle="bold"
@@ -62,7 +62,7 @@
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="备份/导入" />
+            android:text="数据搬家" />
 
 
     </LinearLayout>

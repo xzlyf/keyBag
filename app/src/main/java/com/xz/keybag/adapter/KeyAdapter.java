@@ -56,7 +56,15 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
         viewHolder.name.setText(entity.getT1());
         viewHolder.userId.setText(entity.getT2());
         viewHolder.userPsw.setText(entity.getT3());
-        viewHolder.endTime.setText(TimeUtil.getSimMilliDate("yyyy.MM.dd HH:mm", Long.valueOf(entity.getT5())));
+        long time;
+        try {
+            time = Long.valueOf(entity.getT5());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            time = 0;
+        }
+        viewHolder.endTime.setText(TimeUtil.getSimMilliDate("yyyy.MM.dd HH:mm", time));
+
 
     }
 
@@ -189,11 +197,13 @@ public class KeyAdapter extends BaseRecyclerAdapter<KeyEntity> {
                 layout1.offsetLeftAndRight(childWidth);
                 layout2.offsetLeftAndRight(childWidth);
                 return true;
+            } else {
+                isOpen = true;
+                layout1.offsetLeftAndRight(-childWidth);
+                layout2.offsetLeftAndRight(-childWidth);
             }
-            isOpen = true;
-            layout1.offsetLeftAndRight(-childWidth);
-            layout2.offsetLeftAndRight(-childWidth);
             return true;
+
         }
     }
 

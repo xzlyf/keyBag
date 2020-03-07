@@ -1,7 +1,9 @@
 package com.xz.keybag.activity;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Rect;
@@ -38,9 +40,12 @@ import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.custom.SecretInputDialog;
+import com.xz.keybag.custom.XOnClickListener;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.ArrayUtil;
 import com.xz.utils.MD5Util;
+import com.xz.utils.RandomString;
 import com.xz.utils.ViewUtil;
 import com.xz.utils.hardware.SystemInfoUtil;
 import com.xz.utils.network.NetInfo;
@@ -141,8 +146,6 @@ public class BackupActivity extends BaseActivity {
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //测试关闭
-                /*
 
                 //空检测
                 if (etPort.getText().toString().trim().equals("") || etIp.getIp().trim().equals("")) {
@@ -168,9 +171,6 @@ public class BackupActivity extends BaseActivity {
                     sToast("端口范围:1024-65535");
                     return;
                 }
-                */
-                String host = "192.168.1.157";
-                int port = 45678;
                 btnConnect.setEnabled(false);
                 appendMsg("正在连接" + host + ":" + port);
                 new SocketClient(host, port).start();
@@ -241,6 +241,11 @@ public class BackupActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopSocket();
+    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -420,8 +425,8 @@ public class BackupActivity extends BaseActivity {
         private void doConnect() {
             appendMsg("开始创建服务端");
             Random random = new Random();
-//            int port = ports[random.nextInt(ports.length - 1)];
-            int port = 45678;
+            int port = ports[random.nextInt(ports.length - 1)];
+            //int port = 45678;//测试固定端口
             try {
                 server = new ServerSocket(port);
                 server.setSoTimeout(TIME_OUT);//超时时间
@@ -429,20 +434,23 @@ public class BackupActivity extends BaseActivity {
                 appendMsg("本机ip：" + (NetInfo.isWifiEnabled(mContext) ? NetInfo.getIpInWifi(mContext) : NetInfo.getIpInGPRS() + "（非WIFI）"));
                 appendMsg("端口：" + server.getLocalPort());
                 socket = server.accept();
+                appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
+
             } catch (SocketException e) {
                 e.printStackTrace();
                 appendMsg("超时，将关闭");
                 stopSocket();
-
+                return;
 
             } catch (IOException e) {
                 appendMsg("创建失败，3秒后再次创建...");
                 SystemClock.sleep(3000);//3秒后再次创建
                 doConnect();
+                return;
             } catch (Exception e) {
                 appendMsg("致命错误：" + e.getMessage());
+                return;
             }
-            appendMsg("已接入：" + socket.getInetAddress().getHostAddress());
 
 
             //输出流
@@ -661,6 +669,7 @@ public class BackupActivity extends BaseActivity {
                 public void success(int num) {
                     appendMsg("数据存储完毕");
                     stopSocket();
+                    changeKeyDialog();
                 }
 
                 @Override
@@ -707,6 +716,18 @@ public class BackupActivity extends BaseActivity {
         //    });
         //    return;
         //}
+
+        if (socket!=null){
+            try {
+                socket.shutdownOutput();
+                socket.shutdownInput();
+                appendMsg("通知输入输出流off");
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMsg("通知输入输出流error");
+
+            }
+        }
 
         if (is != null) {
             try {
@@ -931,6 +952,55 @@ public class BackupActivity extends BaseActivity {
         message.what = MSG;
         message.obj = msg + "\n";
         handler.sendMessage(message);
+    }
+
+    private SecretInputDialog dialog;
+
+    /**
+     * 修改密钥
+     */
+    private void changeKeyDialog() {
+        if (!isMainThread()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    changeKeyDialog();
+                }
+            });
+            return;
+        }
+
+        dialog = new SecretInputDialog(mContext);
+        dialog.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        dialog.setOnCancelListener(new XOnClickListener() {
+            @Override
+            public void onClick(String st, View v) {
+                dialog.dismiss();
+
+            }
+        });
+        dialog.setOnSubmitListener(new XOnClickListener() {
+            @Override
+            public void onClick(String st, View v) {
+                if (st.equals("")) {
+                    sToast("无效密钥");
+                    return;
+                }
+                //更新密钥
+                ContentValues values = new ContentValues();
+                values.put("k1", st);
+                values.put("k2", RandomString.getRandomString(16));
+                values.put("k3", 0);
+                SqlManager.update(mContext, "secret", values, "k1 = ?", new String[]{Local.secret});
+                sToast("密钥已修改，重启生效");
+                Local.secret = st;
+
+
+            }
+        });
     }
 
     /**
