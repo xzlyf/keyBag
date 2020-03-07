@@ -16,6 +16,7 @@ import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.RandomString;
 import com.xz.utils.SharedPreferencesUtil;
@@ -113,10 +114,10 @@ public class SecretActivity extends BaseActivity {
                 }
                 //更新密钥
                 ContentValues values = new ContentValues();
-                values.put("k1", st);
+                values.put("k1", EOD.encrypt(st, Local.SECRET_KEY));
                 values.put("k2", RandomString.getRandomString(16));
                 values.put("k3", 0);
-                SqlManager.update(mContext, "secret", values, "k1 = ?", new String[]{Local.secret});
+                SqlManager.update(mContext, "secret", values, "k1 = ?", new String[]{EOD.encrypt(Local.secret, Local.SECRET_KEY)});
                 sToast("密钥已修改，重启生效");
                 Local.secret = st;
                 etInput.setText("");

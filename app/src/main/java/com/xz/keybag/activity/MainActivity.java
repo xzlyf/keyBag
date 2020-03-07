@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -32,13 +30,12 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
-import com.xz.utils.hardware.SystemInfoUtil;
-import com.xz.utils.network.NetInfo;
 import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 
@@ -240,15 +237,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 String secret = RandomString.getRandomString(8, true);
                 ContentValues values = new ContentValues();
                 values.put("k1", secret);
+                values.put("k1", EOD.encrypt(secret, Local.SECRET_KEY));
                 values.put("k2", RandomString.getRandomString(16));
-                values.put("k3", 0);
+                values.put("k3", new Random().nextInt(64));
                 SqlManager.insert(mContext, "secret", values);//插入数据
                 return secret;
             }
             SecretEntity entity = new SecretEntity();
-            entity.setK1(cursor.getString(cursor.getColumnIndex("k1")));
-            entity.setK2(cursor.getString(cursor.getColumnIndex("k2")));
-            entity.setK3(cursor.getString(cursor.getColumnIndex("k3")));
+            entity.setK1(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k1")), Local.SECRET_KEY));
+            entity.setK2(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k2")), Local.SECRET_KEY));
+            entity.setK3(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k3")), Local.SECRET_KEY));
             cursor.close();
 
             return entity.getK1();

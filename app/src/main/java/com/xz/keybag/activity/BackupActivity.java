@@ -42,6 +42,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SecretInputDialog;
 import com.xz.keybag.custom.XOnClickListener;
+import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.ArrayUtil;
 import com.xz.utils.MD5Util;
@@ -717,7 +718,7 @@ public class BackupActivity extends BaseActivity {
         //    return;
         //}
 
-        if (socket!=null){
+        if (socket != null) {
             try {
                 socket.shutdownOutput();
                 socket.shutdownInput();
@@ -991,13 +992,15 @@ public class BackupActivity extends BaseActivity {
                 }
                 //更新密钥
                 ContentValues values = new ContentValues();
-                values.put("k1", st);
+                values.put("k1", EOD.encrypt(st, Local.SECRET_KEY));
                 values.put("k2", RandomString.getRandomString(16));
                 values.put("k3", 0);
                 SqlManager.update(mContext, "secret", values, "k1 = ?", new String[]{Local.secret});
                 sToast("密钥已修改，重启生效");
                 Local.secret = st;
-
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setCancelable(true);
+                dialog.dismiss();
 
             }
         });

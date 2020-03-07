@@ -6,7 +6,9 @@ public class Local {
     public static final String TABLE_SECRET = "secret";//表名
     public static final String TABLE_ACC = "dbase";//表名
 
-    public static final String SECRET_PWD = "xiaoze66";//登录密码加密密钥
+    //密钥长度必须超过或等于8位
+    public static final String SECRET_PWD = "xiaoze66";
+    public static final String SECRET_KEY = "xzlyf666";
     public static String secret;//密钥
 
     //handler标识
