@@ -236,7 +236,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 //用户第一次运行创建一个随机密钥
                 String secret = RandomString.getRandomString(8, true);
                 ContentValues values = new ContentValues();
-                values.put("k1", secret);
                 values.put("k1", EOD.encrypt(secret, Local.SECRET_KEY));
                 values.put("k2", RandomString.getRandomString(16));
                 values.put("k3", new Random().nextInt(64));
