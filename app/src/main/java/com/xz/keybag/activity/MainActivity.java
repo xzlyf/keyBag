@@ -28,8 +28,11 @@ import com.xz.keybag.entity.KeyEntity;
 import com.xz.keybag.entity.SecretEntity;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.utils.MD5Util;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.widget.dialog.XOnClickListener;
+import com.xz.widget.dialog.XzInputDialog;
 import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
@@ -56,6 +59,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     Button btn_2;
     @BindView(R.id.btn_3)
     Button btn_3;
+    @BindView(R.id.btn_4)
+    Button btn_4;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     @BindView(R.id.et_search)
@@ -104,6 +109,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         btn_1.setOnClickListener(this);
         btn_2.setOnClickListener(this);
         btn_3.setOnClickListener(this);
+        btn_4.setOnClickListener(this);
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
@@ -175,6 +181,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btn_3:
                 startActivity(new Intent(MainActivity.this, BackupActivity.class));
+                break;
+            case R.id.btn_4:
+                XzInputDialog dialog = new XzInputDialog.Builder(mContext)
+                        .setTitle("请输入密码")
+                        .setHint("清空需要密码权限，请输入软件进入时的密码用以格式化数据库。")
+                        .setMinLine(3)
+                        .setSubmitOnClickListener("确定", new XOnClickListener() {
+                            @Override
+                            public void onClick(int viewId, String s, int position) {
+
+                                if (MD5Util.getMD5(s).equals(Local.User.loginPwd)) {
+                                    SqlManager.deleteAll(mContext, Local.TABLE_COMMON);
+                                    sToast("删除完成");
+                                } else {
+                                    sToast("密码核对错误");
+                                }
+
+                            }
+                        })
+                        .create();
+                dialog.show();
                 break;
 
 

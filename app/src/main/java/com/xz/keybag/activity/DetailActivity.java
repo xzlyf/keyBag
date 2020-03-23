@@ -66,8 +66,14 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
         user.setText(entity.getT2());
         pwd.setText(entity.getT3());
         remark.setText(entity.getT4());
-        endTime.setText(TimeUtil.getSimMilliDate("yyyy年MM月dd日 hh:mm:ss", Long.valueOf(entity.getT5())));
-
+        long time;
+        try {
+            time = Long.valueOf(entity.getT5());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            time = 0;
+        }
+        endTime.setText(TimeUtil.getSimMilliDate("yyyy年MM月dd日 hh:mm:ss",time));
         name.setOnFocusChangeListener(this);
         user.setOnFocusChangeListener(this);
         pwd.setOnFocusChangeListener(this);

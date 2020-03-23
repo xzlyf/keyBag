@@ -64,6 +64,13 @@
             android:layout_height="wrap_content"
             android:text="数据搬家" />
 
+        <Button
+            android:id="@+id/btn_4"
+            style="@style/menu_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一键清空" />
+
 
     </LinearLayout>
 

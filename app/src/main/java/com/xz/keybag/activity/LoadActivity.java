@@ -225,7 +225,7 @@ public class LoadActivity extends BaseActivity {
             //如果游标为空则返回false
             if (!cursor.moveToFirst()) {
                 setHint(getString(R.string.string_3));
-                Local.User.loginPwd = MD5Util.getMD5("0000");
+                Local.User.loginPwd = MD5Util.getMD5(Local.DEFAULT);
                 return;
             }
 

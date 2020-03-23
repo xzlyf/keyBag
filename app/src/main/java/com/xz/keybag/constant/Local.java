@@ -9,6 +9,7 @@ public class Local {
     //密钥长度必须超过或等于8位
     public static final String SECRET_PWD = "xiaoze66";
     public static final String SECRET_KEY = "xzlyf666";
+    public static final String DEFAULT = "0000";
     public static String secret;//密钥
 
     //handler标识
