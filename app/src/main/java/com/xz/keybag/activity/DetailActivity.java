@@ -80,6 +80,9 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
         remark.setOnFocusChangeListener(this);
         back.setOnClickListener(this);
         submit.setOnClickListener(this);
+        if (isNightMode()) {
+            back.setColorFilter(getResources().getColor(R.color.icons));
+        }
     }
 
     @Override

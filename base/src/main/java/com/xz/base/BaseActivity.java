@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,10 +18,12 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.orhanobut.logger.Logger;
+import com.xz.base.utils.PreferencesUtilV2;
 import com.xz.base.utils.ToastUtil;
 import com.xz.widget.dialog.XOnClickListener;
 import com.xz.widget.dialog.XzLoadingDialog;
@@ -221,6 +225,51 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
             xzTipsDialog = null;
         }
     }
+
+    /**
+     * 切换日间夜间模式
+     *
+     * @param isNight true 夜间模式 false日间模式
+     */
+    protected void changeMode(boolean isNight) {
+        if (isNight) {
+            // 夜间模式
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            // 日间模式
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        //recreate();
+
+        startActivity(new Intent(this, this.getClass()));
+        overridePendingTransition(R.anim.transparen_show, R.anim.transparen_hide);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, 800);
+    }
+
+    /**
+     * 判断当前是什么模式
+     *
+     * @return true 夜间模式 false 日间模式
+     */
+    protected boolean isNightMode() {
+        switch (AppCompatDelegate.getDefaultNightMode()) {
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                return true;
+            case AppCompatDelegate.MODE_NIGHT_NO:
+            case AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY:
+            case AppCompatDelegate.MODE_NIGHT_AUTO_TIME:
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+            case AppCompatDelegate.MODE_NIGHT_UNSPECIFIED:
+            default:
+                return false;
+        }
+    }
+
 
     /**
      * 点击编辑框外隐藏软键盘并清除焦点

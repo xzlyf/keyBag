@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
 import com.xz.keybag.constant.Local;
@@ -52,7 +54,11 @@ public class AddActivity extends BaseActivity implements View.OnClickListener {
         user.setOnClickListener(this);
         psw.setOnClickListener(this);
         note.setOnClickListener(this);
+        if (isNightMode()) {
+            tvBack.setColorFilter(getResources().getColor(R.color.icons));
+        }
     }
+
 
     @Override
     public void onClick(View v) {

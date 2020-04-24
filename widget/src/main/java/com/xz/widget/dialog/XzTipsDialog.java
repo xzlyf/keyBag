@@ -25,7 +25,7 @@ public class XzTipsDialog extends Dialog {
     private int titleGravity = Gravity.CENTER;
     private CharSequence contentText;
     private TextView tvcontent;
-    private int contextBackgroundResour = R.color.white;
+    private int contextBackgroundResour = R.color.BD;
     private Button cancel;
     private Button submit;
     private XOnClickListener cancelListener;

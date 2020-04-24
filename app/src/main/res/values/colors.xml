@@ -7,5 +7,8 @@
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
-    <color name="divider">#BDBDBD</color>
+    <color name="divider">#E4E4E4</color>
+    <color name="nav_background">#fff</color>
+    <color name="item_white">#fff</color>
+    <color name="tips_color">#D6D6D6</color>
 </resources>

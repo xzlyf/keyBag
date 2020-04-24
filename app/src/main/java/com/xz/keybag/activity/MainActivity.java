@@ -10,10 +10,13 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.base.OnItemClickListener;
+import com.xz.base.utils.PreferencesUtilV2;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.KeyAdapter;
 import com.xz.keybag.constant.Local;
@@ -65,10 +69,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     TextView tvTitle;
     @BindView(R.id.et_search)
     SearchEditView etSearch;
+    @BindView(R.id.switch_mode)
+    Switch modeSwitch;
 
 
     private KeyAdapter keyAdapter;
     private List<KeyEntity> mList;
+    private boolean isNight;//日渐模式false 夜间模式true
 
     private Handler handler = new Handler() {
         @Override
@@ -128,8 +135,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
 
+        isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
+        modeSwitch.setChecked(isNight);
+        if (isNight) {
+            if (!isNightMode()) {
+                changeMode(true);
+            }
+        }
+        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                changeMode(isChecked);
+            }
+        });
 
     }
+
+    @Override
+    protected void changeMode(boolean isNight) {
+        super.changeMode(isNight);
+        modeSwitch.setChecked(isNight);
+        PreferencesUtilV2.putBoolean(Local.SHARD_BOOLEAN_MODE, isNight);
+    }
+
 
     /**
      * 每次回到主页重新读取数据库
@@ -171,18 +199,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 drawerLayout.openDrawer(Gravity.LEFT);
                 break;
             case R.id.tv_add:
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, AddActivity.class));
                 break;
             case R.id.btn_1:
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, SecretActivity.class));
                 break;
             case R.id.btn_2:
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode", 1));
                 break;
             case R.id.btn_3:
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 startActivity(new Intent(MainActivity.this, BackupActivity.class));
                 break;
             case R.id.btn_4:
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 XzInputDialog dialog = new XzInputDialog.Builder(mContext)
                         .setTitle("请输入密码")
                         .setHint("清空需要密码权限，请输入软件进入时的密码用以格式化数据库。")
@@ -211,6 +244,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private long backOccTime;
+
     @Override
     public void onBackPressed() {
         long i = System.currentTimeMillis();

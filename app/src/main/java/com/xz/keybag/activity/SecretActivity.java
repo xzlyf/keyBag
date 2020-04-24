@@ -112,6 +112,10 @@ public class SecretActivity extends BaseActivity {
                     sToast("无效密钥");
                     return;
                 }
+                if (st.length()!=8){
+                    sToast("密钥固定长度为8位");
+                    return;
+                }
                 //更新密钥
                 ContentValues values = new ContentValues();
                 values.put("k1", EOD.encrypt(st, Local.SECRET_KEY));

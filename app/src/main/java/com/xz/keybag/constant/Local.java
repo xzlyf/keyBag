@@ -19,6 +19,10 @@ public class Local {
     public static final int CODE_4 = 104;
     public static final int CODE_5 = 105;
 
+
+    //Shard标识
+    public static final String SHARD_BOOLEAN_MODE = "day_or_night";
+
     public static class User {
         public static String loginPwd = "";
 

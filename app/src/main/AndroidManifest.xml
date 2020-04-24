@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.BackupActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CommonTheme">
+            >
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 
@@ -32,11 +32,11 @@
         <activity
             android:name=".activity.KeyActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CommonTheme" />
+             />
         <activity
             android:name=".activity.SecretActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CommonTheme" />
+             />
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
