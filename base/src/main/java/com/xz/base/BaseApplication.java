@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 
 import com.orhanobut.logger.Logger;
+import com.xz.base.utils.PreferencesUtilV2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ public class BaseApplication extends Application {
         super.onCreate();
         instance = this;
         initLog();
+        //初始prefercences工具
+        PreferencesUtilV2.initPreferencesUtils(this, "keybag");
     }
 
 

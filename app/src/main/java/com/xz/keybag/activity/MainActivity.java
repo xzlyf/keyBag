@@ -210,6 +210,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    private long backOccTime;
+    @Override
+    public void onBackPressed() {
+        long i = System.currentTimeMillis();
+        if (i - backOccTime > 2000) {
+            sToast("再次点击退出");
+            backOccTime = i;
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     /**
      * 异步数据读取线程类
      */
