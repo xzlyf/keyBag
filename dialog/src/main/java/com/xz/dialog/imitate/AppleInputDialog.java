@@ -3,7 +3,11 @@ package com.xz.dialog.imitate;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,6 +72,26 @@ public class AppleInputDialog extends BaseDialog {
         positiveName = "确定";
         hint = "请输入...";
         lines = 1;
+
+        etContent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().contains("\n")) {
+                    etContent.setText(etContent.getText().toString().trim().replace("\n", ""));
+                    etContent.setSelection(etContent.length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
 
@@ -106,10 +130,10 @@ public class AppleInputDialog extends BaseDialog {
             int id = v.getId();
             if (id == R.id.negative) {
                 if (negativeOnClickListener != null)
-                    negativeOnClickListener.OnClick(v);
+                    negativeOnClickListener.OnClick(v, etContent.getText().toString().trim());
             } else if (id == R.id.positive) {
                 if (positiveOnClickListener != null)
-                    positiveOnClickListener.OnClick(v);
+                    positiveOnClickListener.OnClick(v, etContent.getText().toString().trim());
             }
             dismiss();
 

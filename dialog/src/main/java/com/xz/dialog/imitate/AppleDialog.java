@@ -95,10 +95,10 @@ public class AppleDialog extends BaseDialog {
             int id = v.getId();
             if (id == R.id.negative) {
                 if (negativeOnClickListener != null)
-                    negativeOnClickListener.OnClick(v);
+                    negativeOnClickListener.OnClick(v,"");
             } else if (id == R.id.positive) {
                 if (positiveOnClickListener != null)
-                    positiveOnClickListener.OnClick(v);
+                    positiveOnClickListener.OnClick(v,"");
             }
             dismiss();
 

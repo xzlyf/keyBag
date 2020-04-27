@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +29,9 @@ import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.base.OnItemClickListener;
 import com.xz.base.utils.PreferencesUtilV2;
+import com.xz.dialog.event.NegativeOnClickListener;
+import com.xz.dialog.event.PositiveOnClickListener;
+import com.xz.dialog.imitate.AppleInputDialog;
 import com.xz.dialog.imitate.UpdateDialog;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.KeyAdapter;
@@ -46,8 +48,6 @@ import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.SystemUtil;
 import com.xz.utils.ThreadUtil;
 import com.xz.utils.network.OkHttpClientManager;
-import com.xz.widget.dialog.XOnClickListener;
-import com.xz.widget.dialog.XzInputDialog;
 import com.xz.widget.textview.SearchEditView;
 
 import java.io.IOException;
@@ -153,10 +153,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initData() {
-
+        initState();
         initView();
         initRecycler();
 
+
+    }
+
+    private void initState() {
+        isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
+        modeSwitch.setChecked(isNight);
+        if (isNight) {
+            if (!isNightMode()) {
+                changeMode(true);
+            }
+        }
+        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                changeMode(isChecked);
+            }
+        });
+
+        Local.NET_GET_UPDATE = PreferencesUtilV2.getString(Local.SHARD_SERVER_URL, Local.NET_GET_UPDATE);
 
     }
 
@@ -168,7 +187,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_2).setOnClickListener(this);
         findViewById(R.id.btn_3).setOnClickListener(this);
         findViewById(R.id.btn_4).setOnClickListener(this);
-        findViewById(R.id.btn_5).setOnClickListener(this);
+        Button btn5 = findViewById(R.id.btn_5);
+        btn5.setOnClickListener(this);
+        btn5.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                sToast("输入新的服务器连接");
+                return true;
+            }
+        });
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
@@ -187,19 +214,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
 
-        isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
-        modeSwitch.setChecked(isNight);
-        if (isNight) {
-            if (!isNightMode()) {
-                changeMode(true);
-            }
-        }
-        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                changeMode(isChecked);
-            }
-        });
 
     }
 
@@ -268,20 +282,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btn_4:
                 drawerLayout.closeDrawer(Gravity.LEFT);
-                XzInputDialog dialog = new XzInputDialog.Builder(mContext)
-                        .setTitle("请输入密码")
-                        .setHint("清空需要密码权限，请输入软件进入时的密码用以格式化数据库。")
-                        .setMinLine(3)
-                        .setSubmitOnClickListener("确定", new XOnClickListener() {
-                            @Override
-                            public void onClick(int viewId, String s, int position) {
 
-                                if (MD5Util.getMD5(s).equals(Local.User.loginPwd)) {
+                AppleInputDialog dialog = new AppleInputDialog.Builder(mContext)
+                        .setTitle("请输入密码")
+                        .setInputLines(1)
+                        .setContent("请输入启动密码，用以格式化数据库。")
+                        .setHint("请输入")
+                        .setPositiveOnClickListener("确定", new PositiveOnClickListener() {
+                            @Override
+                            public void OnClick(View v, String t) {
+                                if (MD5Util.getMD5(t).equals(Local.User.loginPwd)) {
                                     SqlManager.deleteAll(mContext, Local.TABLE_COMMON);
                                     sToast("删除完成");
                                 } else {
                                     sToast("密码核对错误");
                                 }
+                            }
+                        })
+                        .setNegativeOnClickListener("取消", new NegativeOnClickListener() {
+                            @Override
+                            public void OnClick(View v, String t) {
 
                             }
                         })
@@ -335,12 +355,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onBackPressed() {
-        long i = System.currentTimeMillis();
-        if (i - backOccTime > 2000) {
-            sToast("再次点击退出");
-            backOccTime = i;
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawer(Gravity.LEFT);
         } else {
-            super.onBackPressed();
+            long i = System.currentTimeMillis();
+            if (i - backOccTime > 2000) {
+                sToast("再次点击退出");
+                backOccTime = i;
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 

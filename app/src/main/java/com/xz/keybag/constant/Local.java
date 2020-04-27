@@ -26,6 +26,7 @@ public class Local {
 
     //Shard标识
     public static final String SHARD_BOOLEAN_MODE = "day_or_night";
+    public static final String SHARD_SERVER_URL = "server_url";
 
     public static class User {
         public static String loginPwd = "";

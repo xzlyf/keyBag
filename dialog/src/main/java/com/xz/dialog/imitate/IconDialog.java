@@ -96,10 +96,10 @@ public class IconDialog extends BaseDialog implements View.OnClickListener {
         int id = v.getId();
         if (id == R.id.tv_negative) {
             if (negativeOnClickListener != null)
-                negativeOnClickListener.OnClick(v);
+                negativeOnClickListener.OnClick(v,"");
         } else if (id == R.id.tv_positive) {
             if (positiveOnClickListener != null)
-                positiveOnClickListener.OnClick(v);
+                positiveOnClickListener.OnClick(v,"");
         }
 
         dismiss();
