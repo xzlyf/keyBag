@@ -1,2 +1,2 @@
-include ':app', ':base', ':widget', ':utils'
+include ':app', ':base', ':widget', ':utils', ':dialog'
 rootProject.name='KeyBag'

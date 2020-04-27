@@ -35,7 +35,7 @@ dependencies {
 
     implementation project(path: ':widget')
     //logger
-    implementation 'com.orhanobut:logger:1.15'
+    implementation 'com.orhanobut:logger:2.2.0'
     //butterknife
     implementation 'com.jakewharton:butterknife:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'

@@ -1,8 +1,11 @@
 package com.xz.keybag.activity;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -14,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -21,24 +25,32 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.base.OnItemClickListener;
 import com.xz.base.utils.PreferencesUtilV2;
+import com.xz.dialog.imitate.UpdateDialog;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.KeyAdapter;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.KeyEntity;
 import com.xz.keybag.entity.SecretEntity;
+import com.xz.keybag.entity.UpdateEntity;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.MD5Util;
+import com.xz.utils.PackageUtil;
 import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.utils.SystemUtil;
+import com.xz.utils.ThreadUtil;
+import com.xz.utils.network.OkHttpClientManager;
 import com.xz.widget.dialog.XOnClickListener;
 import com.xz.widget.dialog.XzInputDialog;
 import com.xz.widget.textview.SearchEditView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,14 +69,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     ImageView tvAdd;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
-    @BindView(R.id.btn_1)
-    Button btn_1;
-    @BindView(R.id.btn_2)
-    Button btn_2;
-    @BindView(R.id.btn_3)
-    Button btn_3;
-    @BindView(R.id.btn_4)
-    Button btn_4;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     @BindView(R.id.et_search)
@@ -76,19 +80,66 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private KeyAdapter keyAdapter;
     private List<KeyEntity> mList;
     private boolean isNight;//日渐模式false 夜间模式true
+    private boolean isNet = false;//正在进行网络操作
 
-    private Handler handler = new Handler() {
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
+        public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case Local.CODE_1:
                     //刷新列表
                     keyAdapter.superRefresh(mList);
                     break;
+                case Local.CODE_2:
+                    //更新数据
+                    disLoading();
+                    UpdateEntity entity = (UpdateEntity) msg.obj;
+                    if (PackageUtil.getVersionCode(mContext) >= entity.getCode()) {
+                        sToast("当前为最新版本");
+                        break;
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(mContext, "存储权限未获取", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+                    String path = mContext.getExternalFilesDir("update").getAbsolutePath() + "/";
+                    String fileName = "kb.apk";
+                    UpdateDialog dialog = new UpdateDialog.Builder(mContext)
+                            .setContent(entity.getMsg())
+                            .setVersionName("v" + entity.getVersion())
+                            .setDownload(entity.getLink(), fileName, path, new UpdateDialog.UpdateListener() {
+                                @Override
+                                public void onSuccess(String path) {
+
+                                }
+
+                                @Override
+                                public void onFailed(String err) {
+                                    sToast(err);
+                                }
+                            })
+                            .setInstallOnClickListener(new UpdateDialog.InstallListener() {
+                                @Override
+                                public void install(String path) {
+                                    SystemUtil.newInstallAppIntent(mContext, path);
+                                }
+                            })
+                            .create();
+                    dialog.show();
+                    break;
+                case Local.CODE_3:
+                    //请求失败
+                    disLoading();
+                    sToast("服务器异常");
+                    break;
             }
+            return true;
         }
-    };
+    });
+
 
     @Override
     public boolean homeAsUpEnabled() {
@@ -113,10 +164,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         tvAdd.setOnClickListener(this);
         tvMenu.setOnClickListener(this);
-        btn_1.setOnClickListener(this);
-        btn_2.setOnClickListener(this);
-        btn_3.setOnClickListener(this);
-        btn_4.setOnClickListener(this);
+        findViewById(R.id.btn_1).setOnClickListener(this);
+        findViewById(R.id.btn_2).setOnClickListener(this);
+        findViewById(R.id.btn_3).setOnClickListener(this);
+        findViewById(R.id.btn_4).setOnClickListener(this);
+        findViewById(R.id.btn_5).setOnClickListener(this);
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
@@ -236,10 +288,46 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         .create();
                 dialog.show();
                 break;
+            case R.id.btn_5:
+                if (isNet) {
+                    sToast("请勿频繁操作");
+                    return;
+                }
+                checkUpdate();
+                break;
 
 
         }
 
+
+    }
+
+    /**
+     * 检查更新
+     */
+    private void checkUpdate() {
+        isNet = true;
+        showLoading("正在加载");
+        ThreadUtil.runInThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String request = OkHttpClientManager.getAsString(Local.NET_GET_UPDATE);
+                    Logger.w(request);
+                    Gson gson = new Gson();
+                    UpdateEntity entity = gson.fromJson(request, UpdateEntity.class);
+
+                    Message message = Message.obtain();
+                    message.obj = entity;
+                    message.what = Local.CODE_2;
+                    handler.sendMessage(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(Local.CODE_3);
+                }
+                isNet = false;
+            }
+        });
 
     }
 

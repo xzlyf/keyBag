@@ -20,6 +20,10 @@ public class Local {
     public static final int CODE_5 = 105;
 
 
+    //更新服务器
+    public static String NET_GET_UPDATE = "http://192.168.1.72:28080/keybag/update.json";
+
+
     //Shard标识
     public static final String SHARD_BOOLEAN_MODE = "day_or_night";
 
