@@ -11,5 +11,6 @@
     <color name="nav_background">#2B2B2B</color>
     <color name="item_white">#444444</color>
     <color name="tips_color">#292929</color>
+    <color name="edit_background">#535353</color>
 
 </resources>

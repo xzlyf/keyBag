@@ -11,4 +11,5 @@
     <color name="nav_background">#fff</color>
     <color name="item_white">#fff</color>
     <color name="tips_color">#D6D6D6</color>
+    <color name="edit_background">#EEEEEE</color>
 </resources>
