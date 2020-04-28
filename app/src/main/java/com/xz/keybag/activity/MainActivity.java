@@ -48,6 +48,8 @@ import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.SystemUtil;
 import com.xz.utils.ThreadUtil;
 import com.xz.utils.network.OkHttpClientManager;
+import com.xz.widget.dialog.XOnClickListener;
+import com.xz.widget.dialog.XzInputDialog;
 import com.xz.widget.textview.SearchEditView;
 
 import java.io.IOException;
@@ -189,13 +191,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_4).setOnClickListener(this);
         Button btn5 = findViewById(R.id.btn_5);
         btn5.setOnClickListener(this);
-        btn5.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                sToast("输入新的服务器连接");
-                return true;
-            }
-        });
+        btn5.setOnLongClickListener(onLongClickListener);
 
         etSearch.addTextChangeListener(new TextWatcher() {
             @Override
@@ -255,6 +251,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
+    private View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            XzInputDialog dialog = new XzInputDialog.Builder(mContext)
+                    .setHint("服务器更新地址")
+                    .setMinLine(3)
+                    .setMaxLine(3)
+                    .setSubmitOnClickListener("确定", new XOnClickListener() {
+                        @Override
+                        public void onClick(int viewId, String s, int position) {
+                            Local.NET_GET_UPDATE = s;
+                            PreferencesUtilV2.putString(Local.SHARD_SERVER_URL, Local.NET_GET_UPDATE);
+                            sToast("修改完成");
+                        }
+                    })
+                    .create();
+            dialog.show();
+            return true;
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -341,7 +357,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     message.obj = entity;
                     message.what = Local.CODE_2;
                     handler.sendMessage(message);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(Local.CODE_3);
                 }
