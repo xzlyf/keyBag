@@ -438,8 +438,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 String secret = RandomString.getRandomString(8, true);
                 ContentValues values = new ContentValues();
                 values.put("k1", EOD.encrypt(secret, Local.SECRET_KEY));
-                values.put("k2", RandomString.getRandomString(16));
-                values.put("k3", new Random().nextInt(64));
+                values.put("k2", EOD.encrypt(RandomString.getRandomString(16),Local.SECRET_KEY));
+                values.put("k3", EOD.encrypt(String.valueOf(new Random().nextInt(64)),Local.SECRET_KEY));
                 SqlManager.insert(mContext, "secret", values);//插入数据
                 return secret;
             }
