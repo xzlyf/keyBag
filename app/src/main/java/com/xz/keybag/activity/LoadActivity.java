@@ -3,8 +3,13 @@ package com.xz.keybag.activity;
 import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.database.Cursor;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -13,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
@@ -23,6 +29,9 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.KeyBoardUtil;
 import com.xz.utils.MD5Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -54,6 +63,7 @@ public class LoadActivity extends BaseActivity {
             }
         }
     };
+    private ShortcutManager mShortcutManager;
 
     @Override
     public boolean homeAsUpEnabled() {
@@ -119,6 +129,36 @@ public class LoadActivity extends BaseActivity {
         });
         //开始监听
         fingerprintHelper.startListening();
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setupShortcuts();
+        }
+    }
+
+    /**
+     * 加入桌面长按快捷进入
+     * Shortcuts 动态添加
+     */
+    @TargetApi(Build.VERSION_CODES.N_MR1)
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void setupShortcuts() {
+        mShortcutManager = getSystemService(ShortcutManager.class);
+
+        List<ShortcutInfo> infos = new ArrayList<>();
+            Intent intent = new Intent(this, AddActivity.class);
+            intent.setAction(Intent.ACTION_VIEW);
+
+            ShortcutInfo info = new ShortcutInfo.Builder(this, "id" )
+                    .setShortLabel("新增")
+                    .setLongLabel("新增记项")
+                    .setIcon(Icon.createWithResource(this, R.drawable.ic_add_black))
+                    .setIntent(intent)
+                    .build();
+            infos.add(info);
+//            manager.addDynamicShortcuts(Arrays.asList(info));
+
+        mShortcutManager.setDynamicShortcuts(infos);
     }
 
     private void killMySelf() {
