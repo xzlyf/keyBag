@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 
     <application
@@ -40,14 +41,7 @@
         <activity
             android:name=".activity.LoadActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
-
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
-        </activity>
-        <!--loadActivity 2.0测试-->
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoadActivityV2"
             android:screenOrientation="portrait">
