@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +20,13 @@ import androidx.annotation.RequiresApi;
 import com.orhanobut.logger.Logger;
 import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
+import com.xz.keybag.sql.EOD;
+import com.xz.keybag.sql.SqlManager;
+import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +68,7 @@ public class LoadActivityV2 extends BaseActivity {
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
+		new ReadThread().start();
 		initView();
 		initFingerprint();
 		//震动服务
@@ -79,7 +85,11 @@ public class LoadActivityV2 extends BaseActivity {
 			public void clickNum(String num) {
 				playVibration();
 				if (etPwd.getText().toString().trim().length() >= MAX_NUM) {
+					checkPwd();
 					return;
+				}
+				if (etPwd.getText().toString().trim().length() == 3) {
+					checkPwd();
 				}
 				etPwd.append(num);
 			}
@@ -163,6 +173,21 @@ public class LoadActivityV2 extends BaseActivity {
 		}, 500);
 	}
 
+	private void checkPwd() {
+		String temp = etPwd.getText().toString().trim();
+		if (temp.equals("")) {
+			return;
+		}
+
+		temp = MD5Util.getMD5(temp);
+		if (temp.equals(Local.User.loginPwd)) {
+			killMySelf();
+		} else {
+			//密码错误
+			playErrState(etPwd);
+		}
+	}
+
 
 	/**
 	 * 输入错误状态
@@ -216,4 +241,22 @@ public class LoadActivityV2 extends BaseActivity {
 		fingerprintHelper.stopListener();
 	}
 
+
+	private class ReadThread extends Thread {
+		@Override
+		public void run() {
+			super.run();
+
+
+			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
+			//如果游标为空则返回false
+			if (!cursor.moveToFirst()) {
+				Local.User.loginPwd = MD5Util.getMD5(Local.DEFAULT);
+				return;
+			}
+
+			Local.User.loginPwd = EOD.decrypt(cursor.getString(cursor.getColumnIndex("p2")), Local.SECRET_PWD);
+			cursor.close();
+		}
+	}
 }
