@@ -45,6 +45,8 @@ public class LoadActivityV2 extends BaseActivity {
 	LinearLayout inputLayout2;
 	@BindView(R.id.tv_tips)
 	TextView tvTips;
+	@BindView(R.id.tv_input_tips)
+	TextView tvInputTips;
 
 	private int MAX_NUM = 4;
 	private FingerprintHelper fingerprintHelper;
@@ -84,12 +86,12 @@ public class LoadActivityV2 extends BaseActivity {
 			@Override
 			public void clickNum(String num) {
 				playVibration();
-				if (etPwd.getText().toString().trim().length() >= MAX_NUM) {
+				if (etPwd.getText().toString().trim().length() == MAX_NUM - 1) {
+					etPwd.append(num);
 					checkPwd();
 					return;
-				}
-				if (etPwd.getText().toString().trim().length() == 3) {
-					checkPwd();
+				} else if (etPwd.getText().toString().trim().length() >= MAX_NUM) {
+					return;
 				}
 				etPwd.append(num);
 			}
@@ -185,6 +187,7 @@ public class LoadActivityV2 extends BaseActivity {
 		} else {
 			//密码错误
 			playErrState(etPwd);
+			playErrorVibration();
 		}
 	}
 
@@ -207,6 +210,13 @@ public class LoadActivityV2 extends BaseActivity {
 		} else {
 			vibrator.vibrate(30);
 		}
+	}
+
+	/**
+	 * 错误震动
+	 */
+	private void playErrorVibration() {
+		vibrator.vibrate(2000);
 	}
 
 	/**
@@ -251,6 +261,7 @@ public class LoadActivityV2 extends BaseActivity {
 			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
 			//如果游标为空则返回false
 			if (!cursor.moveToFirst()) {
+				tvInputTips.setText(R.string.string_3);
 				Local.User.loginPwd = MD5Util.getMD5(Local.DEFAULT);
 				return;
 			}

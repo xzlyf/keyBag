@@ -53,6 +53,13 @@
             android:textSize="@dimen/sp_20"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_input_tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white" />
+
         <com.xz.keybag.custom.NumberKeyboard
             android:id="@+id/number_view"
             android:layout_width="@dimen/dp_220"
