@@ -5,8 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.xz.base.BaseDialog;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseDialog;
 
 public class SecretInputDialog extends BaseDialog {
     private EditText etInput;

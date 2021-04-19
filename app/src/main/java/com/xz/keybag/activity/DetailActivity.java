@@ -7,14 +7,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
-import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.KeyEntity;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
-import com.xz.utils.MD5Util;
 import com.xz.utils.TimeUtil;
 
 import butterknife.BindView;

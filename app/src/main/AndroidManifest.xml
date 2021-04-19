@@ -12,7 +12,7 @@
 
 
     <application
-        android:name="com.xz.base.BaseApplication"
+        android:name=".base.BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/lanuch_max"
         android:label="@string/app_name"

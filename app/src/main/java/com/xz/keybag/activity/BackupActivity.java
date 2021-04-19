@@ -37,8 +37,8 @@ import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
 import com.orhanobut.logger.Logger;
-import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SecretInputDialog;
 import com.xz.keybag.custom.XOnClickListener;

@@ -40,7 +40,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    implementation project(path: ':base')
     implementation project(path: ':utils')
     implementation project(path: ':widget')
     implementation project(path: ':dialog')
@@ -53,5 +52,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
+    //加密数据库
+    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
 
 }

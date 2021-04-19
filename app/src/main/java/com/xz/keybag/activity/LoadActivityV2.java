@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -15,11 +14,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
-
-import com.orhanobut.logger.Logger;
-import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
 import com.xz.keybag.fingerprint.FingerprintHelper;
@@ -29,7 +25,6 @@ import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class LoadActivityV2 extends BaseActivity {
 

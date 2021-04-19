@@ -15,8 +15,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
