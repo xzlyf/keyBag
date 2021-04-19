@@ -14,14 +14,17 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
+import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
@@ -62,6 +65,8 @@ public class LoadActivityV2 extends BaseActivity {
 
 	@Override
 	public void initData() {
+		Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
+		Logger.w("sign加密："+ NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
