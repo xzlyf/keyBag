@@ -24,6 +24,7 @@ import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.utils.MD5Util;
 
@@ -66,7 +67,8 @@ public class LoadActivity extends BaseActivity {
 	@Override
 	public void initData() {
 		Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
-		Logger.w("sign加密："+ NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
+		Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
+		DBManager.getInstance(this).insertData();
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
