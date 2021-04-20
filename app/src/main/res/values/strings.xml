@@ -25,4 +25,10 @@
     <string name="string_23">资料修改失败</string>
     <string name="string_24">修改成功</string>
     <string name="string_25">密钥异常</string>
+    <string name="string_tips">温馨提示</string>
+    <string name="string_premission">请允许我使用以下权限，以确保程序正确运行！</string>
+    <string name="string_agreed">同意</string>
+    <string name="string_sidagree">不同意</string>
+    <string name="string_error">程序可能出现数据保存不成功、闪退等异常!</string>
+    <string name="string_right">好的</string>
 </resources>

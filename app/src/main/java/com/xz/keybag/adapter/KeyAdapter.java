@@ -1,8 +1,6 @@
 package com.xz.keybag.adapter;
 
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -15,10 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.orhanobut.logger.Logger;
-import com.xz.base.BaseRecyclerAdapter;
-import com.xz.base.BaseRecyclerViewHolder;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseRecyclerAdapter;
+import com.xz.keybag.base.BaseRecyclerViewHolder;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.KeyEntity;
 import com.xz.keybag.sql.EOD;

@@ -1,7 +1,6 @@
 package com.xz.keybag.activity;
 
 import android.content.ContentValues;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -9,18 +8,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.xz.base.BaseActivity;
 import com.xz.keybag.R;
+import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.utils.MD5Util;
 import com.xz.utils.RandomString;
 
-import org.w3c.dom.Text;
-
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class KeyActivity extends BaseActivity implements View.OnClickListener {
 
