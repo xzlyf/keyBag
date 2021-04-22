@@ -1,9 +1,12 @@
 package com.xz.keybag.activity;
 
+import android.Manifest;
 import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
@@ -13,6 +16,8 @@ import android.os.Vibrator;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
@@ -26,6 +31,8 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.AppInfoUtils;
+import com.xz.keybag.utils.DeviceUniqueUtils;
+import com.xz.keybag.utils.PermissionsUtils;
 import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
@@ -68,15 +75,15 @@ public class LoadActivity extends BaseActivity {
 	public void initData() {
 		Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
 		Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
-		DBManager.getInstance(this).insertData();
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
 		new ReadThread().start();
-		initView();
-		initFingerprint();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		initView();
+		initIdentity();
+		initFingerprint();
 	}
 
 
@@ -116,6 +123,41 @@ public class LoadActivity extends BaseActivity {
 	}
 
 
+	/**
+	 * 管理设备唯一id
+	 */
+	private void initIdentity() {
+		//检查权限，获取设备唯一id
+		PermissionsUtils.getInstance().chekPermissions(this,
+				new String[]{Manifest.permission.READ_PHONE_STATE},
+				new PermissionsUtils.IPermissionsResult() {
+					@Override
+					public void passPermissons() {
+						String uuid = DeviceUniqueUtils.getPhoneSign(LoadActivity.this);
+						// TODO: 2021/4/23 获取到唯一id要怎么做
+					}
+
+					@Override
+					public void forbitPermissons() {
+						AlertDialog finallyDialog = new AlertDialog.Builder(LoadActivity.this)
+								.setMessage("App需要此权限，以确保数据安全性。\n否则无法进行下一步")
+								.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+										finish();
+									}
+								})
+								.create();
+						finallyDialog.show();
+
+					}
+				});
+	}
+
+	/**
+	 * 初始化指纹 ，如果有
+	 */
 	private void initFingerprint() {
 		fingerprintHelper = FingerprintHelper.getInstance(mContext);
 		fingerprintHelper.setOnAuthResultListener(new OnAuthResultListener() {
@@ -159,6 +201,10 @@ public class LoadActivity extends BaseActivity {
 		fingerprintHelper.startListening();
 	}
 
+
+	/**
+	 * 杀死自己-_-
+	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
 		if (mode == 1) {
@@ -176,6 +222,7 @@ public class LoadActivity extends BaseActivity {
 			}
 		}, 500);
 	}
+
 
 	private void checkPwd() {
 		String temp = etPwd.getText().toString().trim();
@@ -237,6 +284,14 @@ public class LoadActivity extends BaseActivity {
 			Keyframe.ofFloat(0.9f, -shakeDegrees),
 			Keyframe.ofFloat(1.0f, 0f)
 	);
+
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		//就多一个参数this
+		PermissionsUtils.getInstance().onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+	}
 
 	@Override
 	public void onBackPressed() {

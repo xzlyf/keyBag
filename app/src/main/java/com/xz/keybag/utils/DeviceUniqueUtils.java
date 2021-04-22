@@ -1,6 +1,7 @@
 package com.xz.keybag.utils;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
@@ -24,13 +25,12 @@ public class DeviceUniqueUtils {
 	 * @param context
 	 * @return
 	 */
-	public String getPhoneSign(Context context) {
+	public static String getPhoneSign(Context context) {
 		StringBuilder deviceId = new StringBuilder();
 		// 渠道标志
-		deviceId.append("a");
+		deviceId.append("KeyBag_");
 		try {
 			//IMEI（imei）
-			// TODO: 2021/4/23 检查 PHONE STATE权限
 			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 			String imei = tm.getDeviceId();
 			if (!TextUtils.isEmpty(imei)) {
