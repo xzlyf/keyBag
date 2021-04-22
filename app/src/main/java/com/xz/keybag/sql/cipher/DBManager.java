@@ -43,8 +43,6 @@ public class DBManager {
 		cv.put(DBHelper.FIELD_COMMON_T1, "测试app");
 		cv.put(DBHelper.FIELD_COMMON_T2, "账号");
 		cv.put(DBHelper.FIELD_COMMON_T3, "密码");
-		cv.put(DBHelper.FIELD_COMMON_T4, "备注-------备注");
-		cv.put(DBHelper.FIELD_COMMON_T5, String.valueOf(System.currentTimeMillis()));
 		// insert 操作
 		db.insert(DBHelper.TABLE_COMMON, null, cv);
 		//关闭数据库
