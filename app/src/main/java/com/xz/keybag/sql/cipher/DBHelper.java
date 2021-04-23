@@ -18,7 +18,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static String DB_PWD;//数据库密码
 	public static String TABLE_COMMON = "common";// 表名
 	public static String TABLE_SECRET = "secret";// 表名
-	public static String TABLE_DBASE = "dbase";// 表名
+	public static String TABLE_DEVICE = "device";// 表名
 	public static String FIELD_COMMON_T0 = "id";//id
 	public static String FIELD_COMMON_T1 = "datum";//密码信息json
 	public static String FIELD_COMMON_T2 = "update_date";//更新时间
@@ -57,7 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_SECRET_K2 + " text , " +
 				FIELD_SECRET_K3 + " text " +
 				");";
-		String sql_dbase = "CREATE TABLE " + TABLE_DBASE + "(" +
+		String sql_dbase = "CREATE TABLE " + TABLE_DEVICE + "(" +
 				FIELD_DBASE_P1 + " text " +
 				");";
 

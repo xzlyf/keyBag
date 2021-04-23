@@ -26,6 +26,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
+import com.xz.keybag.custom.PasswordInputDialog;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
@@ -77,8 +78,8 @@ public class LoadActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
-		Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
+		//Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
+		//Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
@@ -91,6 +92,8 @@ public class LoadActivity extends BaseActivity {
 		db = DBManager.getInstance(this);
 		//管理唯一标识
 		initIdentity();
+		//登录初始化
+		initLogin();
 		//初始化指纹模块
 		initFingerprint();
 	}
@@ -191,6 +194,29 @@ public class LoadActivity extends BaseActivity {
 					}
 				});
 	}
+
+	/**
+	 * 初始化登录相关操作
+	 */
+	private void initLogin() {
+		//尝试读取登录密码
+		String loginPwd = db.queryLoginPwd();
+		if (loginPwd.equals("no_password")) {
+			PasswordInputDialog pwdInputDialog = new PasswordInputDialog(this);
+			pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
+				@Override
+				public void onClick(PasswordInputDialog dialog, String st) {
+					dialog.dismiss();
+
+				}
+			});
+			pwdInputDialog.create();
+			pwdInputDialog.show();
+		} else {
+			Logger.d("有密码：" + loginPwd);
+		}
+	}
+
 
 	/**
 	 * 初始化指纹 ，如果有
