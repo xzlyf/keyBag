@@ -6,6 +6,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.xz.keybag.utils.lock.DES;
+
 import net.sqlcipher.Cursor;
 import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
@@ -125,4 +127,24 @@ public class DBManager {
 		return pwd;
 	}
 
+	/**
+	 * 对Secret进行出厂设置，设置新的密钥，新的密码
+	 *
+	 * @param loginPwd 登录密码
+	 * @return
+	 */
+	public void initSecret(String loginPwd) {
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		//清空数据库
+		String sql = "delete from " + TABLE_SECRET;
+		db.execSQL(sql);
+		//生成DES密钥
+		String desSecret = DES.getKey();
+		//生成RSA密钥对
+		//RSA私钥存入数据库
+		//RSA公钥存入私有目录
+
+
+	}
 }
