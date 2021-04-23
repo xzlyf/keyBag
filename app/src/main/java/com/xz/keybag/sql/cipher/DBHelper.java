@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static final String TAG = "DBHelper";
 	private static final int DB_VERSION = 1;   // 数据库版本
 	private static final String DB_KEYBAG = "keybag_db";//数据库名
-	protected static final String DB_PWD = "2eScQBqf";//数据库密码
+	public static String DB_PWD;//数据库密码
 	public static String TABLE_COMMON = "common";// 表名
 	public static String TABLE_SECRET = "secret";// 表名
 	public static String TABLE_DBASE = "dbase";// 表名

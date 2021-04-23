@@ -83,12 +83,15 @@ public class LoadActivity extends BaseActivity {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
 		new ReadThread().start();
+		initView();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-		//sql
+		//initSql
+		DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
 		db = DBManager.getInstance(this);
-		initView();
+		//管理唯一标识
 		initIdentity();
+		//初始化指纹模块
 		initFingerprint();
 	}
 

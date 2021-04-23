@@ -19,7 +19,6 @@ public class Local {
     public static final int CODE_4 = 104;
     public static final int CODE_5 = 105;
 
-
     //更新服务器
     public static String NET_GET_UPDATE = "http://192.168.0.233:28080/keybag/update.json";
 
