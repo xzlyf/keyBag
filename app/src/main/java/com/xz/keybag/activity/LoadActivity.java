@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
@@ -29,6 +31,7 @@ import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.keybag.utils.DeviceUniqueUtils;
@@ -60,6 +63,7 @@ public class LoadActivity extends BaseActivity {
 	private float shakeDegrees = 3f;
 	private Vibrator vibrator;
 	private int mode;
+	private DBManager db;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -81,6 +85,8 @@ public class LoadActivity extends BaseActivity {
 		new ReadThread().start();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		//sql
+		db = DBManager.getInstance(this);
 		initView();
 		initIdentity();
 		initFingerprint();
@@ -134,13 +140,41 @@ public class LoadActivity extends BaseActivity {
 					@Override
 					public void passPermissons() {
 						String uuid = DeviceUniqueUtils.getPhoneSign(LoadActivity.this);
-						// TODO: 2021/4/23 获取到唯一id要怎么做
+						String old = db.queryIdentity();
+						if (old != null) {
+							if (!old.equals(uuid)) {
+								//跟之前保存的唯一标识不一致，环境异常，提示是否确认风险，确认同意后后就存入此次新的唯一标识
+								AlertDialog riskDialog = new AlertDialog.Builder(LoadActivity.this)
+										.setTitle("风险提示")
+										.setMessage("检测到设备异常\n是否继续")
+										.setNegativeButton("无风险，继续", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												db.insertIdentity(uuid);
+											}
+										})
+										.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												finish();
+											}
+										})
+										.setCancelable(false)
+										.create();
+								riskDialog.show();
+							}
+						} else {
+							//存入唯一标识
+							db.insertIdentity(uuid);
+						}
 					}
 
 					@Override
 					public void forbitPermissons() {
 						AlertDialog finallyDialog = new AlertDialog.Builder(LoadActivity.this)
-								.setMessage("App需要此权限，以确保数据安全性。\n否则无法进行下一步")
+								.setMessage("App需要此权限，\n以确保数据安全性。\n否则无法进行下一步")
 								.setPositiveButton("退出", new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {

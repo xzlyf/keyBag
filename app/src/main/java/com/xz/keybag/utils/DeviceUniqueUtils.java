@@ -1,12 +1,14 @@
 package com.xz.keybag.utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
 
 /**
@@ -28,27 +30,26 @@ public class DeviceUniqueUtils {
 	public static String getPhoneSign(Context context) {
 		StringBuilder deviceId = new StringBuilder();
 		// 渠道标志
-		deviceId.append("KeyBag_");
 		try {
 			//IMEI（imei）
 			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 			String imei = tm.getDeviceId();
 			if (!TextUtils.isEmpty(imei)) {
-				deviceId.append("imei");
+				deviceId.append("imei_");
 				deviceId.append(imei);
 				return deviceId.toString();
 			}
 			//序列号（sn）
 			String sn = tm.getSimSerialNumber();
 			if (!TextUtils.isEmpty(sn)) {
-				deviceId.append("sn");
+				deviceId.append("sn_");
 				deviceId.append(sn);
 				return deviceId.toString();
 			}
 			//如果上面都没有， 则生成一个id：随机码
 			String uuid = UUIDUtil.getStrUUID();
 			if (!TextUtils.isEmpty(uuid)) {
-				deviceId.append("id");
+				deviceId.append("id_");
 				deviceId.append(uuid);
 				return deviceId.toString();
 			}

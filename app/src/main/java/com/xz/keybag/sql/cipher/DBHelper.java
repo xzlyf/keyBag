@@ -26,8 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static String FIELD_SECRET_K1 = "k1";//DES密钥
 	public static String FIELD_SECRET_K2 = "k2";//登录密码
 	public static String FIELD_SECRET_K3 = "k3";//指纹登录 fingerprint-开启
-	public static String FIELD_DBASE_P1 = "id";//id
-	public static String FIELD_DBASE_P2 = "identity";//手机唯一标识
+	public static String FIELD_DBASE_P1 = "identity";//手机唯一标识
 
 
 	public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -51,16 +50,15 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_COMMON_T0 + " integer primary key autoincrement , " +
 				FIELD_COMMON_T1 + " text not null , " +
 				FIELD_COMMON_T2 + " text not null , " +
-				FIELD_COMMON_T3 + " text not null , " +
+				FIELD_COMMON_T3 + " text not null " +
 				");";
-		String sql_secret = "CREATE TABLE " + TABLE_DBASE + "(" +
+		String sql_secret = "CREATE TABLE " + TABLE_SECRET + "(" +
 				FIELD_SECRET_K1 + " text , " +
-				FIELD_SECRET_K2 + " text " +
+				FIELD_SECRET_K2 + " text , " +
 				FIELD_SECRET_K3 + " text " +
 				");";
-		String sql_dbase = "CREATE TABLE " + TABLE_SECRET + "(" +
-				FIELD_DBASE_P1 + " integer primary key autoincrement " +
-				FIELD_DBASE_P2 + " text " +
+		String sql_dbase = "CREATE TABLE " + TABLE_DBASE + "(" +
+				FIELD_DBASE_P1 + " text " +
 				");";
 
 
