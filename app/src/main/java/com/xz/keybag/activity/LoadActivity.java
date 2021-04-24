@@ -13,14 +13,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -92,8 +90,6 @@ public class LoadActivity extends BaseActivity {
 		initIdentity();
 		//登录初始化
 		initLogin();
-		//初始化指纹模块
-		initFingerprint();
 	}
 
 
@@ -207,6 +203,8 @@ public class LoadActivity extends BaseActivity {
 					dialog.dismiss();
 					try {
 						db.initSecret(st);
+						//初始化指纹模块
+						initFingerprint();
 					} catch (Exception e) {
 						sToast(e.getMessage());
 						finish();
@@ -216,9 +214,27 @@ public class LoadActivity extends BaseActivity {
 			pwdInputDialog.create();
 			pwdInputDialog.show();
 		} else if (loginPwd.equals("success_password")) {
-			Logger.d("有密码：" + loginPwd);
+			//用户是否开启指纹登录
+			if (!Local.mAdmin.getFingerprint().equals("fingerprint")) {
+				inputLayout2.setVisibility(View.GONE);
+				inputLayout.setVisibility(View.VISIBLE);
+				inputType.setVisibility(View.GONE);
+			} else {
+				//初始化指纹模块
+				initFingerprint();
+			}
+
 		} else {
-			Logger.d("密码文件被篡改，数据丢失：" + loginPwd);
+			AlertDialog dialog = new AlertDialog.Builder(mContext)
+					.setMessage("密码文件被篡改，数据丢失")
+					.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					})
+					.create();
+			dialog.show();
 		}
 	}
 
@@ -261,6 +277,7 @@ public class LoadActivity extends BaseActivity {
 				inputLayout2.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
+				inputType.setVisibility(View.GONE);
 
 			}
 
@@ -298,8 +315,8 @@ public class LoadActivity extends BaseActivity {
 			return;
 		}
 
-		temp = MD5Util.getMD5(temp);
-		if (temp.equals(Local.User.loginPwd)) {
+		//temp = MD5Util.getMD5(temp);
+		if (temp.equals(Local.mAdmin.getLoginPwd())) {
 			killMySelf();
 		} else {
 			//密码错误
@@ -373,7 +390,9 @@ public class LoadActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		fingerprintHelper.stopListener();
+		if (fingerprintHelper != null) {
+			fingerprintHelper.stopListener();
+		}
 	}
 
 
@@ -386,7 +405,6 @@ public class LoadActivity extends BaseActivity {
 			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
 			//如果游标为空则返回false
 			if (!cursor.moveToFirst()) {
-				tvInputTips.setText(R.string.string_3);
 				Local.User.loginPwd = MD5Util.getMD5(Local.DEFAULT);
 				return;
 			}

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.xz.apache_code_android.binary.Base64;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
 import com.xz.keybag.utils.FileTool;
@@ -18,7 +19,14 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.Map;
 
-import static com.xz.keybag.sql.cipher.DBHelper.*;
+import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_DBASE_P1;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K3;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K4;
+import static com.xz.keybag.sql.cipher.DBHelper.TABLE_DEVICE;
+import static com.xz.keybag.sql.cipher.DBHelper.TABLE_SECRET;
 
 
 /**
@@ -106,17 +114,17 @@ public class DBManager {
 		//获取可读数据库
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
 		Cursor cursor = null;
-		String pwd = null;
+		String pwd;
 		try {
 			cursor = db.query(TABLE_SECRET, null, null, null, null, null, null);
 			if (cursor.moveToNext()) {
 				String publicKey = FileTool.read(mContext, "public.xkf");
 				Admin admin = new Admin();
-				admin.setDes(cursor.getString(0));
-				admin.setLoginPwd(cursor.getString(1));
-				admin.setFingerprint(cursor.getString(2));
-				admin.setPrivateKey(cursor.getString(3));
 				admin.setPublicKey(publicKey);
+				admin.setDes(RSA.publicDecrypt(cursor.getString(0), RSA.getPublicKey(admin.getPublicKey())));//公钥解密
+				admin.setLoginPwd(DES.decryptor(cursor.getString(1), admin.getDes()));
+				admin.setFingerprint(DES.decryptor(cursor.getString(2), admin.getDes()));
+				admin.setPrivateKey(DES.decryptor(cursor.getString(3), admin.getDes()));
 				Local.mAdmin = admin;
 				pwd = "success_password";
 			} else {
@@ -125,9 +133,11 @@ public class DBManager {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 			Log.e(TAG, "queryLoginPwd:" + e.toString());
 			pwd = "error_query_pwd";
+		} catch (Exception e) {
+			Log.e(TAG, "queryLoginPwd:" + e.toString());
+			pwd = "error_decrypt";
 		} finally {
 			if (cursor != null) {
 				cursor.close();
@@ -152,22 +162,23 @@ public class DBManager {
 		//生成DES密钥
 		String desSecret = DES.getKey();
 		//生成RSA密钥对
-		Map<Integer, String> keyMap = RSA.getKeyPair();
+		Map<String, String> keyMap = RSA.createKeys(1024);
 		if (keyMap == null || desSecret.equals("error_getKey")) {
 			throw new Exception("密钥生成失败，请检查系统版本和软件版本");
 		}
-		//存入DES密钥
-		cv.put(FIELD_SECRET_K1, desSecret);
+		//存入DES密钥  私钥加密密文
+		cv.put(FIELD_SECRET_K1, RSA.privateEncrypt(desSecret, RSA.getPrivateKey(keyMap.get("privateKey"))));
 		//存入登录密码
-		cv.put(FIELD_SECRET_K2, loginPwd);
+		cv.put(FIELD_SECRET_K2, DES.encryptor(loginPwd, desSecret));
 		//默认开启指纹登录
-		cv.put(FIELD_SECRET_K3, "fingerprint");
+		cv.put(FIELD_SECRET_K3, DES.encryptor("fingerprint", desSecret));
 		//RSA私钥存入数据库
-		cv.put(FIELD_SECRET_K4, keyMap.get(1));
+		//cv.put(FIELD_SECRET_K4, Base64.encodeBase64(keyMap.get("privateKey").getBytes()));
+		cv.put(FIELD_SECRET_K4, DES.encryptor(keyMap.get("privateKey"), desSecret));
 		//删除私有目录得公钥
 		FileTool.delete(mContext, "public.xkf");
 		//RSA公钥存入私有目录
-		FileTool.save(mContext, "public.xkf", keyMap.get(0));
+		FileTool.save(mContext, "public.xkf", keyMap.get("publicKey"));
 
 		//存入全局变量
 		Admin admin = new Admin();

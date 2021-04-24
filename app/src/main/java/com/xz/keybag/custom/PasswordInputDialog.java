@@ -69,7 +69,7 @@ public class PasswordInputDialog extends BaseDialog {
 						seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
 						seekBar.setThumbOffset(0);
 						seekBar.setProgress(0);
-						Toast.makeText(mContext, "数字不能为空", Toast.LENGTH_SHORT).show();
+						Toast.makeText(mContext, "密码不能为空", Toast.LENGTH_SHORT).show();
 					}
 				} else {
 					seekBar.setProgress(0);
