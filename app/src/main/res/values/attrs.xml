@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="UnifyEditView">
+        <!--下面是主要属性-->
+        <attr name="mode" format="enum">
+            <!--水平模式-->
+            <enum name="horizontal" value="0" />
+            <!--垂直模式-->
+            <enum name="vertical" value="1" />
+        </attr>
+        <!--下面是EditView的属性-->
+        <attr name="text" format="string" />
+        <attr name="hint" format="string" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="color" />
+        <attr name="hintColor" format="color" />
+        <attr name="maxLines" format="integer" />
+        <attr name="lines" format="integer" />
+        <!--下面是TextView的属性-->
+        <attr name="label" format="string" />
+        <attr name="labelSize" format="dimension" />
+        <attr name="labelColor" format="color" />
+    </declare-styleable>
+</resources>

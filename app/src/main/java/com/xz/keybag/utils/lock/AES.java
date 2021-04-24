@@ -18,6 +18,16 @@ import javax.crypto.spec.SecretKeySpec;
  * 参考： http://czj4451.iteye.com/blog/1986483
  */
 public class AES {
+    /*public static void main(String[] args) throws Exception {
+        String s = "hello world";
+        // 加密
+        System.out.println("加密前：" + s);
+        String encryptResultStr = encrypt(s);
+        System.out.println("加密后：" + encryptResultStr);
+        // 解密
+        System.out.println("解密后：" + decrypt(encryptResultStr));
+    }*/
+
     // 密钥
     public static String key = "AD42F6697B035B7580E4FEF93BE20BAD";
     private static String charset = "utf-8";
@@ -95,13 +105,4 @@ public class AES {
         return null;
     }
 
-    public static void main(String[] args) throws Exception {
-        String s = "hello world";
-        // 加密
-        System.out.println("加密前：" + s);
-        String encryptResultStr = encrypt(s);
-        System.out.println("加密后：" + encryptResultStr);
-        // 解密
-        System.out.println("解密后：" + decrypt(encryptResultStr));
-    }
 }
