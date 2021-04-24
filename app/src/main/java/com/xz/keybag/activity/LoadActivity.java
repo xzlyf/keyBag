@@ -8,18 +8,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
@@ -34,7 +33,6 @@ import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
-import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.keybag.utils.DeviceUniqueUtils;
 import com.xz.keybag.utils.PermissionsUtils;
 import com.xz.utils.MD5Util;
@@ -200,20 +198,27 @@ public class LoadActivity extends BaseActivity {
 	 */
 	private void initLogin() {
 		//尝试读取登录密码
-		String loginPwd = db.queryLoginPwd();
+		String loginPwd = db.queryLogin();
 		if (loginPwd.equals("no_password")) {
 			PasswordInputDialog pwdInputDialog = new PasswordInputDialog(this);
 			pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
 				@Override
 				public void onClick(PasswordInputDialog dialog, String st) {
 					dialog.dismiss();
-
+					try {
+						db.initSecret(st);
+					} catch (Exception e) {
+						sToast(e.getMessage());
+						finish();
+					}
 				}
 			});
 			pwdInputDialog.create();
 			pwdInputDialog.show();
-		} else {
+		} else if (loginPwd.equals("success_password")) {
 			Logger.d("有密码：" + loginPwd);
+		} else {
+			Logger.d("密码文件被篡改，数据丢失：" + loginPwd);
 		}
 	}
 
