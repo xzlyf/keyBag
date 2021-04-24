@@ -37,19 +37,43 @@
             android:text="新建钥匙"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_5"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:background="@drawable/btn_yuanxin_common"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/dp_5"
+            android:paddingTop="@dimen/dp_2"
+            android:paddingEnd="@dimen/dp_5"
+            android:paddingBottom="@dimen/dp_2"
+            android:text="保存"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_16" />
     </LinearLayout>
 
     <com.xz.keybag.custom.UnifyEditView
+        android:id="@+id/ue_project"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
-        app:label="应用"
+        app:label="应用 >"
         app:textColor="@color/secTextColor" />
 
     <com.xz.keybag.custom.UnifyEditView
+        android:id="@+id/ue_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -60,6 +84,7 @@
         app:textColor="@color/secTextColor" />
 
     <com.xz.keybag.custom.UnifyEditView
+        android:id="@+id/ue_pwd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -70,6 +95,7 @@
         app:textColor="@color/secTextColor" />
 
     <com.xz.keybag.custom.UnifyEditView
+        android:id="@+id/ue_remark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_6"

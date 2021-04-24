@@ -24,7 +24,8 @@ import com.xz.keybag.R;
  */
 public class UnifyEditView extends LinearLayout {
 
-	private EditText input;
+	private TextView mLabel;
+	private EditText mInput;
 
 	public UnifyEditView(Context context) {
 		this(context, null);
@@ -40,17 +41,10 @@ public class UnifyEditView extends LinearLayout {
 	}
 
 	private void initView(Context context, AttributeSet attrs) {
-		setPadding(20, 50, 20, 50);
 
 		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.UnifyEditView);
+		//主属性
 		int mode = ta.getInt(R.styleable.UnifyEditView_mode, 0);
-		if (mode == 1) {
-			//垂直模式
-			setOrientation(VERTICAL);
-		} else {
-			//水平模式
-			setOrientation(HORIZONTAL);
-		}
 		//获取标签属性
 		AttrsByLabel labelAttrs = new AttrsByLabel();
 		labelAttrs.setColor(ta.getColor(R.styleable.UnifyEditView_labelColor, context.getColor(R.color.mainTextColor)));
@@ -67,55 +61,69 @@ public class UnifyEditView extends LinearLayout {
 		editAttrs.setMaxLines(ta.getInt(R.styleable.UnifyEditView_maxLines, 1));
 		ta.recycle();
 
+		setPadding(20, 50, 20, 50);
+		if (mode == 1) {
+			//垂直模式
+			setOrientation(VERTICAL);
+		} else {
+			//水平模式
+			setOrientation(HORIZONTAL);
+		}
 		addView(addTextView(context, labelAttrs));
 		addView(addEditView(context, editAttrs, mode));
 
 	}
 
 	private View addTextView(Context context, AttrsByLabel labelAttrs) {
-		TextView label = new TextView(context);
-		label.setPadding(30, 0, 30, 0);
-		label.setText(labelAttrs.getText());
-		label.setTextSize(labelAttrs.getSize());
-		label.setTextColor(labelAttrs.getColor());
-		label.setTextColor(context.getColor(R.color.mainTextColor));
-		return label;
+		mLabel = new TextView(context);
+		mLabel.setPadding(30, 0, 30, 0);
+		mLabel.setText(labelAttrs.getText());
+		mLabel.setTextSize(labelAttrs.getSize());
+		mLabel.setTextColor(labelAttrs.getColor());
+		mLabel.setTextColor(context.getColor(R.color.mainTextColor));
+		return mLabel;
 	}
 
 	private View addEditView(Context context, AttrsByEdit editAttrs, int mode) {
 		LinearLayout.LayoutParams lp;
-		input = new EditText(context);
+		mInput = new EditText(context);
 		if (mode == 1) {
 			//垂直模式
 			lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.0f);
-			input.setGravity(Gravity.START);
-			input.setPadding(30, 30, 30, 0);
+			mInput.setGravity(Gravity.START);
+			mInput.setPadding(30, 30, 30, 0);
 		} else {
 			//水平模式
 			lp = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f);
-			input.setGravity(Gravity.END);
-			input.setPadding(30, 0, 30, 0);
+			mInput.setGravity(Gravity.END);
+			mInput.setPadding(30, 0, 30, 0);
 		}
-		input.setLayoutParams(lp);
-		input.setBackgroundColor(Color.TRANSPARENT);
-		input.clearFocus();
-		input.setTextSize(editAttrs.getTextSize());
-		input.setTextColor(editAttrs.getTextColor());
-		input.setHint(editAttrs.getHint());
-		input.setLines(editAttrs.getLines());
-		input.setMaxLines(editAttrs.getMaxLines());
-		return input;
+		mInput.setLayoutParams(lp);
+		mInput.setBackgroundColor(Color.TRANSPARENT);
+		mInput.clearFocus();
+		mInput.setTextSize(editAttrs.getTextSize());
+		mInput.setTextColor(editAttrs.getTextColor());
+		mInput.setHint(editAttrs.getHint());
+		mInput.setLines(editAttrs.getLines());
+		mInput.setMaxLines(editAttrs.getMaxLines());
+		return mInput;
 	}
 
 	/**
 	 * =================公开方法====================
 	 */
 	public Editable getText() {
-		return input.getText();
+		return mInput.getText();
 	}
 
 	public void setText(String st) {
-		input.setText(st);
+		mInput.setText(st);
+	}
+
+	public void setLabelOnClickListener(View.OnClickListener listener) {
+		mLabel.setClickable(true);
+		mLabel.setFocusable(true);
+		mLabel.setOnClickListener(listener);
 	}
 
 	private static class AttrsByLabel {
