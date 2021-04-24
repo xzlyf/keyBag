@@ -115,7 +115,6 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
         ButterKnife.bind(this);
     }
 

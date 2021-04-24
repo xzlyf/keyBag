@@ -8,7 +8,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public abstract class BaseDialog extends Dialog {
-    private Context mContext;
+    protected Context mContext;
     private OnCancelListener cancelListener;
 
     public BaseDialog(Context context) {

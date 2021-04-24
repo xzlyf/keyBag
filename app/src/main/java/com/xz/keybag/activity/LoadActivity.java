@@ -1,10 +1,14 @@
 package com.xz.keybag.activity;
 
+import android.Manifest;
 import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
@@ -14,18 +18,25 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
+import com.xz.keybag.custom.PasswordInputDialog;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.AppInfoUtils;
+import com.xz.keybag.utils.DeviceUniqueUtils;
+import com.xz.keybag.utils.PermissionsUtils;
 import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
@@ -53,6 +64,7 @@ public class LoadActivity extends BaseActivity {
 	private float shakeDegrees = 3f;
 	private Vibrator vibrator;
 	private int mode;
+	private DBManager db;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -66,17 +78,24 @@ public class LoadActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
-		Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
-		DBManager.getInstance(this).insertData();
+		//Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
+		//Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
 		new ReadThread().start();
 		initView();
-		initFingerprint();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		//initSql
+		DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
+		db = DBManager.getInstance(this);
+		//管理唯一标识
+		initIdentity();
+		//登录初始化
+		initLogin();
+		//初始化指纹模块
+		initFingerprint();
 	}
 
 
@@ -116,6 +135,92 @@ public class LoadActivity extends BaseActivity {
 	}
 
 
+	/**
+	 * 管理设备唯一id
+	 */
+	private void initIdentity() {
+		//检查权限，获取设备唯一id
+		PermissionsUtils.getInstance().chekPermissions(this,
+				new String[]{Manifest.permission.READ_PHONE_STATE},
+				new PermissionsUtils.IPermissionsResult() {
+					@Override
+					public void passPermissons() {
+						String uuid = DeviceUniqueUtils.getPhoneSign(LoadActivity.this);
+						String old = db.queryIdentity();
+						if (old != null) {
+							if (!old.equals(uuid)) {
+								//跟之前保存的唯一标识不一致，环境异常，提示是否确认风险，确认同意后后就存入此次新的唯一标识
+								AlertDialog riskDialog = new AlertDialog.Builder(LoadActivity.this)
+										.setTitle("风险提示")
+										.setMessage("检测到设备异常\n是否继续")
+										.setNegativeButton("无风险，继续", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												db.insertIdentity(uuid);
+											}
+										})
+										.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												finish();
+											}
+										})
+										.setCancelable(false)
+										.create();
+								riskDialog.show();
+							}
+						} else {
+							//存入唯一标识
+							db.insertIdentity(uuid);
+						}
+					}
+
+					@Override
+					public void forbitPermissons() {
+						AlertDialog finallyDialog = new AlertDialog.Builder(LoadActivity.this)
+								.setMessage("App需要此权限，\n以确保数据安全性。\n否则无法进行下一步")
+								.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+										finish();
+									}
+								})
+								.create();
+						finallyDialog.show();
+
+					}
+				});
+	}
+
+	/**
+	 * 初始化登录相关操作
+	 */
+	private void initLogin() {
+		//尝试读取登录密码
+		String loginPwd = db.queryLoginPwd();
+		if (loginPwd.equals("no_password")) {
+			PasswordInputDialog pwdInputDialog = new PasswordInputDialog(this);
+			pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
+				@Override
+				public void onClick(PasswordInputDialog dialog, String st) {
+					dialog.dismiss();
+
+				}
+			});
+			pwdInputDialog.create();
+			pwdInputDialog.show();
+		} else {
+			Logger.d("有密码：" + loginPwd);
+		}
+	}
+
+
+	/**
+	 * 初始化指纹 ，如果有
+	 */
 	private void initFingerprint() {
 		fingerprintHelper = FingerprintHelper.getInstance(mContext);
 		fingerprintHelper.setOnAuthResultListener(new OnAuthResultListener() {
@@ -159,6 +264,10 @@ public class LoadActivity extends BaseActivity {
 		fingerprintHelper.startListening();
 	}
 
+
+	/**
+	 * 杀死自己-_-
+	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
 		if (mode == 1) {
@@ -176,6 +285,7 @@ public class LoadActivity extends BaseActivity {
 			}
 		}, 500);
 	}
+
 
 	private void checkPwd() {
 		String temp = etPwd.getText().toString().trim();
@@ -237,6 +347,14 @@ public class LoadActivity extends BaseActivity {
 			Keyframe.ofFloat(0.9f, -shakeDegrees),
 			Keyframe.ofFloat(1.0f, 0f)
 	);
+
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		//就多一个参数this
+		PermissionsUtils.getInstance().onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+	}
 
 	@Override
 	public void onBackPressed() {

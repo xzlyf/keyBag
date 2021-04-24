@@ -15,19 +15,18 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static final String TAG = "DBHelper";
 	private static final int DB_VERSION = 1;   // 数据库版本
 	private static final String DB_KEYBAG = "keybag_db";//数据库名
-	protected static final String DB_PWD = "2eScQBqf";//数据库密码
+	public static String DB_PWD;//数据库密码
 	public static String TABLE_COMMON = "common";// 表名
 	public static String TABLE_SECRET = "secret";// 表名
-	public static String TABLE_DBASE = "dbase";// 表名
-	public static String FIELD_COMMON_T0 = "t0";//id
-	public static String FIELD_COMMON_T1 = "t1";//名称
-	public static String FIELD_COMMON_T2 = "t2";//账号
-	public static String FIELD_COMMON_T3 = "t3";//密码
-	public static String FIELD_COMMON_T4 = "t4";//备注信息
-	public static String FIELD_COMMON_T5 = "t5";//最后修改时间(时间戳)
-	public static String FIELD_SECRET_K1 = "k1";//密文密码解密的密钥
+	public static String TABLE_DEVICE = "device";// 表名
+	public static String FIELD_COMMON_T0 = "id";//id
+	public static String FIELD_COMMON_T1 = "datum";//密码信息json
+	public static String FIELD_COMMON_T2 = "update_date";//更新时间
+	public static String FIELD_COMMON_T3 = "create_date";//创建时间
+	public static String FIELD_SECRET_K1 = "k1";//DES密钥
 	public static String FIELD_SECRET_K2 = "k2";//登录密码
-	public static String FIELD_DBASE_P1 = "p1";//是否首次使用
+	public static String FIELD_SECRET_K3 = "k3";//指纹登录 fingerprint-开启
+	public static String FIELD_DBASE_P1 = "identity";//手机唯一标识
 
 
 	public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -51,18 +50,16 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_COMMON_T0 + " integer primary key autoincrement , " +
 				FIELD_COMMON_T1 + " text not null , " +
 				FIELD_COMMON_T2 + " text not null , " +
-				FIELD_COMMON_T3 + " text not null , " +
-				FIELD_COMMON_T4 + " text , " +
-				FIELD_COMMON_T5 + " text not null" +
+				FIELD_COMMON_T3 + " text not null " +
 				");";
-		String sql_secret = "CREATE TABLE " + TABLE_DBASE + "(" +
+		String sql_secret = "CREATE TABLE " + TABLE_SECRET + "(" +
 				FIELD_SECRET_K1 + " text , " +
-				FIELD_SECRET_K2 + " text " +
+				FIELD_SECRET_K2 + " text , " +
+				FIELD_SECRET_K3 + " text " +
 				");";
-		String sql_dbase = "CREATE TABLE " + TABLE_SECRET + "(" +
+		String sql_dbase = "CREATE TABLE " + TABLE_DEVICE + "(" +
 				FIELD_DBASE_P1 + " text " +
 				");";
-
 
 
 		try {
