@@ -10,6 +10,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseDialog;
 import com.xz.utils.KeyBoardUtil;
@@ -48,6 +49,10 @@ public class PasswordInputDialog extends BaseDialog {
 					seekBar.setProgress(seekBar.getMax());
 					seekBar.setEnabled(false);
 					mTvTop.setVisibility(View.VISIBLE);
+					mEtInput.setEnabled(false);
+					if (mOnClickListener != null) {
+						mOnClickListener.onClick(PasswordInputDialog.this, mEtInput.getText().toString().trim());
+					}
 				}
 			}
 
@@ -64,13 +69,7 @@ public class PasswordInputDialog extends BaseDialog {
 						seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
 						seekBar.setThumbOffset(0);
 						seekBar.setProgress(0);
-						Toast.makeText(mContext, "数字不能为空", Toast.LENGTH_SHORT).show();
-					} else {
-						mEtInput.setEnabled(false);
-						if (mOnClickListener != null) {
-							mOnClickListener.onClick(PasswordInputDialog.this, mEtInput.getText().toString().trim());
-						}
-
+						Toast.makeText(mContext, "密码不能为空", Toast.LENGTH_SHORT).show();
 					}
 				} else {
 					seekBar.setProgress(0);

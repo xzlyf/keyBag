@@ -1,13 +1,18 @@
 package com.xz.keybag.utils;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.content.pm.SigningInfo;
 import android.os.Build;
 
+import com.xz.keybag.entity.AppInfo;
+
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author czr
@@ -77,4 +82,51 @@ public class AppInfoUtils {
 		return md5StrBuff.toString();
 	}
 
+
+	/**
+	 * 获取所有应用列表包名
+	 *
+	 * @param isFilterSys 是否过滤系统应用
+	 */
+	public static List<AppInfo> getAllApp(Context context, boolean isFilterSys) {
+		List<AppInfo> list = new ArrayList<>();
+		try {
+			PackageManager pm = context.getPackageManager();
+			List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES |
+					PackageManager.GET_SERVICES);
+			AppInfo appInfo;
+			for (PackageInfo info : packageInfos) {
+				appInfo = new AppInfo();
+				appInfo.setPackageName(info.packageName);
+				appInfo.setAppName(info.applicationInfo.loadLabel(pm).toString());
+				appInfo.setIcon(info.applicationInfo.loadIcon(pm));
+				if (isFilterSys) {
+					//如果不是系统应用，则添加至appList
+					if ((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+						list.add(appInfo);
+					}
+				} else {
+					//不过滤系统应用
+					list.add(appInfo);
+				}
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		return list;
+	}
+
+	/**
+	 * 通过包名获取app名
+	 */
+	public static String getAppName(String packageName, Context context) {
+		PackageManager pm = context.getPackageManager();
+		String Name;
+		try {
+			Name = pm.getApplicationLabel(pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)).toString();
+		} catch (PackageManager.NameNotFoundException e) {
+			Name = "";
+		}
+		return Name;
+	}
 }
