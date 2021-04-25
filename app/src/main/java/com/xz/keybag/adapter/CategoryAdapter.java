@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
@@ -18,6 +19,9 @@ import com.xz.keybag.entity.Category;
  * @date 2021/4/24
  */
 public class CategoryAdapter extends BaseRecyclerAdapter<Category> {
+	private View mSelectView;
+	private boolean isOne = true;
+
 	public CategoryAdapter(Context context) {
 		super(context);
 	}
@@ -39,15 +43,28 @@ public class CategoryAdapter extends BaseRecyclerAdapter<Category> {
 		ViewHolder(@NonNull View itemView) {
 			super(itemView);
 			mName = itemView.findViewById(R.id.tv_key);
-			if (mOnItemClickListener != null) {
-				itemView.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (mSelectView != null) {
+						mSelectView.setEnabled(true);
+					}
+					mSelectView = v;
+					mSelectView.setEnabled(false);
+					if (mOnItemClickListener != null) {
 						mOnItemClickListener.onItemClick(v, getLayoutPosition(), mList.get(getLayoutPosition()));
 					}
-				});
+				}
+			});
+			//默认选中第一个
+			if (isOne) {
+				mSelectView = mName;
+				mSelectView.setEnabled(false);
+				if (mOnItemClickListener != null) {
+					mOnItemClickListener.onItemClick(mName, 0, mList.get(0));
+				}
+				isOne = false;
 			}
-
 		}
 	}
 }
