@@ -36,7 +36,7 @@ public class AppListAdapter extends BaseRecyclerAdapter<AppInfo> {
 		return new ViewHolder(mInflater.inflate(R.layout.item_applist, parent, false));
 	}
 
-	private static class ViewHolder extends BaseRecyclerViewHolder {
+	private class ViewHolder extends BaseRecyclerViewHolder {
 		private ImageView mIcon;
 		private TextView mName;
 
@@ -44,6 +44,15 @@ public class AppListAdapter extends BaseRecyclerAdapter<AppInfo> {
 			super(itemView);
 			mIcon = itemView.findViewById(R.id.img_icon);
 			mName = itemView.findViewById(R.id.tv_name);
+			if (mOnItemClickListener != null) {
+				itemView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mOnItemClickListener.onItemClick(v, getLayoutPosition(), mList.get(getLayoutPosition()));
+					}
+				});
+			}
+
 		}
 	}
 }

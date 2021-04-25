@@ -1,18 +1,26 @@
 package com.xz.keybag.custom;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.AppListAdapter;
 import com.xz.keybag.base.BaseDialog;
+import com.xz.keybag.base.OnItemClickListener;
+import com.xz.keybag.entity.AppInfo;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.utils.SpacesItemDecorationVertical;
+
+import java.util.List;
 
 /**
  * @author czr
@@ -22,6 +30,7 @@ import com.xz.utils.SpacesItemDecorationVertical;
 public class AppListDialog extends BaseDialog {
 	private RecyclerView itemRecycler;
 	private AppListAdapter mAdapter;
+	private Handler mHandler;
 
 	public AppListDialog(Context context) {
 		super(context);
@@ -35,6 +44,14 @@ public class AppListDialog extends BaseDialog {
 	@Override
 	protected void initData() {
 		initView();
+		mHandler = new Handler(new Handler.Callback() {
+			@Override
+			public boolean handleMessage(@NonNull Message msg) {
+				return true;
+			}
+		});
+
+		new ReadThread(mContext).start();
 	}
 
 	private void initView() {
@@ -55,6 +72,34 @@ public class AppListDialog extends BaseDialog {
 		itemRecycler.setLayoutManager(new LinearLayoutManager(mContext));
 		itemRecycler.addItemDecoration(new SpacesItemDecorationVertical(20));
 		itemRecycler.setAdapter(mAdapter);
-		mAdapter.refresh(AppInfoUtils.getAllApp(mContext,true));
+		//mAdapter.refresh(AppInfoUtils.getAllApp(mContext, true));
+
+	}
+
+	public void setOnItemClickListener(OnItemClickListener<AppInfo> listener) {
+		mAdapter.setOnItemClickListener(listener);
+	}
+
+	private class ReadThread extends Thread {
+		private Context mContext;
+
+		public ReadThread(Context context) {
+			mContext = context;
+		}
+
+		@Override
+		public void run() {
+			List<AppInfo> allApp = AppInfoUtils.getAllApp(mContext, true);
+			for (int i = 0; i < allApp.size(); i++) {
+				int finalI = i;
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mAdapter.refreshSingle(allApp.get(finalI));
+					}
+				});
+				SystemClock.sleep(50);
+			}
+		}
 	}
 }

@@ -3,6 +3,7 @@ package com.xz.keybag.custom;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.os.Build;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -85,18 +86,21 @@ public class UnifyEditView extends LinearLayout {
 	}
 
 	private View addEditView(Context context, AttrsByEdit editAttrs, int mode) {
-		LinearLayout.LayoutParams lp;
+		LayoutParams lp;
 		mInput = new EditText(context);
 		if (mode == 1) {
 			//垂直模式
-			lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.0f);
+			lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.0f);
 			mInput.setGravity(Gravity.START);
 			mInput.setPadding(30, 30, 30, 0);
 		} else {
 			//水平模式
-			lp = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f);
+			lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f);
 			mInput.setGravity(Gravity.END);
 			mInput.setPadding(30, 0, 30, 0);
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			mInput.setAutoLinkMask(AUTOFILL_TYPE_NONE);
 		}
 		mInput.setLayoutParams(lp);
 		mInput.setBackgroundColor(Color.TRANSPARENT);

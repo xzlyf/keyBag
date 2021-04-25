@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.base.OnItemClickListener;
 import com.xz.keybag.custom.AppListDialog;
 import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.AppInfo;
@@ -78,6 +79,18 @@ public class AddActivityV2 extends BaseActivity {
 		if (appListDialog == null) {
 			appListDialog = new AppListDialog(mContext);
 			appListDialog.create();
+			appListDialog.setOnItemClickListener(new OnItemClickListener<AppInfo>() {
+				@Override
+				public void onItemClick(View view, int position, AppInfo model) {
+					appListDialog.dismiss();
+					ueProject.setText(model.getAppName());
+				}
+
+				@Override
+				public void onItemLongClick(View view, int position, AppInfo model) {
+
+				}
+			});
 		}
 		appListDialog.show();
 	}
