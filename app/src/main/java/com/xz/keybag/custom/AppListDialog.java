@@ -5,13 +5,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.AppListAdapter;
 import com.xz.keybag.base.BaseDialog;
@@ -20,6 +25,7 @@ import com.xz.keybag.entity.AppInfo;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.utils.SpacesItemDecorationVertical;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +36,9 @@ import java.util.List;
 public class AppListDialog extends BaseDialog {
 	private RecyclerView itemRecycler;
 	private AppListAdapter mAdapter;
+	private ProgressBar mProgressBar;
 	private Handler mHandler;
+	private ReadThread readThread;
 
 	public AppListDialog(Context context) {
 		super(context);
@@ -51,7 +59,8 @@ public class AppListDialog extends BaseDialog {
 			}
 		});
 
-		new ReadThread(mContext).start();
+		readThread = new ReadThread(mContext);
+		readThread.start();
 	}
 
 	private void initView() {
@@ -67,6 +76,7 @@ public class AppListDialog extends BaseDialog {
 			window.setAttributes(lp);
 		}
 
+		mProgressBar = findViewById(R.id.bar_total);
 		mAdapter = new AppListAdapter(mContext);
 		itemRecycler = findViewById(R.id.item_recycler);
 		itemRecycler.setLayoutManager(new LinearLayoutManager(mContext));
@@ -76,30 +86,64 @@ public class AppListDialog extends BaseDialog {
 
 	}
 
+
 	public void setOnItemClickListener(OnItemClickListener<AppInfo> listener) {
 		mAdapter.setOnItemClickListener(listener);
 	}
 
+	public void stopThread() {
+		if (readThread.isAlive()) {
+			readThread.stopThread();
+		}
+	}
+
+	/**
+	 * 使用子线程读取应用列表并显示图标
+	 * 防止一下子加载过多图标
+	 */
 	private class ReadThread extends Thread {
 		private Context mContext;
+		private boolean isStop = false;
 
-		public ReadThread(Context context) {
+		ReadThread(Context context) {
 			mContext = context;
 		}
 
 		@Override
 		public void run() {
 			List<AppInfo> allApp = AppInfoUtils.getAllApp(mContext, true);
+			int total = allApp.size();
 			for (int i = 0; i < allApp.size(); i++) {
+				if (isStop) {
+					break;
+				}
 				int finalI = i;
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
+						int curr = (int) (((float) finalI / (float) total) * 100);
+						mProgressBar.setProgress(curr);
 						mAdapter.refreshSingle(allApp.get(finalI));
 					}
 				});
-				SystemClock.sleep(50);
+				SystemClock.sleep(80);
 			}
+			if (!isStop) {
+				//隐藏进度条
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mProgressBar.setProgress(100);
+						mProgressBar.setVisibility(View.INVISIBLE);
+					}
+				});
+			}
+
+		}
+
+		void stopThread() {
+			isStop = true;
 		}
 	}
+
 }

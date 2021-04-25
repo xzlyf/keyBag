@@ -94,4 +94,12 @@ public class AddActivityV2 extends BaseActivity {
 		}
 		appListDialog.show();
 	}
+
+	@Override
+	protected void onDestroy() {
+		if (appListDialog != null) {
+			appListDialog.stopThread();
+		}
+		super.onDestroy();
+	}
 }
