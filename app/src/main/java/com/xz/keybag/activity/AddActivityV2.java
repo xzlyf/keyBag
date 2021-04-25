@@ -1,20 +1,25 @@
 package com.xz.keybag.activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.xz.keybag.R;
+import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.OnItemClickListener;
 import com.xz.keybag.custom.AppListDialog;
 import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.AppInfo;
-import com.xz.keybag.utils.AppInfoUtils;
+import com.xz.keybag.entity.Category;
+import com.xz.utils.SpacesItemDecorationHorizontal;
+import com.xz.utils.SpacesItemDecorationVertical;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,8 +43,11 @@ public class AddActivityV2 extends BaseActivity {
 	UnifyEditView uePwd;
 	@BindView(R.id.ue_remark)
 	UnifyEditView ueRemark;
+	@BindView(R.id.category_view)
+	RecyclerView categoryView;
 
 	private AppListDialog appListDialog;
+	private CategoryAdapter categoryAdapter;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -54,6 +62,7 @@ public class AddActivityV2 extends BaseActivity {
 	@Override
 	public void initData() {
 		initView();
+		initCategory();
 	}
 
 	private void initView() {
@@ -63,7 +72,41 @@ public class AddActivityV2 extends BaseActivity {
 				showAppListDialog();
 			}
 		});
+
+
 	}
+
+	/**
+	 * 加载分类标签
+	 */
+	private void initCategory() {
+		//todo  sql读取分类标签
+
+		List<Category> list = new ArrayList<>();
+		list.add(new Category("App", "a219dha8h12jhjkh1"));
+		list.add(new Category("网站", "1233445ckjwu34ng"));
+		list.add(new Category("邮箱", "1sc521f6asdf4489da"));
+
+		categoryAdapter = new CategoryAdapter(mContext);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		categoryView.setLayoutManager(linearLayoutManager);
+		categoryView.addItemDecoration(new SpacesItemDecorationHorizontal(20));
+		categoryView.setAdapter(categoryAdapter);
+		categoryAdapter.refresh(list);
+		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
+			@Override
+			public void onItemClick(View view, int position, Category model) {
+
+			}
+
+			@Override
+			public void onItemLongClick(View view, int position, Category model) {
+
+			}
+		});
+	}
+
 
 	@OnClick({R.id.tv_back, R.id.tv_save})
 	public void onViewClicked(View view) {
@@ -102,4 +145,5 @@ public class AddActivityV2 extends BaseActivity {
 		}
 		super.onDestroy();
 	}
+
 }

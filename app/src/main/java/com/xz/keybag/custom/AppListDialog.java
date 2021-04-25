@@ -70,9 +70,9 @@ public class AppListDialog extends BaseDialog {
 			window.setBackgroundDrawableResource(com.xz.xzwidget.R.color.transparent);
 			WindowManager.LayoutParams lp = window.getAttributes();
 			DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-			lp.height = (int) (dm.heightPixels * 0.5);
+			lp.height = (int) (dm.heightPixels * 0.8);
 			lp.width = (int) (dm.widthPixels * 0.8);
-			lp.dimAmount = 0.2f;
+			lp.dimAmount = 0.4f;
 			window.setAttributes(lp);
 		}
 
