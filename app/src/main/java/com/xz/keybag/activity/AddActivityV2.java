@@ -1,13 +1,15 @@
 package com.xz.keybag.activity;
 
-import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
@@ -16,14 +18,13 @@ import com.xz.keybag.custom.AppListDialog;
 import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.AppInfo;
 import com.xz.keybag.entity.Category;
+import com.xz.keybag.entity.Datum;
 import com.xz.utils.SpacesItemDecorationHorizontal;
-import com.xz.utils.SpacesItemDecorationVertical;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class AddActivityV2 extends BaseActivity {
@@ -48,6 +49,7 @@ public class AddActivityV2 extends BaseActivity {
 
 	private AppListDialog appListDialog;
 	private CategoryAdapter categoryAdapter;
+	private String mCategorySt;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -97,7 +99,7 @@ public class AddActivityV2 extends BaseActivity {
 		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
 			@Override
 			public void onItemClick(View view, int position, Category model) {
-
+				mCategorySt = model.getName();
 			}
 
 			@Override
@@ -112,8 +114,10 @@ public class AddActivityV2 extends BaseActivity {
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
+				finish();
 				break;
 			case R.id.tv_save:
+				saveAndExit();
 				break;
 		}
 	}
@@ -137,6 +141,36 @@ public class AddActivityV2 extends BaseActivity {
 		}
 		appListDialog.show();
 	}
+
+	/**
+	 * 保存并退出
+	 */
+	private void saveAndExit() {
+		Datum datum = new Datum();
+		datum.setProject(ueProject.getText().toString().trim());
+		datum.setAccount(ueAccount.getText().toString().trim());
+		datum.setPassword(uePwd.getText().toString().trim());
+		datum.setRemark(ueRemark.getText().toString().trim());
+		datum.setCategory(mCategorySt);
+		Logger.d(datum.toString());
+		if (datum.isEmpty()) {
+			finish();
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getProject())) {
+			sToast("请输入名称");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getAccount())) {
+			sToast("请输入账号");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getAccount())) {
+			sToast("请输入密码");
+			return;
+		}
+	}
+
 
 	@Override
 	protected void onDestroy() {

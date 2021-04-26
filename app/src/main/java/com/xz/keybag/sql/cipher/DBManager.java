@@ -109,6 +109,8 @@ public class DBManager {
 
 	/**
 	 * 查询登录密码
+	 *
+	 * @return 返回状态
 	 */
 	public String queryLogin() {
 		//获取可读数据库
@@ -150,7 +152,6 @@ public class DBManager {
 	 * 对Secret进行出厂设置，设置新的密钥，新的密码
 	 *
 	 * @param loginPwd 登录密码
-	 * @return
 	 */
 	public void initSecret(String loginPwd) throws Exception {
 		//获取写数据库
