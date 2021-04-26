@@ -12,7 +12,9 @@
     <color name="item_white">#444444</color>
     <color name="tips_color">#292929</color>
     <color name="edit_background">#535353</color>
+    <color name="category_background">#2B2B2B</color>
     <color name="category_icon">#5E5E5E</color>
     <color name="category_text">#FFFFFF</color>
+    <color name="category_text_2">#FFFFFF</color>
 
 </resources>

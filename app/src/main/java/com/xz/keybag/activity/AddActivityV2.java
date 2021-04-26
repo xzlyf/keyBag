@@ -2,14 +2,12 @@ package com.xz.keybag.activity;
 
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
@@ -19,6 +17,7 @@ import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.AppInfo;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 
 import java.util.ArrayList;
@@ -50,6 +49,7 @@ public class AddActivityV2 extends BaseActivity {
 	private AppListDialog appListDialog;
 	private CategoryAdapter categoryAdapter;
 	private String mCategorySt;
+	private DBManager db;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -63,6 +63,7 @@ public class AddActivityV2 extends BaseActivity {
 
 	@Override
 	public void initData() {
+		db = DBManager.getInstance(mContext);
 		initView();
 		initCategory();
 	}
@@ -152,7 +153,6 @@ public class AddActivityV2 extends BaseActivity {
 		datum.setPassword(uePwd.getText().toString().trim());
 		datum.setRemark(ueRemark.getText().toString().trim());
 		datum.setCategory(mCategorySt);
-		Logger.d(datum.toString());
 		if (datum.isEmpty()) {
 			finish();
 			return;
@@ -169,6 +169,9 @@ public class AddActivityV2 extends BaseActivity {
 			sToast("请输入密码");
 			return;
 		}
+		db.insertProject(datum);
+		sToast("已保存");
+		finish();
 	}
 
 

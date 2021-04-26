@@ -21,13 +21,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.AddActivityV2"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.BackupActivity"
             android:screenOrientation="portrait" />
@@ -46,7 +40,11 @@
         <activity
             android:name=".activity.LoadActivity"
             android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.MainActivity"

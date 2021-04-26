@@ -12,6 +12,8 @@
     <color name="item_white">#fff</color>
     <color name="tips_color">#D6D6D6</color>
     <color name="edit_background">#EEEEEE</color>
+    <color name="category_background">#ffffff</color>
     <color name="category_icon">#5E5E5E</color>
     <color name="category_text">#FFFFFF</color>
+    <color name="category_text_2">#505050</color>
 </resources>

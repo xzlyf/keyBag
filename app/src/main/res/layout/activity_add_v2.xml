@@ -65,39 +65,39 @@
         android:id="@+id/ue_project"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
         app:label="名称 >"
-        app:textColor="@color/secTextColor" />
+        app:textColor="@color/category_text_2" />
 
     <com.xz.keybag.custom.UnifyEditView
         android:id="@+id/ue_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
         app:label="账号"
-        app:textColor="@color/secTextColor" />
+        app:textColor="@color/category_text_2" />
 
     <com.xz.keybag.custom.UnifyEditView
         android:id="@+id/ue_pwd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
         app:label="密码"
-        app:textColor="@color/secTextColor" />
+        app:textColor="@color/category_text_2" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         android:orientation="vertical">
 
@@ -107,7 +107,7 @@
             android:layout_marginStart="@dimen/dp_10"
             android:layout_marginTop="@dimen/dp_6"
             android:text="分类标签"
-            android:textColor="@color/mainTextColor" />
+            android:textColor="@color/category_text_2" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/category_view"
@@ -121,7 +121,7 @@
         android:id="@+id/ue_remark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
@@ -129,6 +129,6 @@
         app:lines="4"
         app:maxLines="4"
         app:mode="vertical"
-        app:textColor="@color/secTextColor" />
+        app:textColor="@color/category_text_2" />
 
 </LinearLayout>

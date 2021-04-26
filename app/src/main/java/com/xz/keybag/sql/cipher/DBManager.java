@@ -2,13 +2,15 @@ package com.xz.keybag.sql.cipher;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.xz.apache_code_android.binary.Base64;
+import com.google.gson.Gson;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
+import com.xz.keybag.entity.Datum;
 import com.xz.keybag.utils.FileTool;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
@@ -20,11 +22,15 @@ import net.sqlcipher.database.SQLiteDatabase;
 import java.util.Map;
 
 import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_DBASE_P1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K3;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K4;
+import static com.xz.keybag.sql.cipher.DBHelper.TABLE_COMMON;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_DEVICE;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_SECRET;
 
@@ -39,11 +45,13 @@ public class DBManager {
 	private static DBManager mInstance;
 	private static Context mContext;
 	private DBHelper dbHelper;
+	private Gson mSGon;
 
 
 	private DBManager(Context context) {
 		dbHelper = new DBHelper(context);
 		mContext = context;
+		mSGon = new Gson();
 	}
 
 	public static DBManager getInstance(Context context) {
@@ -198,7 +206,29 @@ public class DBManager {
 			db.close();
 		}
 
+	}
 
+	/**
+	 * 插入一条密码数据
+	 */
+	public void insertProject(Datum datum) {
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		ContentValues cv = new ContentValues();
+		if (TextUtils.isEmpty(Local.mAdmin.getDes())) {
+			throw new NullPointerException("not find secret");
+		}
+		String date = String.valueOf(System.currentTimeMillis());
+		cv.put(FIELD_COMMON_T1, DES.encryptor(mSGon.toJson(datum), Local.mAdmin.getDes()));
+		cv.put(FIELD_COMMON_T2, date);
+		cv.put(FIELD_COMMON_T3, date);
+		try {
+			// insert 操作
+			db.insert(TABLE_COMMON, null, cv);
+		} finally {
+			//关闭数据库
+			db.close();
+		}
 	}
 
 
