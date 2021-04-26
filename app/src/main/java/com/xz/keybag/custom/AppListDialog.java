@@ -126,7 +126,7 @@ public class AppListDialog extends BaseDialog {
 						mAdapter.refreshSingle(allApp.get(finalI));
 					}
 				});
-				SystemClock.sleep(80);
+				SystemClock.sleep(60);
 			}
 			if (!isStop) {
 				//隐藏进度条

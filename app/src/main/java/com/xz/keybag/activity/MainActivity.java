@@ -281,7 +281,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				break;
 			case R.id.tv_add:
 				drawerLayout.closeDrawer(Gravity.LEFT);
-				startActivity(new Intent(MainActivity.this, AddActivityV2.class));
+				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.btn_1:
 				drawerLayout.closeDrawer(Gravity.LEFT);

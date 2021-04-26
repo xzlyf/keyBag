@@ -1,176 +1,186 @@
 package com.xz.keybag.activity;
 
-import android.content.ContentValues;
-import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.xz.keybag.R;
+import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
-import com.xz.keybag.constant.Local;
-import com.xz.keybag.sql.EOD;
-import com.xz.keybag.sql.SqlManager;
-import com.xz.widget.dialog.XOnClickListener;
-import com.xz.widget.dialog.XzTipsDialog;
+import com.xz.keybag.base.OnItemClickListener;
+import com.xz.keybag.custom.AppListDialog;
+import com.xz.keybag.custom.UnifyEditView;
+import com.xz.keybag.entity.AppInfo;
+import com.xz.keybag.entity.Category;
+import com.xz.keybag.entity.Datum;
+import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.utils.SpacesItemDecorationHorizontal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
-public class AddActivity extends BaseActivity implements View.OnClickListener {
-
-
-    @BindView(R.id.tv_back)
-    ImageView tvBack;
-    @BindView(R.id.name)
-    EditText name;
-    @BindView(R.id.user)
-    EditText user;
-    @BindView(R.id.psw)
-    EditText psw;
-    @BindView(R.id.note)
-    EditText note;
-    @BindView(R.id.save)
-    TextView save;
-    private XzTipsDialog tipsDialog;
-
-    @Override
-    public boolean homeAsUpEnabled() {
-        return false;
-    }
-
-    @Override
-    public int getLayoutResource() {
-        return R.layout.activity_add;
-    }
-
-    @Override
-    public void initData() {
-        tvBack.setOnClickListener(this);
-        save.setOnClickListener(this);
-        name.setOnClickListener(this);
-        user.setOnClickListener(this);
-        psw.setOnClickListener(this);
-        note.setOnClickListener(this);
-        if (isNightMode()) {
-            tvBack.setColorFilter(getResources().getColor(R.color.icons));
-        }
-    }
+public class AddActivity extends BaseActivity {
 
 
-    @Override
-    public void onClick(View v) {
+	@BindView(R.id.tv_back)
+	ImageView tvBack;
+	@BindView(R.id.tv_title)
+	TextView tvTitle;
+	@BindView(R.id.tv_save)
+	TextView tvSave;
+	@BindView(R.id.ue_project)
+	UnifyEditView ueProject;
+	@BindView(R.id.ue_account)
+	UnifyEditView ueAccount;
+	@BindView(R.id.ue_pwd)
+	UnifyEditView uePwd;
+	@BindView(R.id.ue_remark)
+	UnifyEditView ueRemark;
+	@BindView(R.id.category_view)
+	RecyclerView categoryView;
 
-        switch (v.getId()) {
-            case R.id.tv_back:
-                if (hasContent()) {
+	private AppListDialog appListDialog;
+	private CategoryAdapter categoryAdapter;
+	private String mCategorySt;
+	private DBManager db;
 
-                    if (tipsDialog == null) {
-                        tipsDialog = new XzTipsDialog.Builder(mContext)
-                                .setContent(getString(R.string.string_9))
-                                .setSubmitBtnBackground(0)
-                                .setSubmitTextColor(Color.GRAY)
-                                .setSubmitOnClickListener(getString(R.string.string_10), new XOnClickListener() {
-                                    @Override
-                                    public void onClick(int viewId, String s, int position) {
-                                        finish();
-                                    }
-                                })
-                                .setCancelBtnBackground(0)
-                                .setCancelTextColor(Color.GRAY)
-                                .setCancelOnclickListener(getString(R.string.string_11), new XOnClickListener() {
-                                    @Override
-                                    public void onClick(int viewId, String s, int position) {
-                                    }
-                                })
-                                .create();
-                    }
+	@Override
+	public boolean homeAsUpEnabled() {
+		return true;
+	}
 
-                    tipsDialog.show();
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_add;
+	}
+
+	@Override
+	public void initData() {
+		db = DBManager.getInstance(mContext);
+		initView();
+		initCategory();
+	}
+
+	private void initView() {
+		ueProject.setLabelOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showAppListDialog();
+			}
+		});
 
 
-                } else {
-                    finish();
-                }
+	}
 
-                break;
-            case R.id.save:
-                submit();
-                break;
-            case R.id.name:
-            case R.id.user:
-            case R.id.psw:
-            case R.id.note:
-                break;
-        }
-    }
+	/**
+	 * 加载分类标签
+	 */
+	private void initCategory() {
+		//todo  sql读取分类标签
 
-    /**
-     * 存储
-     */
-    private void submit() {
-        String t1 = name.getText().toString().trim();
-        String t2 = user.getText().toString().trim();
-        String t3 = psw.getText().toString().trim();
-        String t4 = note.getText().toString().trim();
-        String t5 = String.valueOf(System.currentTimeMillis());
+		List<Category> list = new ArrayList<>();
+		list.add(new Category("App", "a219dha8h12jhjkh1"));
+		list.add(new Category("网站", "1233445ckjwu34ng"));
+		list.add(new Category("邮箱", "1sc521f6asdf4489da"));
 
-        if (!checkEmpty(t1, t2, t3, t5)) {
-            sToast(getString(R.string.string_12));
-            return;
-        }
+		categoryAdapter = new CategoryAdapter(mContext);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		categoryView.setLayoutManager(linearLayoutManager);
+		categoryView.addItemDecoration(new SpacesItemDecorationHorizontal(20));
+		categoryView.setAdapter(categoryAdapter);
+		categoryAdapter.refresh(list);
+		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
+			@Override
+			public void onItemClick(View view, int position, Category model) {
+				mCategorySt = model.getName();
+			}
 
-        ContentValues values = new ContentValues();
-        values.put("t1", EOD.encrypt(t1, Local.secret));
-        values.put("t2", EOD.encrypt(t2, Local.secret));
-        values.put("t3", EOD.encrypt(t3, Local.secret));
-        values.put("t4", EOD.encrypt(t4, Local.secret));
-        values.put("t5", EOD.encrypt(t5, Local.secret));
-        long i = SqlManager.insert(mContext, "common", values);//插入数据
-        if (i == -1) {
-            sToast(getString(R.string.string_13));
-        } else {
-            sToast(getString(R.string.string_14));
-            finish();
-        }
-    }
+			@Override
+			public void onItemLongClick(View view, int position, Category model) {
 
-    /**
-     * 检查是否存在空
-     *
-     * @param arg
-     * @return
-     */
-    private boolean checkEmpty(String... arg) {
-        for (String s : arg) {
-            if (s == null || s.equals("")) {
-                return false;
-            }
-        }
-        return true;
-    }
+			}
+		});
+	}
 
-    /**
-     * 是否有内容
-     *
-     * @return true 有 false 无
-     */
-    private boolean hasContent() {
-        if (!name.getText().toString().trim().equals("")) {
-            return true;
-        }
-        if (!user.getText().toString().trim().equals("")) {
-            return true;
-        }
-        if (!psw.getText().toString().trim().equals("")) {
-            return true;
-        }
-        if (!note.getText().toString().trim().equals("")) {
-            return true;
-        }
-        return false;
 
-    }
+	@OnClick({R.id.tv_back, R.id.tv_save})
+	public void onViewClicked(View view) {
+		switch (view.getId()) {
+			case R.id.tv_back:
+				finish();
+				break;
+			case R.id.tv_save:
+				saveAndExit();
+				break;
+		}
+	}
+
+	private void showAppListDialog() {
+		if (appListDialog == null) {
+			appListDialog = new AppListDialog(mContext);
+			appListDialog.create();
+			appListDialog.setOnItemClickListener(new OnItemClickListener<AppInfo>() {
+				@Override
+				public void onItemClick(View view, int position, AppInfo model) {
+					appListDialog.dismiss();
+					ueProject.setText(model.getAppName());
+				}
+
+				@Override
+				public void onItemLongClick(View view, int position, AppInfo model) {
+
+				}
+			});
+		}
+		appListDialog.show();
+	}
+
+	/**
+	 * 保存并退出
+	 */
+	private void saveAndExit() {
+		Datum datum = new Datum();
+		datum.setProject(ueProject.getText().toString().trim());
+		datum.setAccount(ueAccount.getText().toString().trim());
+		datum.setPassword(uePwd.getText().toString().trim());
+		datum.setRemark(ueRemark.getText().toString().trim());
+		datum.setCategory(mCategorySt);
+		if (datum.isEmpty()) {
+			finish();
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getProject())) {
+			sToast("请输入名称");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getAccount())) {
+			sToast("请输入账号");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getAccount())) {
+			sToast("请输入密码");
+			return;
+		}
+		db.insertProject(datum);
+		sToast("已保存");
+		finish();
+	}
+
+
+	@Override
+	protected void onDestroy() {
+		if (appListDialog != null) {
+			appListDialog.stopThread();
+		}
+		super.onDestroy();
+	}
+
 }

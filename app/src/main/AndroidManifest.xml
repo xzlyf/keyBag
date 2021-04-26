@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.AddActivityV2"
+            android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.BackupActivity"
@@ -33,9 +33,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.SecretActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoadActivity"
