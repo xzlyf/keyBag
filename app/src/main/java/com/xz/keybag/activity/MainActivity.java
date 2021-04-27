@@ -41,6 +41,7 @@ import com.xz.keybag.entity.SecretEntity;
 import com.xz.keybag.entity.UpdateEntity;
 import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.MD5Util;
 import com.xz.utils.PackageUtil;
 import com.xz.utils.RandomString;
@@ -78,6 +79,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 	Switch modeSwitch;
 
 
+	private DBManager db;
 	private KeyAdapter keyAdapter;
 	private List<KeyEntity> mList;
 	private boolean isNight;//日渐模式false 夜间模式true
@@ -154,10 +156,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 	@Override
 	public void initData() {
+		db = DBManager.getInstance(this);
 		initState();
 		initView();
 		initRecycler();
 
+		db.queryProject();
 
 	}
 

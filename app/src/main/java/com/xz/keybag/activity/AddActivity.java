@@ -20,7 +20,6 @@ import com.xz.keybag.entity.Datum;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -84,12 +83,7 @@ public class AddActivity extends BaseActivity {
 	 */
 	private void initCategory() {
 		//todo  sql读取分类标签
-
-		List<Category> list = new ArrayList<>();
-		list.add(new Category("App", "a219dha8h12jhjkh1"));
-		list.add(new Category("网站", "1233445ckjwu34ng"));
-		list.add(new Category("邮箱", "1sc521f6asdf4489da"));
-
+		List<Category> list = db.queryCategory();
 		categoryAdapter = new CategoryAdapter(mContext);
 		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
 		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);

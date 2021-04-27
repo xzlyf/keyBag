@@ -10,8 +10,10 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
+import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
 import com.xz.keybag.utils.FileTool;
+import com.xz.keybag.utils.UUIDUtil;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 
@@ -19,9 +21,13 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L1;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
@@ -30,6 +36,7 @@ import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K3;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K4;
+import static com.xz.keybag.sql.cipher.DBHelper.TABLE_CATEGORY;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_COMMON;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_DEVICE;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_SECRET;
@@ -162,34 +169,33 @@ public class DBManager {
 	 * @param loginPwd 登录密码
 	 */
 	public void initSecret(String loginPwd) throws Exception {
-		//获取写数据库
+		//1.获取写数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
 		ContentValues cv = new ContentValues();
-		//清空数据库
+		//2.清空数据库
 		String sql = "delete from " + TABLE_SECRET;
 		db.execSQL(sql);
-		//生成DES密钥
+		//3.生成DES密钥
 		String desSecret = DES.getKey();
-		//生成RSA密钥对
+		//3.1生成RSA密钥对
 		Map<String, String> keyMap = RSA.createKeys(1024);
 		if (keyMap == null || desSecret.equals("error_getKey")) {
 			throw new Exception("密钥生成失败，请检查系统版本和软件版本");
 		}
-		//存入DES密钥  私钥加密密文
+		//4.存入DES密钥  私钥加密密文
 		cv.put(FIELD_SECRET_K1, RSA.privateEncrypt(desSecret, RSA.getPrivateKey(keyMap.get("privateKey"))));
-		//存入登录密码
+		//4.1存入登录密码
 		cv.put(FIELD_SECRET_K2, DES.encryptor(loginPwd, desSecret));
-		//默认开启指纹登录
+		//4.2默认开启指纹登录
 		cv.put(FIELD_SECRET_K3, DES.encryptor("fingerprint", desSecret));
-		//RSA私钥存入数据库
-		//cv.put(FIELD_SECRET_K4, Base64.encodeBase64(keyMap.get("privateKey").getBytes()));
+		//4.3RSA私钥存入数据库 RSA私钥需要用DES加密
 		cv.put(FIELD_SECRET_K4, DES.encryptor(keyMap.get("privateKey"), desSecret));
-		//删除私有目录得公钥
+		//4.4删除私有目录得公钥
 		FileTool.delete(mContext, "public.xkf");
-		//RSA公钥存入私有目录
+		//4.5RSA公钥存入私有目录
 		FileTool.save(mContext, "public.xkf", keyMap.get("publicKey"));
 
-		//存入全局变量
+		//5.存入全局变量
 		Admin admin = new Admin();
 		admin.setDes(desSecret);
 		admin.setLoginPwd(loginPwd);
@@ -197,14 +203,16 @@ public class DBManager {
 		admin.setPrivateKey(keyMap.get(1));
 		admin.setPublicKey(keyMap.get(0));
 		Local.mAdmin = admin;
-
-		try {
-			// insert 操作
-			db.insert(TABLE_SECRET, null, cv);
-		} finally {
-			//关闭数据库
-			db.close();
-		}
+		//6.存入数据库
+		db.insert(TABLE_SECRET, null, cv);
+		//7.清空Category数据库
+		sql = "delete from " + TABLE_CATEGORY;
+		db.execSQL(sql);
+		db.close();
+		//7.1生成默认分类标签
+		insertCategory(new Category("APP", UUIDUtil.getStrUUID()));
+		insertCategory(new Category("网站", UUIDUtil.getStrUUID()));
+		insertCategory(new Category("邮箱", UUIDUtil.getStrUUID()));
 
 	}
 
@@ -229,6 +237,70 @@ public class DBManager {
 			//关闭数据库
 			db.close();
 		}
+	}
+
+	/**
+	 * 查询所有密码数据
+	 */
+	public void queryProject() {
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = null;
+		try {
+			cursor = db.query(TABLE_COMMON, null, null, null, null, null, null);
+			if (cursor.moveToNext()) {
+				Log.d(TAG, "queryProject: " + cursor.getColumnCount());
+				Log.d(TAG, "queryProject: " + cursor.getColumnName(0));
+				Log.d(TAG, "queryProject: " + cursor.getString(0));
+			}
+
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+
+
+	/**
+	 * 新建一条分类标签
+	 */
+	public void insertCategory(Category category) {
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_CATEGORY_L1, category.getId());
+		cv.put(FIELD_CATEGORY_L2, category.getName());
+		try {
+			// insert 操作
+			db.insert(TABLE_CATEGORY, null, cv);
+		} finally {
+			//关闭数据库
+			db.close();
+		}
+	}
+
+	/**
+	 * 查询分类标签表
+	 */
+	public List<Category> queryCategory() {
+		List<Category> list = new ArrayList<>();
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = null;
+		try {
+			cursor = db.query(TABLE_CATEGORY, null, null, null, null, null, null);
+			while (cursor.moveToNext()) {
+				list.add(new Category(cursor.getString(1), cursor.getString(0)));
+			}
+
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+
+		return list;
 	}
 
 
