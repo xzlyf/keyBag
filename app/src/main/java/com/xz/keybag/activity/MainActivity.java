@@ -1,10 +1,8 @@
 package com.xz.keybag.activity;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -36,15 +34,12 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.OnItemClickListener;
 import com.xz.keybag.base.utils.PreferencesUtilV2;
 import com.xz.keybag.constant.Local;
-import com.xz.keybag.entity.KeyEntity;
-import com.xz.keybag.entity.SecretEntity;
+import com.xz.keybag.entity.Project;
 import com.xz.keybag.entity.UpdateEntity;
-import com.xz.keybag.sql.EOD;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.MD5Util;
 import com.xz.utils.PackageUtil;
-import com.xz.utils.RandomString;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.SystemUtil;
 import com.xz.utils.ThreadUtil;
@@ -56,7 +51,6 @@ import com.xz.widget.textview.SearchEditView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 
@@ -81,7 +75,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 	private DBManager db;
 	private KeyAdapter keyAdapter;
-	private List<KeyEntity> mList;
+	private List<Project> mList;
 	private boolean isNight;//日渐模式false 夜间模式true
 	private boolean isNet = false;//正在进行网络操作
 
@@ -160,9 +154,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		initState();
 		initView();
 		initRecycler();
-
-		db.queryProject();
-
 	}
 
 	private void initState() {
@@ -240,15 +231,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		keyRecycler.setLayoutManager(new LinearLayoutManager(mContext));
 		keyRecycler.addItemDecoration(new SpacesItemDecorationVertical(20));
 		keyRecycler.setAdapter(keyAdapter);
-		keyAdapter.setOnItemClickListener(new OnItemClickListener<KeyEntity>() {
+		keyAdapter.setOnItemClickListener(new OnItemClickListener<Project>() {
 			@Override
-			public void onItemClick(View view, int position, KeyEntity model) {
-				startActivity(new Intent(MainActivity.this, DetailActivity.class)
-						.putExtra("model", model));
+			public void onItemClick(View view, int position, Project model) {
+				//TODO 新界面打开
+				//startActivity(new Intent(MainActivity.this, DetailActivity.class)
+				//		.putExtra("model", model));
 			}
 
 			@Override
-			public void onItemLongClick(View view, int position, KeyEntity model) {
+			public void onItemLongClick(View view, int position, Project model) {
 
 			}
 		});
@@ -394,66 +386,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		@Override
 		public void run() {
 			super.run();
-
-			String secret = getSecret();
-			Local.secret = secret;
-			if (secret == null) {
-				Logger.i(getString(R.string.string_1));
-				return;
-			}
-
-			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_COMMON);
-			//如果游标为空则返回false
-			if (!cursor.moveToFirst()) {
-				Logger.i(getString(R.string.string_2));
-				return;
-			}
-			KeyEntity entity;
-			mList.clear();
-			do {
-				entity = new KeyEntity();
-				entity.setT1(EOD.decrypt(cursor.getString(cursor.getColumnIndex("t1")), secret));
-				entity.setT2(EOD.decrypt(cursor.getString(cursor.getColumnIndex("t2")), secret));
-				entity.setT3(EOD.decrypt(cursor.getString(cursor.getColumnIndex("t3")), secret));
-				entity.setT4(EOD.decrypt(cursor.getString(cursor.getColumnIndex("t4")), secret));
-				entity.setT5(EOD.decrypt(cursor.getString(cursor.getColumnIndex("t5")), secret));
-
-				mList.add(entity);
-
-			} while (cursor.moveToNext());
-			cursor.close();
+			mList = db.queryProject();
 			//反转列表
 			Collections.reverse(mList);
 			Message message = handler.obtainMessage();
 			message.what = Local.CODE_1;
 			handler.sendMessage(message);
-
 		}
 
-		/**
-		 * 获取密钥
-		 */
-		private String getSecret() {
-			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_SECRET);
-			//如果游标为空则返回false
-			if (!cursor.moveToFirst()) {
-				//用户第一次运行创建一个随机密钥
-				String secret = RandomString.getRandomString(8, true);
-				ContentValues values = new ContentValues();
-				values.put("k1", EOD.encrypt(secret, Local.SECRET_KEY));
-				values.put("k2", EOD.encrypt(RandomString.getRandomString(16), Local.SECRET_KEY));
-				values.put("k3", EOD.encrypt(String.valueOf(new Random().nextInt(64)), Local.SECRET_KEY));
-				SqlManager.insert(mContext, "secret", values);//插入数据
-				return secret;
-			}
-			SecretEntity entity = new SecretEntity();
-			entity.setK1(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k1")), Local.SECRET_KEY));
-			entity.setK2(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k2")), Local.SECRET_KEY));
-			entity.setK3(EOD.decrypt(cursor.getString(cursor.getColumnIndex("k3")), Local.SECRET_KEY));
-			cursor.close();
-
-			return entity.getK1();
-		}
 	}
 
 }

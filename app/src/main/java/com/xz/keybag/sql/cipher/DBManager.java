@@ -12,10 +12,12 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
+import com.xz.keybag.entity.Project;
 import com.xz.keybag.utils.FileTool;
 import com.xz.keybag.utils.UUIDUtil;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
+import com.xz.utils.TimeUtil;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.SQLException;
@@ -52,13 +54,13 @@ public class DBManager {
 	private static DBManager mInstance;
 	private static Context mContext;
 	private DBHelper dbHelper;
-	private Gson mSGon;
+	private Gson mGson;
 
 
 	private DBManager(Context context) {
 		dbHelper = new DBHelper(context);
 		mContext = context;
-		mSGon = new Gson();
+		mGson = new Gson();
 	}
 
 	public static DBManager getInstance(Context context) {
@@ -227,7 +229,7 @@ public class DBManager {
 			throw new NullPointerException("not find secret");
 		}
 		String date = String.valueOf(System.currentTimeMillis());
-		cv.put(FIELD_COMMON_T1, DES.encryptor(mSGon.toJson(datum), Local.mAdmin.getDes()));
+		cv.put(FIELD_COMMON_T1, DES.encryptor(mGson.toJson(datum), Local.mAdmin.getDes()));
 		cv.put(FIELD_COMMON_T2, date);
 		cv.put(FIELD_COMMON_T3, date);
 		try {
@@ -241,24 +243,38 @@ public class DBManager {
 
 	/**
 	 * 查询所有密码数据
+	 *
+	 * @return
 	 */
-	public void queryProject() {
+	public List<Project> queryProject() {
+		List<Project> list = new ArrayList<>();
 		//获取可读数据库
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
 		Cursor cursor = null;
 		try {
 			cursor = db.query(TABLE_COMMON, null, null, null, null, null, null);
-			if (cursor.moveToNext()) {
-				Log.d(TAG, "queryProject: " + cursor.getColumnCount());
-				Log.d(TAG, "queryProject: " + cursor.getColumnName(0));
-				Log.d(TAG, "queryProject: " + cursor.getString(0));
+			Project project;
+			while (cursor.moveToNext()) {
+				project = new Project();
+				project.setId(cursor.getString(0));
+				//json已被加密
+				project.setDatum(mGson.fromJson(
+						DES.decryptor(cursor.getString(1), Local.mAdmin.getDes())
+						, Datum.class));
+				project.setUpdateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss",
+						Long.parseLong(cursor.getString(2))));
+				project.setCreateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss",
+						Long.parseLong(cursor.getString(3))));
+				list.add(project);
 			}
 
-		} finally {
+		}finally {
 			if (cursor != null) {
 				cursor.close();
 			}
 		}
+
+		return list;
 	}
 
 
