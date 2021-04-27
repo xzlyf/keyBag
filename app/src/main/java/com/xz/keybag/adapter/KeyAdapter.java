@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
@@ -58,6 +57,35 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 	@Override
 	protected BaseRecyclerViewHolder createNewViewHolder(ViewGroup parent, int viewType) {
 		return new ViewHolder(mInflater.inflate(R.layout.item_key, parent, false));
+	}
+
+	/**
+	 * 设置以分类标签为过滤器
+	 */
+	public void setFilterByCategory(String category) {
+		if (category.isEmpty()) {
+			//没有过滤的内容，则使用源数据
+			filterDatas = mList;
+		} else {
+			List<Project> filteredList = new ArrayList<>();
+
+			//toLowerCase统一设置为小写，这样就忽略大小写了
+			for (int i = 0; i < mList.size(); i++) {
+				if (mList.get(i).getDatum().getCategory().contains(category)) {
+					filteredList.add(mList.get(i));
+				}
+			}
+			filterDatas = filteredList;
+		}
+		notifyDataSetChanged();
+	}
+
+	/**
+	 * 清除过滤器
+	 */
+	public void clearFilter() {
+		filterDatas = mList;
+		notifyDataSetChanged();
 	}
 
 

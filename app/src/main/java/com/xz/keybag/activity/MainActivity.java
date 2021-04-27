@@ -29,17 +29,20 @@ import com.xz.dialog.event.PositiveOnClickListener;
 import com.xz.dialog.imitate.AppleInputDialog;
 import com.xz.dialog.imitate.UpdateDialog;
 import com.xz.keybag.R;
+import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.adapter.KeyAdapter;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.OnItemClickListener;
 import com.xz.keybag.base.utils.PreferencesUtilV2;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.entity.UpdateEntity;
 import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.MD5Util;
 import com.xz.utils.PackageUtil;
+import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.SystemUtil;
 import com.xz.utils.ThreadUtil;
@@ -71,13 +74,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 	SearchEditView etSearch;
 	@BindView(R.id.switch_mode)
 	Switch modeSwitch;
+	@BindView(R.id.category_view)
+	RecyclerView categoryRecycler;
 
 
 	private DBManager db;
 	private KeyAdapter keyAdapter;
+	private CategoryAdapter categoryAdapter;
 	private List<Project> mList;
 	private boolean isNight;//日渐模式false 夜间模式true
 	private boolean isNet = false;//正在进行网络操作
+	private static final String CATEGORY_ALL = "所有";
 
 	private Handler handler = new Handler(new Handler.Callback() {
 		@Override
@@ -241,6 +248,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 			@Override
 			public void onItemLongClick(View view, int position, Project model) {
+
+			}
+		});
+
+		//分类标签
+		List<Category> list = db.queryCategory();
+		list.add(0, new Category(CATEGORY_ALL, "1"));
+		categoryAdapter = new CategoryAdapter(mContext);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		categoryRecycler.setLayoutManager(linearLayoutManager);
+		categoryRecycler.addItemDecoration(new SpacesItemDecorationHorizontal(20));
+		categoryRecycler.setAdapter(categoryAdapter);
+		categoryAdapter.refresh(list);
+		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
+			@Override
+			public void onItemClick(View view, int position, Category model) {
+				if (model.getName().equals(CATEGORY_ALL)) {
+					keyAdapter.clearFilter();
+				} else {
+					keyAdapter.setFilterByCategory(model.getName());
+				}
+			}
+
+			@Override
+			public void onItemLongClick(View view, int position, Category model) {
 
 			}
 		});

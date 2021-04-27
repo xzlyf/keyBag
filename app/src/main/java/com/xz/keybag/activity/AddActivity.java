@@ -82,7 +82,6 @@ public class AddActivity extends BaseActivity {
 	 * 加载分类标签
 	 */
 	private void initCategory() {
-		//todo  sql读取分类标签
 		List<Category> list = db.queryCategory();
 		categoryAdapter = new CategoryAdapter(mContext);
 		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
