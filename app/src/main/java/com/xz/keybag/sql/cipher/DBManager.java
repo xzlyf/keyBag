@@ -30,6 +30,7 @@ import java.util.Map;
 import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L2;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
@@ -268,13 +269,27 @@ public class DBManager {
 				list.add(project);
 			}
 
-		}finally {
+		} finally {
 			if (cursor != null) {
 				cursor.close();
 			}
 		}
 
 		return list;
+	}
+
+	/**
+	 * 删除单个密码数据
+	 *
+	 * @param id 项目id
+	 */
+	public void deleteProject(String id) {
+		//生成条件语句
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.delete(TABLE_COMMON, whereBuffer.toString(), null);
 	}
 
 

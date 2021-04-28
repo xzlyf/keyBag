@@ -17,6 +17,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
 import com.xz.keybag.entity.Project;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.CopyUtil;
 
 import java.util.ArrayList;
@@ -29,11 +30,13 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 
 	private List<Project> filterDatas;
 	private CopyUtil copyUtil;
+	private DBManager db;
 
 	public KeyAdapter(Context context) {
 		super(context);
 		this.filterDatas = mList;
 		copyUtil = new CopyUtil(context);
+		db = DBManager.getInstance(context);
 	}
 
 	@Override
@@ -187,8 +190,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					Toast.makeText(mContext, getString(R.string.string_7), Toast.LENGTH_SHORT).show();
 					break;
 				case R.id.delete:
-					// TODO: 2021/4/27  删除
-					mList.remove(getLayoutPosition());
+					int position = getLayoutPosition();
+					//db.deleteProject(filterDatas.get(position).getId());
+					Project project = filterDatas.get(position);
+					filterDatas.remove(project);
+					mList.remove(project);//也要删除源数据中的项目
 					notifyDataSetChanged();
 					Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
 					break;
