@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatSeekBar;
  * @author Mr.release
  * @create 2019-12-19
  * @Describe
+ * 滑动验证条
  */
 
 public class SlidingVerification extends AppCompatSeekBar {

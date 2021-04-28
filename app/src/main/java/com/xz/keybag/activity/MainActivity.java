@@ -35,6 +35,7 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.OnItemClickListener;
 import com.xz.keybag.base.utils.PreferencesUtilV2;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.custom.SlideRecyclerView;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.entity.UpdateEntity;
@@ -61,7 +62,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
 	@BindView(R.id.key_recycler)
-	RecyclerView keyRecycler;
+	SlideRecyclerView keyRecycler;
 	@BindView(R.id.tv_menu)
 	ImageView tvMenu;
 	@BindView(R.id.tv_add)
@@ -249,6 +250,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 			@Override
 			public void onItemLongClick(View view, int position, Project model) {
 
+			}
+		});
+		keyAdapter.setOnDeleteClickListener(new com.xz.keybag.custom.XOnClickListener() {
+			@Override
+			public void onClick(String st, View v) {
+				//删除后自动关闭菜单，否则会移动到下一个
+				keyRecycler.closeMenu();
 			}
 		});
 

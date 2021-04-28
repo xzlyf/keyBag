@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
+import com.xz.keybag.custom.XOnClickListener;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.CopyUtil;
@@ -31,6 +32,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 	private List<Project> filterDatas;
 	private CopyUtil copyUtil;
 	private DBManager db;
+	private XOnClickListener mListener;
 
 	public KeyAdapter(Context context) {
 		super(context);
@@ -131,8 +133,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		};
 	}
 
+	public void setOnDeleteClickListener(XOnClickListener listener) {
+		mListener = listener;
+	}
 
-	class ViewHolder extends BaseRecyclerViewHolder implements View.OnClickListener, View.OnLongClickListener {
+	class ViewHolder extends BaseRecyclerViewHolder implements View.OnClickListener {
 		@BindView(R.id.name)
 		TextView name;
 		@BindView(R.id.user_id)
@@ -151,15 +156,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		ConstraintLayout layout1;
 		@BindView(R.id.delete)
 		ImageView delete;
-		private ViewGroup viewGroup;
-		private int childWidth;
-		private boolean isOpen = false;
 
 		ViewHolder(@NonNull View itemView) {
 			super(itemView);
 
 			layout1.setOnClickListener(this);
-			layout1.setOnLongClickListener(this);
 			userId.setOnClickListener(this);
 			userPsw.setOnClickListener(this);
 			delete.setOnClickListener(this);
@@ -171,12 +172,6 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.layout_1:
-					if (isOpen) {
-						isOpen = false;
-						layout1.offsetLeftAndRight(childWidth);
-						layout2.offsetLeftAndRight(childWidth);
-						return;
-					}
 					if (mOnItemClickListener != null) {
 						mOnItemClickListener.onItemClick(v, getLayoutPosition(), filterDatas.get(getLayoutPosition()));
 					}
@@ -197,28 +192,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					mList.remove(project);//也要删除源数据中的项目
 					notifyDataSetChanged();
 					Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
+					if (mListener != null) {
+						mListener.onClick(project.getId(), v);
+					}
 					break;
 			}
-
-		}
-
-		@Override
-		public boolean onLongClick(View v) {
-			if (viewGroup == null) {
-				viewGroup = rootLayout;
-				childWidth = viewGroup.getChildAt(1).getWidth();
-			}
-			if (isOpen) {
-				isOpen = false;
-				layout1.offsetLeftAndRight(childWidth);
-				layout2.offsetLeftAndRight(childWidth);
-				return true;
-			} else {
-				isOpen = true;
-				layout1.offsetLeftAndRight(-childWidth);
-				layout2.offsetLeftAndRight(-childWidth);
-			}
-			return true;
 
 		}
 	}
