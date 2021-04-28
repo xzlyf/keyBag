@@ -1,6 +1,7 @@
 package com.xz.keybag.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.xz.keybag.R;
@@ -137,6 +139,44 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		mListener = listener;
 	}
 
+	private AlertDialog mAffirmDialog;
+
+	/**
+	 * 显示删除前确认对话框
+	 */
+	private void affirmDialog(int position) {
+		if (mAffirmDialog != null) {
+			mAffirmDialog.cancel();
+		}
+		mAffirmDialog = new AlertDialog.Builder(mContext)
+				.setMessage("确定删除吗")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						db.deleteProject(filterDatas.get(position).getId());
+						Project project = filterDatas.get(position);
+						filterDatas.remove(project);
+						mList.remove(project);//也要删除源数据中的项目
+						notifyDataSetChanged();
+						Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
+						if (mListener != null) {
+							mListener.onClick(project.getId(), null);
+						}
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (mListener != null) {
+							mListener.onClick("", null);
+						}
+						dialog.dismiss();
+					}
+				})
+				.create();
+		mAffirmDialog.show();
+	}
+
 	class ViewHolder extends BaseRecyclerViewHolder implements View.OnClickListener {
 		@BindView(R.id.name)
 		TextView name;
@@ -186,15 +226,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					break;
 				case R.id.delete:
 					int position = getLayoutPosition();
-					//db.deleteProject(filterDatas.get(position).getId());
-					Project project = filterDatas.get(position);
-					filterDatas.remove(project);
-					mList.remove(project);//也要删除源数据中的项目
-					notifyDataSetChanged();
-					Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
-					if (mListener != null) {
-						mListener.onClick(project.getId(), v);
-					}
+					affirmDialog(position);
 					break;
 			}
 

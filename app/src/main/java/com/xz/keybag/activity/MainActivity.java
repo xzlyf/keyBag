@@ -242,9 +242,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		keyAdapter.setOnItemClickListener(new OnItemClickListener<Project>() {
 			@Override
 			public void onItemClick(View view, int position, Project model) {
-				//TODO 新界面打开
-				//startActivity(new Intent(MainActivity.this, DetailActivity.class)
-				//		.putExtra("model", model));
+				startActivity(new Intent(MainActivity.this, DetailActivity.class).putExtra("model", model));
 			}
 
 			@Override
