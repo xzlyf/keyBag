@@ -78,7 +78,6 @@ public class DetailActivity extends BaseActivity {
 		}
 	}
 
-
 	/**
 	 * 加载分类标签
 	 */
