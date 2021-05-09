@@ -303,7 +303,7 @@ public class DBManager {
 		long l = System.currentTimeMillis();
 		cv.put(FIELD_COMMON_T1, DES.encryptor(mGson.toJson(project.getDatum()), Local.mAdmin.getDes()));
 		cv.put(FIELD_COMMON_T2, TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
-		cv.put(FIELD_COMMON_T3, TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
+		cv.put(FIELD_COMMON_T3, project.getCreateDate());
 		//获取写数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
 		StringBuilder whereBuild = new StringBuilder();

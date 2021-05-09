@@ -1,46 +1,52 @@
 package com.xz.keybag.activity;
 
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.xz.keybag.R;
+import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.base.OnItemClickListener;
+import com.xz.keybag.custom.UnifyEditView;
+import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.utils.SpacesItemDecorationHorizontal;
+
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class DetailActivity extends BaseActivity implements View.OnFocusChangeListener, View.OnClickListener {
+public class DetailActivity extends BaseActivity {
 	@BindView(R.id.name)
-	EditText name;
-	@BindView(R.id.name_edit)
-	ImageView nameEdit;
+	UnifyEditView name;
 	@BindView(R.id.user)
-	EditText user;
-	@BindView(R.id.user_edit)
-	ImageView userEdit;
+	UnifyEditView user;
 	@BindView(R.id.pwd)
-	EditText pwd;
-	@BindView(R.id.pwd_edit)
-	ImageView pwdEdit;
+	UnifyEditView pwd;
 	@BindView(R.id.remark)
-	EditText remark;
-	@BindView(R.id.remark_edit)
-	ImageView remarkEdit;
-	@BindView(R.id.end_time)
-	TextView endTime;
+	UnifyEditView remark;
+	@BindView(R.id.update_time)
+	TextView updateTime;
+	@BindView(R.id.create_time)
+	TextView createTime;
 	@BindView(R.id.back)
 	ImageView back;
 	@BindView(R.id.submit)
 	TextView submit;
+	@BindView(R.id.category_view)
+	RecyclerView categoryView;
 	private Project project;
 	private DBManager db;
+	private CategoryAdapter categoryAdapter;
+	private String mCategorySt;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -60,59 +66,47 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
 			return;
 		}
 		db = DBManager.getInstance(this);
+		initCategory();
 		name.setText(project.getDatum().getProject());
 		user.setText(project.getDatum().getAccount());
 		pwd.setText(project.getDatum().getPassword());
 		remark.setText(project.getDatum().getRemark());
-		endTime.setText(project.getUpdateDate());
-		name.setOnFocusChangeListener(this);
-		user.setOnFocusChangeListener(this);
-		pwd.setOnFocusChangeListener(this);
-		remark.setOnFocusChangeListener(this);
-		back.setOnClickListener(this);
-		submit.setOnClickListener(this);
+		updateTime.setText(project.getUpdateDate());
+		createTime.setText(project.getCreateDate());
 		if (isNightMode()) {
 			back.setColorFilter(getResources().getColor(R.color.icons));
 		}
 	}
 
-	@Override
-	public void onFocusChange(View v, boolean hasFocus) {
-		switch (v.getId()) {
-			case R.id.name:
-				showEditorImg(hasFocus, nameEdit);
-				break;
-			case R.id.user:
-				showEditorImg(hasFocus, userEdit);
 
-				break;
-			case R.id.pwd:
-				showEditorImg(hasFocus, pwdEdit);
+	/**
+	 * 加载分类标签
+	 */
+	private void initCategory() {
+		List<Category> list = db.queryCategory();
+		categoryAdapter = new CategoryAdapter(mContext);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		categoryView.setLayoutManager(linearLayoutManager);
+		categoryView.addItemDecoration(new SpacesItemDecorationHorizontal(20));
+		categoryView.setAdapter(categoryAdapter);
+		categoryAdapter.refresh(list);
+		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
+			@Override
+			public void onItemClick(View view, int position, Category model) {
+				mCategorySt = model.getName();
+			}
 
-				break;
-			case R.id.remark:
-				showEditorImg(hasFocus, remarkEdit);
+			@Override
+			public void onItemLongClick(View view, int position, Category model) {
 
-				break;
-		}
+			}
+		});
 	}
 
-	private void showEditorImg(boolean b, ImageView view) {
-		if (b) {
-			view.setVisibility(View.INVISIBLE);
-		} else {
-			view.setVisibility(View.VISIBLE);
-		}
-	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		ButterKnife.bind(this);
-	}
-
-	@Override
-	public void onClick(View v) {
+	@OnClick({R.id.back, R.id.submit})
+	public void onViewClick(View v) {
 
 		switch (v.getId()) {
 			case R.id.back:
@@ -131,8 +125,8 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
 		datum.setProject(name.getText().toString().trim());
 		datum.setAccount(user.getText().toString().trim());
 		datum.setPassword(pwd.getText().toString().trim());
+		datum.setCategory(mCategorySt);
 		datum.setRemark(remark.getText().toString().trim());
-		//datum.setCategory(mCategorySt);//todo 加入修改分类
 		if (datum.isEmpty()) {
 			finish();
 			return;
@@ -155,19 +149,5 @@ public class DetailActivity extends BaseActivity implements View.OnFocusChangeLi
 
 	}
 
-	/**
-	 * 检查是否存在空
-	 *
-	 * @param arg
-	 * @return
-	 */
-	private boolean checkEmpty(String... arg) {
-		for (String s : arg) {
-			if (s == null || s.equals("")) {
-				return false;
-			}
-		}
-		return true;
-	}
 
 }
