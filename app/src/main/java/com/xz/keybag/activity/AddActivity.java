@@ -158,7 +158,7 @@ public class AddActivity extends BaseActivity {
 			sToast("请输入账号");
 			return;
 		}
-		if (TextUtils.isEmpty(datum.getAccount())) {
+		if (TextUtils.isEmpty(datum.getPassword())) {
 			sToast("请输入密码");
 			return;
 		}

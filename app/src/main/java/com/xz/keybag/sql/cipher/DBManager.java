@@ -30,6 +30,7 @@ import java.util.Map;
 import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L2;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
@@ -228,10 +229,10 @@ public class DBManager {
 		if (TextUtils.isEmpty(Local.mAdmin.getDes())) {
 			throw new NullPointerException("not find secret");
 		}
-		String date = String.valueOf(System.currentTimeMillis());
+		long l = System.currentTimeMillis();
 		cv.put(FIELD_COMMON_T1, DES.encryptor(mGson.toJson(datum), Local.mAdmin.getDes()));
-		cv.put(FIELD_COMMON_T2, date);
-		cv.put(FIELD_COMMON_T3, date);
+		cv.put(FIELD_COMMON_T2, TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
+		cv.put(FIELD_COMMON_T3, TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
 		try {
 			// insert 操作
 			db.insert(TABLE_COMMON, null, cv);
@@ -261,20 +262,54 @@ public class DBManager {
 				project.setDatum(mGson.fromJson(
 						DES.decryptor(cursor.getString(1), Local.mAdmin.getDes())
 						, Datum.class));
-				project.setUpdateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss",
-						Long.parseLong(cursor.getString(2))));
-				project.setCreateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss",
-						Long.parseLong(cursor.getString(3))));
+				project.setUpdateDate(cursor.getString(2));
+				project.setCreateDate(cursor.getString(3));
 				list.add(project);
 			}
 
-		}finally {
+		} finally {
 			if (cursor != null) {
 				cursor.close();
 			}
 		}
 
 		return list;
+	}
+
+	/**
+	 * 删除单个密码数据
+	 *
+	 * @param id 项目id
+	 */
+	public void deleteProject(String id) {
+		//生成条件语句
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.delete(TABLE_COMMON, whereBuffer.toString(), null);
+		db.close();
+	}
+
+
+	/**
+	 * 更新单个项目
+	 *
+	 * @param id      项目id
+	 * @param project 项目数据
+	 */
+	public void updateProject(String id, Project project) {
+		ContentValues cv = new ContentValues();
+		long l = System.currentTimeMillis();
+		cv.put(FIELD_COMMON_T1, DES.encryptor(mGson.toJson(project.getDatum()), Local.mAdmin.getDes()));
+		cv.put(FIELD_COMMON_T2, TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
+		cv.put(FIELD_COMMON_T3, project.getCreateDate());
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		StringBuilder whereBuild = new StringBuilder();
+		whereBuild.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
+		db.update(TABLE_COMMON, cv, whereBuild.toString(), null);
+		db.close();
 	}
 
 

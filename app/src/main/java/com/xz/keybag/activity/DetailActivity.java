@@ -1,182 +1,153 @@
 package com.xz.keybag.activity;
 
-import android.content.ContentValues;
-import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.xz.keybag.R;
+import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
-import com.xz.keybag.constant.Local;
-import com.xz.keybag.entity.KeyEntity;
-import com.xz.keybag.sql.EOD;
-import com.xz.keybag.sql.SqlManager;
-import com.xz.utils.TimeUtil;
+import com.xz.keybag.base.OnItemClickListener;
+import com.xz.keybag.custom.UnifyEditView;
+import com.xz.keybag.entity.Category;
+import com.xz.keybag.entity.Datum;
+import com.xz.keybag.entity.Project;
+import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.utils.SpacesItemDecorationHorizontal;
+
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class DetailActivity extends BaseActivity implements View.OnFocusChangeListener, View.OnClickListener {
-    @BindView(R.id.name)
-    EditText name;
-    @BindView(R.id.name_edit)
-    ImageView nameEdit;
-    @BindView(R.id.user)
-    EditText user;
-    @BindView(R.id.user_edit)
-    ImageView userEdit;
-    @BindView(R.id.pwd)
-    EditText pwd;
-    @BindView(R.id.pwd_edit)
-    ImageView pwdEdit;
-    @BindView(R.id.remark)
-    EditText remark;
-    @BindView(R.id.remark_edit)
-    ImageView remarkEdit;
-    @BindView(R.id.end_time)
-    TextView endTime;
-    @BindView(R.id.back)
-    ImageView back;
-    @BindView(R.id.submit)
-    TextView submit;
-    private KeyEntity entity;
+public class DetailActivity extends BaseActivity {
+	@BindView(R.id.name)
+	UnifyEditView name;
+	@BindView(R.id.user)
+	UnifyEditView user;
+	@BindView(R.id.pwd)
+	UnifyEditView pwd;
+	@BindView(R.id.remark)
+	UnifyEditView remark;
+	@BindView(R.id.update_time)
+	TextView updateTime;
+	@BindView(R.id.create_time)
+	TextView createTime;
+	@BindView(R.id.back)
+	ImageView back;
+	@BindView(R.id.submit)
+	TextView submit;
+	@BindView(R.id.category_view)
+	RecyclerView categoryView;
+	private Project project;
+	private DBManager db;
+	private CategoryAdapter categoryAdapter;
+	private String mCategorySt;
 
-    @Override
-    public boolean homeAsUpEnabled() {
-        return true;
-    }
+	@Override
+	public boolean homeAsUpEnabled() {
+		return true;
+	}
 
-    @Override
-    public int getLayoutResource() {
-        return R.layout.activity_detail;
-    }
+	@Override
+	public int getLayoutResource() {
+		return R.layout.activity_detail;
+	}
 
-    @Override
-    public void initData() {
-        if (getIntent() == null) {
-            sToast(getString(R.string.string_22));
-            return;
-        }
-        entity = (KeyEntity) getIntent().getSerializableExtra("model");
-        name.setText(entity.getT1());
-        user.setText(entity.getT2());
-        pwd.setText(entity.getT3());
-        remark.setText(entity.getT4());
-        long time;
-        try {
-            time = Long.valueOf(entity.getT5());
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            time = 0;
-        }
-        endTime.setText(TimeUtil.getSimMilliDate("yyyy年MM月dd日 hh:mm:ss",time));
-        name.setOnFocusChangeListener(this);
-        user.setOnFocusChangeListener(this);
-        pwd.setOnFocusChangeListener(this);
-        remark.setOnFocusChangeListener(this);
-        back.setOnClickListener(this);
-        submit.setOnClickListener(this);
-        if (isNightMode()) {
-            back.setColorFilter(getResources().getColor(R.color.icons));
-        }
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.name:
-                showEditorImg(hasFocus, nameEdit);
-                break;
-            case R.id.user:
-                showEditorImg(hasFocus, userEdit);
-
-                break;
-            case R.id.pwd:
-                showEditorImg(hasFocus, pwdEdit);
-
-                break;
-            case R.id.remark:
-                showEditorImg(hasFocus, remarkEdit);
-
-                break;
-        }
-    }
-
-    private void showEditorImg(boolean b, ImageView view) {
-        if (b) {
-            view.setVisibility(View.INVISIBLE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ButterKnife.bind(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.back:
-                finish();
-                break;
-            case R.id.submit:
-                submit();
-                break;
-        }
-    }
-
-    private void submit() {
+	@Override
+	public void initData() {
+		project = (Project) getIntent().getSerializableExtra("model");
+		if (project == null) {
+			sToast(getString(R.string.string_22));
+			return;
+		}
+		db = DBManager.getInstance(this);
+		initCategory();
+		name.setText(project.getDatum().getProject());
+		user.setText(project.getDatum().getAccount());
+		pwd.setText(project.getDatum().getPassword());
+		remark.setText(project.getDatum().getRemark());
+		updateTime.setText(project.getUpdateDate());
+		createTime.setText(project.getCreateDate());
+		if (isNightMode()) {
+			back.setColorFilter(getResources().getColor(R.color.icons));
+		}
+	}
 
 
-        String t1 = name.getText().toString().trim();
-        String t2 = user.getText().toString().trim();
-        String t3 = pwd.getText().toString().trim();
-        String t4 = remark.getText().toString().trim();
-        String t5 = String.valueOf(System.currentTimeMillis());
+	/**
+	 * 加载分类标签
+	 */
+	private void initCategory() {
+		List<Category> list = db.queryCategory();
+		categoryAdapter = new CategoryAdapter(mContext);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		categoryView.setLayoutManager(linearLayoutManager);
+		categoryView.addItemDecoration(new SpacesItemDecorationHorizontal(20));
+		categoryView.setAdapter(categoryAdapter);
+		categoryAdapter.refresh(list);
+		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
+			@Override
+			public void onItemClick(View view, int position, Category model) {
+				mCategorySt = model.getName();
+			}
 
-        if (!checkEmpty(t1, t2, t3, t5)) {
-            sToast(getString(R.string.string_12));
-            return;
-        }
-        String eodT1 = EOD.encrypt(entity.getT1(), Local.secret);
-        String eodT2 = EOD.encrypt(entity.getT2(), Local.secret);
-        String eodT3 = EOD.encrypt(entity.getT3(), Local.secret);
+			@Override
+			public void onItemLongClick(View view, int position, Category model) {
+
+			}
+		});
+	}
 
 
-        ContentValues values = new ContentValues();
-        values.put("t1", EOD.encrypt(t1, Local.secret));
-        values.put("t2", EOD.encrypt(t2, Local.secret));
-        values.put("t3", EOD.encrypt(t3, Local.secret));
-        values.put("t4", EOD.encrypt(t4, Local.secret));
-        values.put("t5", EOD.encrypt(t5, Local.secret));
-        int i = SqlManager.update(mContext, "common", values, "t1 = ? and t2 = ? and t3 = ? ", new String[]{eodT1, eodT2, eodT3});//更新
-        if (i == 0) {
-            sToast(getString(R.string.string_23));
-        } else {
-            sToast(getString(R.string.string_24));
-        }
+	@OnClick({R.id.back, R.id.submit})
+	public void onViewClick(View v) {
 
-    }
+		switch (v.getId()) {
+			case R.id.back:
+				finish();
+				break;
+			case R.id.submit:
+				submit();
+				break;
+		}
+	}
 
-    /**
-     * 检查是否存在空
-     *
-     * @param arg
-     * @return
-     */
-    private boolean checkEmpty(String... arg) {
-        for (String s : arg) {
-            if (s == null || s.equals("")) {
-                return false;
-            }
-        }
-        return true;
-    }
+	private void submit() {
+
+
+		Datum datum = new Datum();
+		datum.setProject(name.getText().toString().trim());
+		datum.setAccount(user.getText().toString().trim());
+		datum.setPassword(pwd.getText().toString().trim());
+		datum.setCategory(mCategorySt);
+		datum.setRemark(remark.getText().toString().trim());
+		if (datum.isEmpty()) {
+			finish();
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getProject())) {
+			sToast("请输入名称");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getAccount())) {
+			sToast("请输入账号");
+			return;
+		}
+		if (TextUtils.isEmpty(datum.getPassword())) {
+			sToast("请输入密码");
+			return;
+		}
+		project.setDatum(datum);
+		db.updateProject(project.getId(), project);
+		sToast("修改成功");
+
+	}
+
 
 }

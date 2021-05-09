@@ -1,5 +1,6 @@
 package com.xz.keybag.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * @email czr2001@outlook.com
  * @date 2021/4/26
  */
-public class Datum {
+public class Datum implements Serializable {
 
 	/**
 	 * project : 应用名/软件名

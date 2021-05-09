@@ -1,11 +1,13 @@
 package com.xz.keybag.entity;
 
+import java.io.Serializable;
+
 /**
  * @author czr
  * @email czr2001@outlook.com
  * @date 2021/4/27
  */
-public class Project {
+public class Project implements Serializable {
 	private String id;
 	private Datum datum;
 	private String updateDate;
