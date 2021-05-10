@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -310,29 +311,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-
 			case R.id.tv_menu:
-				drawerLayout.openDrawer(Gravity.LEFT);
-				break;
+				drawerLayout.openDrawer(GravityCompat.START);
+				return;
 			case R.id.tv_add:
-				drawerLayout.closeDrawer(Gravity.LEFT);
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.btn_1:
-				drawerLayout.closeDrawer(Gravity.LEFT);
-				startActivity(new Intent(MainActivity.this, SecretActivity.class));
+				startActivity(new Intent(MainActivity.this, SecretActivityV2.class));
 				break;
 			case R.id.btn_2:
-				drawerLayout.closeDrawer(Gravity.LEFT);
 				startActivity(new Intent(MainActivity.this, LoadActivity.class).putExtra("mode", 1));
 				break;
 			case R.id.btn_3:
-				drawerLayout.closeDrawer(Gravity.LEFT);
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));
 				break;
 			case R.id.btn_4:
-				drawerLayout.closeDrawer(Gravity.LEFT);
-
 				AppleInputDialog dialog = new AppleInputDialog.Builder(mContext)
 						.setTitle("请输入密码")
 						.setInputLines(1)
@@ -365,10 +359,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				}
 				checkUpdate();
 				break;
-
-
 		}
-
+		drawerLayout.closeDrawer(GravityCompat.START);
 
 	}
 
