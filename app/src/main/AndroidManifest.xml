@@ -19,8 +19,9 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.QRCodeActivity"></activity>
-        <activity android:name=".activity.SecretActivityV2" />
+        <activity android:name=".activity.ModifyActivity"></activity>
+        <activity android:name=".activity.QRCodeActivity" />
+        <activity android:name=".activity.SecretActivity" />
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
@@ -32,9 +33,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.KeyActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.SecretActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoginActivity"

@@ -318,7 +318,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.btn_1:
-				startActivity(new Intent(MainActivity.this, SecretActivityV2.class));
+				startActivity(new Intent(MainActivity.this, SecretActivity.class));
 				break;
 			case R.id.btn_2:
 				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", 1));
