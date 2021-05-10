@@ -70,15 +70,19 @@ public class SecretActivityV2 extends BaseActivity {
 					sToast("密钥文件已被篡改");
 					return;
 				}
-				String qrSt;
+				//二维码传输协议:keybag_secret=RSA密文
+				StringBuilder qrSt = new StringBuilder();
 				try {
-					qrSt = RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey));
+					qrSt.append("keybag_secret");
+					qrSt.append("=");
+					qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
 				} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 					e.printStackTrace();
 					sToast("密钥文件已被损坏");
 					return;
 				}
-				startActivity(new Intent(SecretActivityV2.this, QRCodeActivity.class).putExtra("qr_code", qrSt));
+				startActivity(new Intent(SecretActivityV2.this, QRCodeActivity.class)
+						.putExtra("qr_code", qrSt.toString()));
 				break;
 		}
 	}
