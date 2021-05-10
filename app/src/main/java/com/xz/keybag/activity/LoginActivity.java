@@ -90,6 +90,9 @@ public class LoginActivity extends BaseActivity {
 		initIdentity();
 		//登录初始化
 		initLogin();
+
+		//todo  测试模式：关闭密码验证
+		killMySelf();
 	}
 
 
