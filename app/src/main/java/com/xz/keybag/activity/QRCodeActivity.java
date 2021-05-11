@@ -49,26 +49,6 @@ public class QRCodeActivity extends BaseActivity {
 
 	}
 
-	/**
-	 * 二维码报文头判断
-	 *
-	 * @param qrSt 二维码加密密文
-	 */
-	public void test(String qrSt) {
-		//二维码报文头判断 keybag_secret=RSA密文
-		String[] qrArray = qrSt.split("=");
-		if (qrArray.length == 0) {
-			sToast("非法二维码");
-			return;
-		}
-
-		if (!qrArray[0].equals("keybag_secret")) {
-			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
-			return;
-		}
-
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();

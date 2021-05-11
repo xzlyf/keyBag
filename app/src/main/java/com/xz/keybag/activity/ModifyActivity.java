@@ -4,33 +4,40 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.bumptech.glide.Glide;
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ModifyActivity extends BaseActivity {
 
-	@BindView(R.id.btn_camera)
-	Button btnCamera;
 	@BindView(R.id.tv_back)
 	ImageView tvBack;
-	@BindView(R.id.banner)
-	ImageView banner;
+	@BindView(R.id.open_camera)
+	LinearLayout openCamera;
+	@BindView(R.id.current_secret)
+	TextView currentSecret;
+	@BindView(R.id.layout_new_secret)
+	LinearLayout newSecretLayout;
+	@BindView(R.id.new_secret)
+	TextView newSecret;
+
+	private boolean isSafeSecret = false;//是否合法密钥
+	private String xtSecret;//des明文密钥
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -44,14 +51,20 @@ public class ModifyActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
+		newSecretLayout.setVisibility(View.GONE);
 		changeStatusBarTextColor();
-		Glide.with(this).asGif().load(R.drawable.animaiton_data).into(banner);
+		String qrSt = getIntent().getStringExtra("qr_code");
+		if (TextUtils.isEmpty(qrSt)) {
+			finish();
+			return;
+		}
+		currentSecret.setText(verifySecret(qrSt));
 	}
 
-	@OnClick({R.id.btn_camera, R.id.tv_back})
+	@OnClick({R.id.tv_back, R.id.open_camera})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
-			case R.id.btn_camera:
+			case R.id.open_camera:
 				startQrCode();
 				break;
 			case R.id.tv_back:
@@ -111,16 +124,50 @@ public class ModifyActivity extends BaseActivity {
 		//扫描结果回调
 		if (requestCode == Local.REQ_QR_CODE && resultCode == RESULT_OK) {
 			Bundle bundle = data.getExtras();
+			if (bundle == null) {
+				return;
+			}
 			String scanResult = bundle.getString(Local.INTENT_EXTRA_KEY_QR_SCAN);
-			//将扫描出的信息显示出来
-			Logger.w("二维码内容:" + scanResult);
+			if (TextUtils.isEmpty(scanResult)) {
+				return;
+			}
+			handleQrCode(scanResult);
 		}
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// TODO: add setContentView(...) invocation
-		ButterKnife.bind(this);
+
+	/**
+	 * 处理接收过来的二维码数据
+	 */
+	private void handleQrCode(String qrSt) {
+		newSecretLayout.setVisibility(View.VISIBLE);
+		newSecret.setText(verifySecret(qrSt));
+
 	}
+
+	/**
+	 * 验证密钥文本
+	 */
+	private String verifySecret(String secret) {
+		//二维码报文头判断 keybag_secret@RSA密文
+		String[] qrArray = secret.split("@");
+		if (qrArray.length != 2) {
+			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
+			return "no_message";
+		}
+
+		if (!qrArray[0].equals("keybag_secret")) {
+			sToast("非法二维码");
+			return "error_code";
+		}
+
+		try {
+			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+		} catch (Exception e) {
+			e.printStackTrace();
+			xtSecret = null;
+		}
+		return qrArray[1];
+	}
+
 }

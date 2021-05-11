@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -63,28 +64,40 @@ public class SecretActivity extends BaseActivity {
 			case R.id.tv_examine:
 				break;
 			case R.id.tv_change:
-				startActivity(new Intent(SecretActivity.this, ModifyActivity.class));
+				startActivity(new Intent(SecretActivity.this, ModifyActivity.class)
+						.putExtra("qr_code", getQrSecret()));
 				break;
 			case R.id.tv_share:
-				String secret = Local.mAdmin.getDes();
-				if (TextUtils.isEmpty(secret)) {
-					sToast("密钥文件已被篡改");
-					return;
-				}
-				//二维码传输协议:keybag_secret=RSA密文
-				StringBuilder qrSt = new StringBuilder();
-				try {
-					qrSt.append("keybag_secret");
-					qrSt.append("=");
-					qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
-				} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-					e.printStackTrace();
-					sToast("密钥文件已被损坏");
-					return;
-				}
 				startActivity(new Intent(SecretActivity.this, QRCodeActivity.class)
-						.putExtra("qr_code", qrSt.toString()));
+						.putExtra("qr_code", getQrSecret()));
 				break;
 		}
+	}
+
+	/**
+	 * 获取密钥
+	 * 经过加密的
+	 * 二维码传输协议:keybag_secret@RSA密文
+	 */
+	private String getQrSecret() {
+		String secret = Local.mAdmin.getDes();
+		if (TextUtils.isEmpty(secret)) {
+			sToast("密钥文件已被篡改");
+			return "error_secret";
+		}
+		StringBuilder qrSt = new StringBuilder();
+		try {
+			qrSt.append("keybag_secret");
+			qrSt.append("@");
+			qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			e.printStackTrace();
+			sToast("密钥文件已被损坏");
+			return "error_failure";
+		}
+		Logger.w("加密：" + Local.mAdmin.getDes());
+		Logger.w("生成：" + qrSt.toString());
+		//Logger.w("解密：" + RSA.privateDecrypt(qrSt.toString(),RSA.getPrivateKey(Local.privateKey)));
+		return qrSt.toString();
 	}
 }
