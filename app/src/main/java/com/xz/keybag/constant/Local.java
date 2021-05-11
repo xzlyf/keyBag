@@ -29,6 +29,14 @@ public class Local {
 	public static final String SHARD_BOOLEAN_MODE = "day_or_night";
 	public static final String SHARD_SERVER_URL = "server_url";
 
+	//Request参数
+	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
+	public static final int REQ_PERM_CAMERA = 11003; // 打开摄像头
+	public static final int REQ_PERM_EXTERNAL_STORAGE = 11004; // 读写文件
+
+	//EXTRA标识
+	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
+
 	//user
 	public static Admin mAdmin;
 

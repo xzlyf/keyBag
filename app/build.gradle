@@ -67,7 +67,7 @@ dependencies {
     //glide 图片框架
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     //Google zxing 二维码
-    implementation 'com.google.zxing:android-core:3.3.0'
+//    implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:core:3.3.2'
 
 

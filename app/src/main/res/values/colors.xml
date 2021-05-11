@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#00BCD4</color>
-    <color name="colorPrimaryDark">#0097A7</color>
+    <color name="colorPrimaryDark">#00BCD4</color>
     <color name="primary_light">#B2EBF2</color>
     <color name="colorAccent">#8BC34A</color>
     <color name="primary_text">#212121</color>
@@ -16,4 +16,13 @@
     <color name="category_icon">#5E5E5E</color>
     <color name="category_text">#FFFFFF</color>
     <color name="category_text_2">#505050</color>
+
+    <!-- QRCode scanner color begin -->
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="result_view">#B0000000</color>
+    <color name="viewfinder_frame">#90FFFFFF</color>
+    <color name="result_point_color">#C0089CFF</color>
+    <color name="laser_color">#00BCD4</color>
+    <color name="corner_color">#00BCD4</color>
+    <!-- QRCode scanner color end -->
 </resources>

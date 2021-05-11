@@ -51,7 +51,7 @@ public class SecretActivity extends BaseActivity {
 			return;
 		}
 		changeStatusBarTextColor();
-		Glide.with(this).asGif().load(R.drawable.unlock_animaiton).into(bannerView);
+		Glide.with(this).asGif().load(R.drawable.animaiton_unlock).into(bannerView);
 	}
 
 	@OnClick({R.id.tv_back, R.id.tv_examine, R.id.tv_change, R.id.tv_share})
