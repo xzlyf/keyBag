@@ -25,4 +25,9 @@
     <color name="laser_color">#00BCD4</color>
     <color name="corner_color">#00BCD4</color>
     <!-- QRCode scanner color end -->
+
+    <!--密钥修改页面漫画黑底颜色-->
+    <color name="secret_layout_dark">#5A5A5A</color>
+    <!--密钥修改页面漫画黑底颜色-->
+
 </resources>

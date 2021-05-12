@@ -37,7 +37,7 @@ public class ModifyActivity extends BaseActivity {
 	TextView newSecret;
 
 	private boolean isSafeSecret = false;//是否合法密钥
-	private String xtSecret;//des明文密钥
+	private String xtSecret;//接收来的des明文密钥
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -61,7 +61,7 @@ public class ModifyActivity extends BaseActivity {
 		currentSecret.setText(verifySecret(qrSt));
 	}
 
-	@OnClick({R.id.tv_back, R.id.open_camera})
+	@OnClick({R.id.tv_back, R.id.open_camera, R.id.tv_close})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
 			case R.id.open_camera:
@@ -69,6 +69,11 @@ public class ModifyActivity extends BaseActivity {
 				break;
 			case R.id.tv_back:
 				finish();
+				break;
+			case R.id.tv_close:
+				newSecretLayout.setVisibility(View.GONE);
+				newSecret.setText("");
+				xtSecret = null;
 				break;
 		}
 	}
@@ -140,8 +145,19 @@ public class ModifyActivity extends BaseActivity {
 	 * 处理接收过来的二维码数据
 	 */
 	private void handleQrCode(String qrSt) {
+		String secret = verifySecret(qrSt);
+		if (secret.equals("no_message") || secret.equals("error_code")) {
+			return;
+		}
+
 		newSecretLayout.setVisibility(View.VISIBLE);
-		newSecret.setText(verifySecret(qrSt));
+		newSecret.setText(secret);
+		try {
+			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+		} catch (Exception e) {
+			e.printStackTrace();
+			xtSecret = null;
+		}
 
 	}
 
@@ -161,12 +177,6 @@ public class ModifyActivity extends BaseActivity {
 			return "error_code";
 		}
 
-		try {
-			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
-		} catch (Exception e) {
-			e.printStackTrace();
-			xtSecret = null;
-		}
 		return qrArray[1];
 	}
 
