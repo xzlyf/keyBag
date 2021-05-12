@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 
@@ -35,9 +36,12 @@ public class ModifyActivity extends BaseActivity {
 	LinearLayout newSecretLayout;
 	@BindView(R.id.new_secret)
 	TextView newSecret;
+	@BindView(R.id.tv_log)
+	TextView tvLog;
 
 	private boolean isSafeSecret = false;//是否合法密钥
 	private String xtSecret;//接收来的des明文密钥
+	private DBManager db;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -58,10 +62,11 @@ public class ModifyActivity extends BaseActivity {
 			finish();
 			return;
 		}
+		db = DBManager.getInstance(this);
 		currentSecret.setText(verifySecret(qrSt));
 	}
 
-	@OnClick({R.id.tv_back, R.id.open_camera, R.id.tv_close})
+	@OnClick({R.id.tv_back, R.id.open_camera, R.id.tv_close, R.id.change_secret})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
 			case R.id.open_camera:
@@ -75,9 +80,16 @@ public class ModifyActivity extends BaseActivity {
 				newSecret.setText("");
 				xtSecret = null;
 				break;
+			case R.id.change_secret:
+				startChange();
+				break;
 		}
 	}
 
+
+	/**
+	 * 调用zxing扫描二维码
+	 */
 	private void startQrCode() {
 		// 申请相机权限
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -180,4 +192,53 @@ public class ModifyActivity extends BaseActivity {
 		return qrArray[1];
 	}
 
+
+	/**
+	 * 开始修改密钥
+	 */
+	private void startChange() {
+		clearLog();
+		appendLog("----开始修改密钥----");
+		//appendLog(TimeUtil.getSimMilliDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis()));
+		appendLog("请勿退出或关闭");
+		if (xtSecret == null) {
+			appendLog("密钥无效");
+			appendLog("----结束修改密钥----");
+			return;
+		}
+		appendLog("正在测试密钥兼容性...");
+		boolean isOK = db.testSecret(xtSecret);
+		if (!isOK) {
+			appendLog("密钥可能不兼容");
+		}
+		Local.mAdmin.setDes(xtSecret);
+		appendLog("修改密钥成功");
+		appendLog("----结束修改密钥----");
+
+	}
+
+	private void appendLog(String st) {
+		//if (Looper.myLooper() != Looper.getMainLooper()) {
+		//	runOnUiThread(new Runnable() {
+		//		@Override
+		//		public void run() {
+		//			appendLog(st);
+		//		}
+		//	});
+		//}
+		tvLog.append(st);
+		tvLog.append("\n");
+	}
+
+	private void clearLog() {
+		//if (Looper.myLooper() != Looper.getMainLooper()) {
+		//	runOnUiThread(new Runnable() {
+		//		@Override
+		//		public void run() {
+		//			clearLog();
+		//		}
+		//	});
+		//}
+		tvLog.setText("");
+	}
 }

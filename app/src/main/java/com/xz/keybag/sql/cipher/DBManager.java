@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
 import com.xz.keybag.entity.Category;
@@ -219,6 +220,39 @@ public class DBManager {
 
 	}
 
+	/**
+	 * 测试DES密钥是否合法
+	 */
+	public boolean testSecret(String secret) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = null;
+		try {
+			cursor = db.query(TABLE_COMMON, null, null, null, null, null, null);
+			Project project;
+			if (cursor.moveToNext()) {
+				project = new Project();
+				project.setId(cursor.getString(0));
+				//json已被加密
+				project.setDatum(mGson.fromJson(
+						DES.decryptor(cursor.getString(1), secret)
+						, Datum.class));
+				project.setUpdateDate(cursor.getString(2));
+				project.setCreateDate(cursor.getString(3));
+			}
+
+		} catch (Exception e) {
+			return false;
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+
+
+		//尝试解密第一条密文
+		return true;
+	}
+
 
 	/**
 	 * 插入一条密码数据
@@ -266,6 +300,10 @@ public class DBManager {
 				project.setUpdateDate(cursor.getString(2));
 				project.setCreateDate(cursor.getString(3));
 				list.add(project);
+				Logger.w("======================="+"\n"+
+				"密钥：" + Local.mAdmin.getDes()+"\n"+
+				"密文：" + cursor.getString(1)+"\n"+
+				"json:" + DES.decryptor(cursor.getString(1), Local.mAdmin.getDes()+"das465d16165sa4d6asd"));
 			}
 
 		} finally {

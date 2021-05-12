@@ -95,8 +95,8 @@ public class SecretActivity extends BaseActivity {
 			sToast("密钥文件已被损坏");
 			return "error_failure";
 		}
-		Logger.w("加密：" + Local.mAdmin.getDes());
-		Logger.w("生成：" + qrSt.toString());
+		//Logger.w("加密：" + Local.mAdmin.getDes());
+		//Logger.w("生成：" + qrSt.toString());
 		//Logger.w("解密：" + RSA.privateDecrypt(qrSt.toString(),RSA.getPrivateKey(Local.privateKey)));
 		return qrSt.toString();
 	}
