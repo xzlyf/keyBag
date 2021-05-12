@@ -37,7 +37,7 @@ import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
 
-public class LoadActivity extends BaseActivity {
+public class LoginActivity extends BaseActivity {
 
 	@BindView(R.id.input_type)
 	TextView inputType;
@@ -90,6 +90,9 @@ public class LoadActivity extends BaseActivity {
 		initIdentity();
 		//登录初始化
 		initLogin();
+
+		//todo  测试模式：关闭密码验证
+		killMySelf();
 	}
 
 
@@ -139,12 +142,12 @@ public class LoadActivity extends BaseActivity {
 				new PermissionsUtils.IPermissionsResult() {
 					@Override
 					public void passPermissons() {
-						String uuid = DeviceUniqueUtils.getPhoneSign(LoadActivity.this);
+						String uuid = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
 						String old = db.queryIdentity();
 						if (old != null) {
 							if (!old.equals(uuid)) {
 								//跟之前保存的唯一标识不一致，环境异常，提示是否确认风险，确认同意后后就存入此次新的唯一标识
-								AlertDialog riskDialog = new AlertDialog.Builder(LoadActivity.this)
+								AlertDialog riskDialog = new AlertDialog.Builder(LoginActivity.this)
 										.setTitle("风险提示")
 										.setMessage("检测到设备异常\n是否继续")
 										.setNegativeButton("无风险，继续", new DialogInterface.OnClickListener() {
@@ -173,7 +176,7 @@ public class LoadActivity extends BaseActivity {
 
 					@Override
 					public void forbitPermissons() {
-						AlertDialog finallyDialog = new AlertDialog.Builder(LoadActivity.this)
+						AlertDialog finallyDialog = new AlertDialog.Builder(LoginActivity.this)
 								.setMessage("App需要此权限，\n以确保数据安全性。\n否则无法进行下一步")
 								.setPositiveButton("退出", new DialogInterface.OnClickListener() {
 									@Override

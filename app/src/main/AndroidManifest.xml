@@ -8,8 +8,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
+    <uses-permission android:name="android.permission.VIBRATE" /> <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 摄像头权限 -->
+    <uses-feature android:name="android.hardware.camera.autofocus" /> <!-- 自动聚焦权限 -->
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -19,6 +20,10 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".zxing.activity.CaptureActivity" />
+        <activity android:name=".activity.ModifyActivity" />
+        <activity android:name=".activity.QRCodeActivity" />
+        <activity android:name=".activity.SecretActivity" />
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
@@ -32,10 +37,7 @@
             android:name=".activity.KeyActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SecretActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.LoadActivity"
+            android:name=".activity.LoginActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

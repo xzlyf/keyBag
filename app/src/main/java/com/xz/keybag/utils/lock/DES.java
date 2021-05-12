@@ -23,9 +23,16 @@ public class DES {
 		String decrySt = des.decryptor(encrySt, secret);
 		System.out.println("decrySt=" + decrySt);
 
+		//String secret = "dasd123saasds";
+		//System.out.println("原密钥：" + secret);
+		//System.out.println(encryptor(st, secret));
+		//System.out.println(decryptor(encryptor(st, secret), secret));
+		//secret = secret + "123123123";
+		//System.out.println("新密钥：" + secret);
+		//System.out.println(encryptor(st, secret));
+		//System.out.println(decryptor(encryptor(st, secret), secret));
 
 	}*/
-
 
 	//生成一个DES密钥
 	public static String getKey() {
@@ -75,7 +82,6 @@ public class DES {
 			s = new String(responseByte);
 			return s;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return "error_decrypt.";
 		}
 	}

@@ -39,7 +39,7 @@ public class RSA {
 
 	/*// 简单测试____________
 	public static void main(String[] args) throws Exception {
-		Map<String, String> keyMap = RSAUtil.createKeys(1024);
+		Map<String, String> keyMap = createKeys(1024);
 		String publicKey = keyMap.get("publicKey");
 		String privateKey = keyMap.get("privateKey");
 		System.out.println("公钥: \n\r" + publicKey);
@@ -49,14 +49,14 @@ public class RSA {
 		String message = "123456abc";
 		System.out.println("明文数据========" + message);
 		System.out.println("======================================================================");
-		String privateStr = RSAUtil.privateEncrypt(message, RSAUtil.getPrivateKey(privateKey));//传入明文和公钥加密,得到密文
+		String privateStr = privateEncrypt(message, getPrivateKey(privateKey));//传入明文和公钥加密,得到密文
 		System.out.println("私钥加密========" + privateKey);
-		String publicStr = RSAUtil.publicDecrypt(privateStr, RSAUtil.getPublicKey(publicKey)); //传入密文和私钥,得到明文
+		String publicStr = publicDecrypt(privateStr, getPublicKey(publicKey)); //传入密文和私钥,得到明文
 		System.out.println("公钥解密========" + publicStr);
 		System.out.println("======================================================================");
-		String publicStr2 = RSAUtil.publicEncrypt(message, RSAUtil.getPublicKey(publicKey));
+		String publicStr2 = publicEncrypt(message, getPublicKey(publicKey));
 		System.out.println("公钥加密========" + publicStr2);
-		String privateStr2 = RSAUtil.privateDecrypt(publicStr2, RSAUtil.getPrivateKey(privateKey));
+		String privateStr2 = privateDecrypt(publicStr2, getPrivateKey(privateKey));
 		System.out.println("私钥加密========" + privateStr2);
 	}*/
 
