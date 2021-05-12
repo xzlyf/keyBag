@@ -21,6 +21,9 @@ import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -38,6 +41,10 @@ public class ModifyActivity extends BaseActivity {
 	TextView newSecret;
 	@BindView(R.id.tv_log)
 	TextView tvLog;
+	@BindView(R.id.change_secret)
+	LinearLayout changeSecret;
+	@BindView(R.id.tv_close)
+	TextView tvClose;
 
 	private boolean isSafeSecret = false;//是否合法密钥
 	private String xtSecret;//接收来的des明文密钥
@@ -164,6 +171,8 @@ public class ModifyActivity extends BaseActivity {
 
 		newSecretLayout.setVisibility(View.VISIBLE);
 		newSecret.setText(secret);
+		changeSecret.setEnabled(true);
+		changeSecret.setVisibility(View.VISIBLE);
 		try {
 			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
 		} catch (Exception e) {
@@ -197,6 +206,9 @@ public class ModifyActivity extends BaseActivity {
 	 * 开始修改密钥
 	 */
 	private void startChange() {
+		changeSecret.setEnabled(false);
+		openCamera.setEnabled(false);
+		tvClose.setEnabled(false);
 		clearLog();
 		appendLog("----开始修改密钥----");
 		//appendLog(TimeUtil.getSimMilliDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis()));
@@ -211,9 +223,19 @@ public class ModifyActivity extends BaseActivity {
 		if (!isOK) {
 			appendLog("密钥可能不兼容");
 		}
+		appendLog("正在替换旧密钥...");
+		int state = db.updateSecret(Local.mAdmin.getDes(), xtSecret);
+		appendLog("更新状态：" + state);
 		Local.mAdmin.setDes(xtSecret);
 		appendLog("修改密钥成功");
 		appendLog("----结束修改密钥----");
+
+		changeSecret.setVisibility(View.GONE);
+		openCamera.setEnabled(true);
+		tvClose.setEnabled(true);
+
+		//显示新的密钥
+		currentSecret.setText(newSecret.getText().toString().trim());
 
 	}
 
@@ -240,5 +262,33 @@ public class ModifyActivity extends BaseActivity {
 		//	});
 		//}
 		tvLog.setText("");
+	}
+
+
+	/**
+	 * 获取密钥
+	 * 经过加密的
+	 * 二维码传输协议:keybag_secret@RSA密文
+	 */
+	private String getQrSecret() {
+		String secret = Local.mAdmin.getDes();
+		if (TextUtils.isEmpty(secret)) {
+			sToast("密钥文件已被篡改");
+			return "error_secret";
+		}
+		StringBuilder qrSt = new StringBuilder();
+		try {
+			qrSt.append("keybag_secret");
+			qrSt.append("@");
+			qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			e.printStackTrace();
+			sToast("密钥文件已被损坏");
+			return "error_failure";
+		}
+		//Logger.w("加密：" + Local.mAdmin.getDes());
+		//Logger.w("生成：" + qrSt.toString());
+		//Logger.w("解密：" + RSA.privateDecrypt(qrSt.toString(),RSA.getPrivateKey(Local.privateKey)));
+		return qrSt.toString();
 	}
 }

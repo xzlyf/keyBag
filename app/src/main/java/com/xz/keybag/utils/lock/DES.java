@@ -14,26 +14,25 @@ public class DES {
 	/*public static void main(String[] args) {
 		String st = "hello world";
 		DES des = new DES();
-		//System.out.println("=====================");
-		//System.out.println("st=" + st);
-		//String secret = des.getKey();
-		//System.out.println("secret=" + secret);
-		//String encrySt = des.encryptor(st, secret);
-		//System.out.println("encrySt=" + encrySt);
-		//String decrySt = des.decryptor(encrySt, secret);
-		//System.out.println("decrySt=" + decrySt);
+		System.out.println("=====================");
+		System.out.println("st=" + st);
+		String secret = des.getKey();
+		System.out.println("secret=" + secret);
+		String encrySt = des.encryptor(st, secret);
+		System.out.println("encrySt=" + encrySt);
+		String decrySt = des.decryptor(encrySt, secret);
+		System.out.println("decrySt=" + decrySt);
 
-		String secret = "dasd123saasds";
-		System.out.println("原密钥：" + secret);
-		System.out.println(encryptor(st, secret));
-		System.out.println(decryptor(encryptor(st, secret), secret));
-		secret = secret + "123123123";
-		System.out.println("新密钥：" + secret);
-		System.out.println(encryptor(st, secret));
-		System.out.println(decryptor(encryptor(st, secret), secret));
+		//String secret = "dasd123saasds";
+		//System.out.println("原密钥：" + secret);
+		//System.out.println(encryptor(st, secret));
+		//System.out.println(decryptor(encryptor(st, secret), secret));
+		//secret = secret + "123123123";
+		//System.out.println("新密钥：" + secret);
+		//System.out.println(encryptor(st, secret));
+		//System.out.println(decryptor(encryptor(st, secret), secret));
 
-	}
-*/
+	}*/
 
 	//生成一个DES密钥
 	public static String getKey() {
