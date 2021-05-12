@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,12 +18,11 @@ import androidx.core.app.ActivityCompat;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.custom.SlidingVerification;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import com.xz.utils.TimeUtil;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -41,10 +41,12 @@ public class ModifyActivity extends BaseActivity {
 	TextView newSecret;
 	@BindView(R.id.tv_log)
 	TextView tvLog;
-	@BindView(R.id.change_secret)
-	LinearLayout changeSecret;
 	@BindView(R.id.tv_close)
 	TextView tvClose;
+	@BindView(R.id.verify_progress)
+	SlidingVerification mVerifyProgress;
+	@BindView(R.id.tv_top)
+	TextView mTvTop;
 
 	private boolean isSafeSecret = false;//是否合法密钥
 	private String xtSecret;//接收来的des明文密钥
@@ -71,11 +73,44 @@ public class ModifyActivity extends BaseActivity {
 		}
 		db = DBManager.getInstance(this);
 		currentSecret.setText(verifySecret(qrSt));
+
+		mVerifyProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+				if (seekBar.getProgress() >= seekBar.getMax()) {
+					seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.check_pass_bule));
+					seekBar.setThumbOffset(seekBar.getMax() + 50);
+					seekBar.setProgress(seekBar.getMax());
+					seekBar.setEnabled(false);
+					mTvTop.setVisibility(View.VISIBLE);
+					//开始修改
+					startChange();
+				}
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+
+				if (seekBar.getProgress() >= seekBar.getMax()) {
+					seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
+					seekBar.setThumbOffset(0);
+					seekBar.setProgress(0);
+				} else {
+					seekBar.setProgress(0);
+				}
+			}
+		});
 	}
 
-	@OnClick({R.id.tv_back, R.id.open_camera, R.id.tv_close, R.id.change_secret})
+	@OnClick({R.id.tv_back, R.id.open_camera, R.id.tv_close, R.id.image_camera})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
+			case R.id.image_camera:
 			case R.id.open_camera:
 				startQrCode();
 				break;
@@ -86,9 +121,6 @@ public class ModifyActivity extends BaseActivity {
 				newSecretLayout.setVisibility(View.GONE);
 				newSecret.setText("");
 				xtSecret = null;
-				break;
-			case R.id.change_secret:
-				startChange();
 				break;
 		}
 	}
@@ -171,8 +203,13 @@ public class ModifyActivity extends BaseActivity {
 
 		newSecretLayout.setVisibility(View.VISIBLE);
 		newSecret.setText(secret);
-		changeSecret.setEnabled(true);
-		changeSecret.setVisibility(View.VISIBLE);
+		if (mVerifyProgress.getProgress() >= 99) {
+			mVerifyProgress.setProgress(0);
+			mVerifyProgress.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
+			mVerifyProgress.setThumbOffset(0);
+			mVerifyProgress.setEnabled(true);
+			mTvTop.setVisibility(View.INVISIBLE);
+		}
 		try {
 			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
 		} catch (Exception e) {
@@ -206,7 +243,6 @@ public class ModifyActivity extends BaseActivity {
 	 * 开始修改密钥
 	 */
 	private void startChange() {
-		changeSecret.setEnabled(false);
 		openCamera.setEnabled(false);
 		tvClose.setEnabled(false);
 		clearLog();
@@ -228,9 +264,9 @@ public class ModifyActivity extends BaseActivity {
 		appendLog("更新状态：" + state);
 		Local.mAdmin.setDes(xtSecret);
 		appendLog("修改密钥成功");
+		appendLog(TimeUtil.getSimMilliDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis()));
 		appendLog("----结束修改密钥----");
 
-		changeSecret.setVisibility(View.GONE);
 		openCamera.setEnabled(true);
 		tvClose.setEnabled(true);
 
@@ -265,30 +301,4 @@ public class ModifyActivity extends BaseActivity {
 	}
 
 
-	/**
-	 * 获取密钥
-	 * 经过加密的
-	 * 二维码传输协议:keybag_secret@RSA密文
-	 */
-	private String getQrSecret() {
-		String secret = Local.mAdmin.getDes();
-		if (TextUtils.isEmpty(secret)) {
-			sToast("密钥文件已被篡改");
-			return "error_secret";
-		}
-		StringBuilder qrSt = new StringBuilder();
-		try {
-			qrSt.append("keybag_secret");
-			qrSt.append("@");
-			qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			e.printStackTrace();
-			sToast("密钥文件已被损坏");
-			return "error_failure";
-		}
-		//Logger.w("加密：" + Local.mAdmin.getDes());
-		//Logger.w("生成：" + qrSt.toString());
-		//Logger.w("解密：" + RSA.privateDecrypt(qrSt.toString(),RSA.getPrivateKey(Local.privateKey)));
-		return qrSt.toString();
-	}
 }

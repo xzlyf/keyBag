@@ -36,6 +36,21 @@
             android:textColor="@color/primary_text"
             android:textSize="@dimen/sp_16" />
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/image_camera"
+            style="@style/img_onclick_yuanxing"
+            android:layout_width="@dimen/dp_35"
+            android:layout_height="@dimen/dp_35"
+            android:tint="@color/primary_text"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:padding="@dimen/dp_5"
+            android:src="@mipmap/ic_scan" />
+
     </LinearLayout>
 
 
@@ -111,33 +126,43 @@
             android:textIsSelectable="false"
             android:textSize="14sp" />
 
-        <LinearLayout
-            android:id="@+id/change_secret"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_5"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="@dimen/dp_30"
-                android:layout_height="@dimen/dp_30"
-                android:padding="@dimen/dp_5"
-                android:src="@mipmap/ic_switch"
-                android:tint="@color/primary_text" />
+            android:layout_marginTop="@dimen/dp_5">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="0dp"
-                android:text="使用新的密钥"
-                android:textColor="@color/primary_text"
-                android:textSize="18sp" />
-        </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="#E7EAE9"
+                android:gravity="center"
+                android:text="滑动至右侧使用新的密钥"
+                android:textSize="12sp" />
 
+            <com.xz.keybag.custom.SlidingVerification
+                android:id="@+id/verify_progress"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:max="100"
+                android:maxHeight="45dp"
+                android:minHeight="45dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/bg_seekbar_bule"
+                android:thumb="@mipmap/seekbar_thumb"
+                android:thumbOffset="0dp" />
+
+            <TextView
+                android:id="@+id/tv_top"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="马上就好"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </RelativeLayout>
     </LinearLayout>
 
     <TextView
