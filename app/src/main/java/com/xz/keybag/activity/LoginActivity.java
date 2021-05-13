@@ -92,7 +92,7 @@ public class LoginActivity extends BaseActivity {
 		initLogin();
 
 		//todo  测试模式：关闭密码验证
-		killMySelf();
+		//killMySelf();
 	}
 
 

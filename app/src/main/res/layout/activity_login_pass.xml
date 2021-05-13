@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_5"
             android:layout_marginEnd="@dimen/dp_10"
-            android:text="修改登录"
+            android:text="修改密码"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16" />
 
