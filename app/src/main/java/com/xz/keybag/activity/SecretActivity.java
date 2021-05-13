@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -28,8 +27,6 @@ public class SecretActivity extends BaseActivity {
 	TextView tvTitle;
 	@BindView(R.id.banner)
 	ImageView bannerView;
-	@BindView(R.id.tv_examine)
-	TextView tvExamine;
 	@BindView(R.id.tv_change)
 	TextView tvChange;
 	@BindView(R.id.tv_share)
@@ -55,13 +52,11 @@ public class SecretActivity extends BaseActivity {
 		Glide.with(this).asGif().load(R.drawable.animaiton_unlock).into(bannerView);
 	}
 
-	@OnClick({R.id.tv_back, R.id.tv_examine, R.id.tv_change, R.id.tv_share})
+	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share})
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
 				finish();
-				break;
-			case R.id.tv_examine:
 				break;
 			case R.id.tv_change:
 				startActivity(new Intent(SecretActivity.this, ModifyActivity.class)

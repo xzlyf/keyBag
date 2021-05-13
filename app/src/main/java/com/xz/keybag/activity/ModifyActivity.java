@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -73,7 +74,7 @@ public class ModifyActivity extends BaseActivity {
 		}
 		db = DBManager.getInstance(this);
 		currentSecret.setText(verifySecret(qrSt));
-
+		tvLog.setMovementMethod(ScrollingMovementMethod.getInstance());
 		mVerifyProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -243,6 +244,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 开始修改密钥
 	 */
 	private void startChange() {
+		tvBack.setEnabled(false);
 		openCamera.setEnabled(false);
 		tvClose.setEnabled(false);
 		clearLog();
@@ -269,6 +271,7 @@ public class ModifyActivity extends BaseActivity {
 
 		openCamera.setEnabled(true);
 		tvClose.setEnabled(true);
+		tvBack.setEnabled(true);
 
 		//显示新的密钥
 		currentSecret.setText(newSecret.getText().toString().trim());
@@ -286,6 +289,8 @@ public class ModifyActivity extends BaseActivity {
 		//}
 		tvLog.append(st);
 		tvLog.append("\n");
+		//滚动到底部
+		tvLog.scrollTo(0, tvLog.getLineCount() * tvLog.getLineHeight() - (tvLog.getHeight() - (tvLog.getPaddingTop() * 2)));
 	}
 
 	private void clearLog() {
