@@ -131,7 +131,7 @@ public class DBManager {
 	 *
 	 * @return 返回状态
 	 */
-	public String queryLogin() {
+	public String login() {
 		//获取可读数据库
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
 		Cursor cursor = null;
@@ -147,24 +147,39 @@ public class DBManager {
 				admin.setFingerprint(DES.decryptor(cursor.getString(2), admin.getDes()));
 				admin.setPrivateKey(DES.decryptor(cursor.getString(3), admin.getDes()));
 				Local.mAdmin = admin;
-				pwd = "success_password";
+				pwd = Local.PASSWORD_STATE_SUCCESS;
 			} else {
 				//未设置密码
-				pwd = "no_password";
+				pwd = Local.PASSWORD_STATE_NULL;
 			}
 
-		} catch (SQLException e) {
-			Log.e(TAG, "queryLoginPwd:" + e.toString());
-			pwd = "error_query_pwd";
 		} catch (Exception e) {
 			Log.e(TAG, "queryLoginPwd:" + e.toString());
-			pwd = "error_decrypt";
+			pwd = Local.PASSWORD_STATE_ERROR;
 		} finally {
 			if (cursor != null) {
 				cursor.close();
 			}
 		}
 		return pwd;
+	}
+
+	/**
+	 * 修改指纹状态
+	 *
+	 * @param fingerprintState Local.FINGERPRINT_STATE
+	 */
+	public void updateFingerprintLogin(String fingerprintState) {
+		String tf = fingerprintState;
+		fingerprintState = DES.encryptor(fingerprintState,Local.mAdmin.getDes());
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_SECRET_K3, fingerprintState);
+		int state = db.update(TABLE_SECRET, cv, null, null);
+		if (state == 1) {
+			Local.mAdmin.setFingerprint(tf);
+		}
+
 	}
 
 	/**
@@ -191,7 +206,7 @@ public class DBManager {
 		//4.1存入登录密码
 		cv.put(FIELD_SECRET_K2, DES.encryptor(loginPwd, desSecret));
 		//4.2默认开启指纹登录
-		cv.put(FIELD_SECRET_K3, DES.encryptor("fingerprint", desSecret));
+		cv.put(FIELD_SECRET_K3, DES.encryptor(Local.FINGERPRINT_STATE_OPEN, desSecret));
 		//4.3RSA私钥存入数据库 RSA私钥需要用DES加密
 		cv.put(FIELD_SECRET_K4, DES.encryptor(keyMap.get("privateKey"), desSecret));
 		//4.4删除私有目录得公钥
@@ -203,7 +218,7 @@ public class DBManager {
 		Admin admin = new Admin();
 		admin.setDes(desSecret);
 		admin.setLoginPwd(loginPwd);
-		admin.setFingerprint("fingerprint");
+		admin.setFingerprint(Local.FINGERPRINT_STATE_OPEN);
 		admin.setPrivateKey(keyMap.get(1));
 		admin.setPublicKey(keyMap.get(0));
 		Local.mAdmin = admin;

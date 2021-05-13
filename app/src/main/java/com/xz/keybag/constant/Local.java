@@ -36,7 +36,15 @@ public class Local {
 
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
-	public static final int INTENT_EXTRA_LOGIN_MODE= 0x14764185;
+	public static final int INTENT_EXTRA_LOGIN_MODE = 0x14764185;
+
+	//参数标识
+	public static final String FINGERPRINT_STATE_OPEN = "fingerprint";//开启指纹登录
+	public static final String FINGERPRINT_STATE_CLOSE = "shutdown_f";//关闭指纹登录
+	public static final String FINGERPRINT_STATE_NONSUPPORT = "no_f";//设备不知指纹
+	public static final String PASSWORD_STATE_NULL = "no_password";
+	public static final String PASSWORD_STATE_SUCCESS = "success_password";
+	public static final String PASSWORD_STATE_ERROR = "error_query_pwd";
 
 	//user
 	public static Admin mAdmin;

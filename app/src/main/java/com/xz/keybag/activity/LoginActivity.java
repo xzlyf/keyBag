@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -92,7 +93,7 @@ public class LoginActivity extends BaseActivity {
 		initLogin();
 
 		//todo  测试模式：关闭密码验证
-		//killMySelf();
+		killMySelf();
 	}
 
 
@@ -196,9 +197,9 @@ public class LoginActivity extends BaseActivity {
 	 * 初始化登录相关操作
 	 */
 	private void initLogin() {
-		//尝试读取登录密码
-		String loginPwd = db.queryLogin();
-		if (loginPwd.equals("no_password")) {
+		//获取密码状态
+		String loginState = db.login();
+		if (loginState.equals(Local.PASSWORD_STATE_NULL)) {
 			PasswordInputDialog pwdInputDialog = new PasswordInputDialog(this);
 			pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
 				@Override
@@ -216,9 +217,10 @@ public class LoginActivity extends BaseActivity {
 			});
 			pwdInputDialog.create();
 			pwdInputDialog.show();
-		} else if (loginPwd.equals("success_password")) {
+		} else if (loginState.equals(Local.PASSWORD_STATE_SUCCESS)) {
+			Logger.w("用户状态："+Local.mAdmin.getFingerprint());
 			//用户是否开启指纹登录
-			if (!Local.mAdmin.getFingerprint().equals("fingerprint")) {
+			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
 				inputLayout2.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
@@ -281,6 +283,7 @@ public class LoginActivity extends BaseActivity {
 				inputLayout.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
+				Local.mAdmin.setFingerprint(Local.FINGERPRINT_STATE_NONSUPPORT);
 
 			}
 

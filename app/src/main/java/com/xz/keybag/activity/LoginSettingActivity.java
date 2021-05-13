@@ -3,13 +3,16 @@ package com.xz.keybag.activity;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.lock.RSA;
 
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +34,10 @@ public class LoginSettingActivity extends BaseActivity {
 	TextView tvChange;
 	@BindView(R.id.tv_share)
 	TextView tvShare;
+	@BindView(R.id.sw_fingerprint)
+	Switch swFingerprint;
+
+	private DBManager db;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -48,8 +55,38 @@ public class LoginSettingActivity extends BaseActivity {
 			sToast("请先初始化");
 			return;
 		}
+		db = DBManager.getInstance(this);
 		changeStatusBarTextColor();
 		Glide.with(this).asGif().load(R.drawable.animaiton_unlock).into(bannerView);
+		initState();
+		swFingerprint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					db.updateFingerprintLogin(Local.FINGERPRINT_STATE_OPEN);
+					sToast("已开启指纹登录");
+				} else {
+					db.updateFingerprintLogin(Local.FINGERPRINT_STATE_CLOSE);
+					sToast("已关闭指纹登录");
+				}
+			}
+		});
+	}
+
+	/**
+	 * 刷新状态
+	 */
+	private void initState() {
+		//指纹登录状态
+		if (Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
+			swFingerprint.setChecked(true);
+		} else if (Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_NONSUPPORT)) {
+			swFingerprint.setChecked(false);
+			swFingerprint.setEnabled(false);
+			swFingerprint.setVisibility(View.GONE);
+		} else {
+			swFingerprint.setChecked(false);
+		}
 	}
 
 	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share, R.id.tv_login})
