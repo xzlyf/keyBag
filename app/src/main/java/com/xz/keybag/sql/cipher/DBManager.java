@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
 import com.xz.keybag.entity.Category;
@@ -220,9 +221,36 @@ public class DBManager {
 	}
 
 	/**
+	 * 更新登录密码
+	 *
+	 * @param oldLogin 旧密码
+	 * @param newLogin 新密码
+	 */
+	public int updateLogin(String oldLogin, String newLogin) {
+		//明文登录密码
+		String tLogin = newLogin;
+		oldLogin = DES.encryptor(oldLogin, Local.mAdmin.getDes());
+		newLogin = DES.encryptor(newLogin, Local.mAdmin.getDes());
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		//生成条件语句
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_SECRET_K2).append(" = ").append("'").append(oldLogin).append("'");
+		//生成要修改或者插入的键值
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_SECRET_K2, newLogin);
+		int state = db.update(TABLE_SECRET, cv, whereBuffer.toString(), null);
+		if (state == 1) {
+			Local.mAdmin.setLoginPwd(tLogin);
+		}
+		db.close();
+		return state;
+	}
+
+	/**
 	 * 测试DES密钥是否合法
 	 */
-	public boolean testSecret(String secret) {
+	public boolean testDES(String secret) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
 		Cursor cursor = null;
 		try {
@@ -259,7 +287,16 @@ public class DBManager {
 	 * @param oldSecret 旧密钥
 	 * @return 影响的行数
 	 */
-	public int updateSecret(String oldSecret, String newSecret) {
+	public int updateDES(String oldSecret, String newSecret) {
+		//明文DES密钥
+		String tSecret = newSecret;
+		try {
+			oldSecret = RSA.privateEncrypt(oldSecret, RSA.getPrivateKey(Local.mAdmin.getPrivateKey()));
+			newSecret = RSA.privateEncrypt(newSecret, RSA.getPrivateKey(Local.mAdmin.getPrivateKey()));
+		} catch (Exception e) {
+			Logger.e("私钥错误-_-");
+			return -1;
+		}
 		//获取写数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
 		//生成条件语句
@@ -269,6 +306,9 @@ public class DBManager {
 		ContentValues cv = new ContentValues();
 		cv.put(FIELD_SECRET_K1, newSecret);
 		int state = db.update(TABLE_SECRET, cv, whereBuffer.toString(), null);
+		if (state == 1) {
+			Local.mAdmin.setDes(tSecret);
+		}
 		db.close();
 		return state;
 	}

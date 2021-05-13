@@ -36,6 +36,7 @@ public class Local {
 
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
+	public static final int INTENT_EXTRA_LOGIN_MODE= 0x14764185;
 
 	//user
 	public static Admin mAdmin;

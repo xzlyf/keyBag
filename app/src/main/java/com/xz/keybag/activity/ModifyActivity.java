@@ -257,14 +257,18 @@ public class ModifyActivity extends BaseActivity {
 			return;
 		}
 		appendLog("正在测试密钥兼容性...");
-		boolean isOK = db.testSecret(xtSecret);
+		boolean isOK = db.testDES(xtSecret);
 		if (!isOK) {
 			appendLog("密钥可能不兼容");
 		}
 		appendLog("正在替换旧密钥...");
-		int state = db.updateSecret(Local.mAdmin.getDes(), xtSecret);
+		int state = db.updateDES(Local.mAdmin.getDes(), xtSecret);
 		appendLog("更新状态：" + state);
-		Local.mAdmin.setDes(xtSecret);
+		if (state != 1) {
+			appendLog("修改密钥失败");
+			appendLog("----结束修改密钥----");
+			return;
+		}
 		appendLog("修改密钥成功");
 		appendLog(TimeUtil.getSimMilliDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis()));
 		appendLog("----结束修改密钥----");
