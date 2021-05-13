@@ -5,10 +5,14 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.method.DigitsKeyListener;
+import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +64,9 @@ public class UnifyEditView extends LinearLayout {
 		editAttrs.setTextSize(ta.getDimensionPixelSize(R.styleable.UnifyEditView_textSize, 16));
 		editAttrs.setLines(ta.getInt(R.styleable.UnifyEditView_lines, 1));
 		editAttrs.setMaxLines(ta.getInt(R.styleable.UnifyEditView_maxLines, 1));
+		editAttrs.setMaxLength(ta.getInt(R.styleable.UnifyEditView_maxLength, -1));
+		editAttrs.setPassword(ta.getBoolean(R.styleable.UnifyEditView_isPassword, false));
+		editAttrs.setDigits(ta.getString(R.styleable.UnifyEditView_digits));
 		ta.recycle();
 
 		setPadding(20, 50, 20, 50);
@@ -110,6 +117,20 @@ public class UnifyEditView extends LinearLayout {
 		mInput.setHint(editAttrs.getHint());
 		mInput.setLines(editAttrs.getLines());
 		mInput.setMaxLines(editAttrs.getMaxLines());
+		//手动设置maxLength
+		if (editAttrs.getMaxLength() != -1) {
+			InputFilter[] filters = {new InputFilter.LengthFilter(editAttrs.getMaxLength())};
+			mInput.setFilters(filters);
+		}
+		//是否密码输入
+		if (editAttrs.isPassword()) {
+			mInput.setInputType(EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+			mInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
+		}
+		//限制输入内容 digits
+		if (editAttrs.getDigits() != null) {
+			mInput.setKeyListener(DigitsKeyListener.getInstance(editAttrs.getDigits()));
+		}
 		return mInput;
 	}
 
@@ -163,11 +184,14 @@ public class UnifyEditView extends LinearLayout {
 	private static class AttrsByEdit {
 		private String text;
 		private String hint;
+		private String digits;
 		private int textSize;
 		private int textColor;
 		private int hintColor;
 		private int lines;
 		private int maxLines;
+		private int maxLength;
+		private boolean isPassword;
 
 		public String getText() {
 			return text;
@@ -223,6 +247,30 @@ public class UnifyEditView extends LinearLayout {
 
 		public void setMaxLines(int maxLines) {
 			this.maxLines = maxLines;
+		}
+
+		public int getMaxLength() {
+			return maxLength;
+		}
+
+		public void setMaxLength(int maxLength) {
+			this.maxLength = maxLength;
+		}
+
+		public boolean isPassword() {
+			return isPassword;
+		}
+
+		public void setPassword(boolean password) {
+			isPassword = password;
+		}
+
+		public String getDigits() {
+			return digits;
+		}
+
+		public void setDigits(String digits) {
+			this.digits = digits;
 		}
 	}
 }

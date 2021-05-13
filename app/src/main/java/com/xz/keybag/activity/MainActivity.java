@@ -189,7 +189,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		tvAdd.setOnClickListener(this);
 		tvMenu.setOnClickListener(this);
 		findViewById(R.id.btn_1).setOnClickListener(this);
-		findViewById(R.id.btn_2).setOnClickListener(this);
 		findViewById(R.id.btn_3).setOnClickListener(this);
 		findViewById(R.id.btn_4).setOnClickListener(this);
 		Button btn5 = findViewById(R.id.btn_5);
@@ -318,9 +317,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.btn_1:
-				startActivity(new Intent(MainActivity.this, SecretActivity.class));
-				break;
-			case R.id.btn_2:
 				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
 				break;
 			case R.id.btn_3:

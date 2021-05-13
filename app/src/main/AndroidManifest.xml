@@ -23,7 +23,7 @@
         <activity android:name=".zxing.activity.CaptureActivity" />
         <activity android:name=".activity.ModifyActivity" />
         <activity android:name=".activity.QRCodeActivity" />
-        <activity android:name=".activity.SecretActivity" />
+        <activity android:name=".activity.LoginSettingActivity" />
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
@@ -34,7 +34,7 @@
             android:name=".activity.DetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.KeyActivity"
+            android:name=".activity.LoginPassActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoginActivity"

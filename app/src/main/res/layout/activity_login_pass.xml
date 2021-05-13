@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.KeyActivity">
+    tools:context=".activity.LoginPassActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_5"
             android:layout_marginEnd="@dimen/dp_10"
-            android:text="登录管理"
+            android:text="修改登录"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16" />
 
@@ -67,30 +67,46 @@
         android:layout_height="wrap_content"
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
+        app:digits="@string/digits_password"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
+        app:isPassword="true"
         app:label="旧的密码"
+        app:lines="1"
+        app:maxLength="4"
+        app:maxLines="1"
         app:textColor="@color/category_text_2" />
+
     <com.xz.keybag.custom.UnifyEditView
         android:id="@+id/ue_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
+        app:digits="@string/digits_password"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
+        app:isPassword="true"
         app:label="新的密码"
+        app:lines="1"
+        app:maxLength="4"
+        app:maxLines="1"
         app:textColor="@color/category_text_2" />
+
     <com.xz.keybag.custom.UnifyEditView
         android:id="@+id/ue_retry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
+        app:digits="@string/digits_password"
         app:hint="请输入..."
         app:hintColor="@color/secTextColor"
+        app:isPassword="true"
         app:label="重复密码"
+        app:lines="1"
+        app:maxLength="4"
+        app:maxLines="1"
         app:textColor="@color/category_text_2" />
-
 
 </LinearLayout>

@@ -18,7 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class SecretActivity extends BaseActivity {
+public class LoginSettingActivity extends BaseActivity {
 
 
 	@BindView(R.id.tv_back)
@@ -39,7 +39,7 @@ public class SecretActivity extends BaseActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_secret;
+		return R.layout.activity_login_setting;
 	}
 
 	@Override
@@ -52,19 +52,22 @@ public class SecretActivity extends BaseActivity {
 		Glide.with(this).asGif().load(R.drawable.animaiton_unlock).into(bannerView);
 	}
 
-	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share})
+	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share, R.id.tv_login})
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
 				finish();
 				break;
 			case R.id.tv_change:
-				startActivity(new Intent(SecretActivity.this, ModifyActivity.class)
+				startActivity(new Intent(LoginSettingActivity.this, ModifyActivity.class)
 						.putExtra("qr_code", getQrSecret()));
 				break;
 			case R.id.tv_share:
-				startActivity(new Intent(SecretActivity.this, QRCodeActivity.class)
+				startActivity(new Intent(LoginSettingActivity.this, QRCodeActivity.class)
 						.putExtra("qr_code", getQrSecret()));
+				break;
+			case R.id.tv_login:
+				startActivity(new Intent(LoginSettingActivity.this, LoginPassActivity.class));
 				break;
 		}
 	}

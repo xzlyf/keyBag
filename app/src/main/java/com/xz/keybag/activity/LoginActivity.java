@@ -69,7 +69,7 @@ public class LoginActivity extends BaseActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_load;
+		return R.layout.activity_login;
 	}
 
 	@Override
@@ -296,7 +296,7 @@ public class LoginActivity extends BaseActivity {
 	private void killMySelf() {
 		//判断模式，打开对应的活动
 		if (mode == Local.INTENT_EXTRA_LOGIN_MODE) {
-			startActivity(new Intent(mContext, KeyActivity.class));
+			startActivity(new Intent(mContext, LoginSettingActivity.class));
 			finish();
 			return;
 		}
