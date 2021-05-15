@@ -11,6 +11,7 @@ public class Admin {
 	private String fingerprint;
 	private String privateKey;
 	private String publicKey;
+	private String forgetPass;//密码防忘记
 
 	public String getLoginPwd() {
 		return loginPwd;
@@ -50,5 +51,13 @@ public class Admin {
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public String getForgetPass() {
+		return forgetPass;
+	}
+
+	public void setForgetPass(String forgetPass) {
+		this.forgetPass = forgetPass;
 	}
 }

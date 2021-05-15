@@ -87,10 +87,31 @@
         <Switch
             android:id="@+id/sw_fingerprint"
             style="@style/secret_textView"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:text="指纹登录" />
+
+        <Switch
+            style="@style/secret_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:text="密码防忘记" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:paddingStart="@dimen/dp_20"
+            android:padding="@dimen/dp_5"
+            android:singleLine="true"
+            android:text="开启后将会每隔几天优先显示密码登录，以防忘记密码"
+            android:textIsSelectable="false" />
 
     </LinearLayout>
 </ScrollView>

@@ -20,6 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	static String TABLE_SECRET = "secret";// 表名
 	static String TABLE_DEVICE = "device";// 表名
 	static String TABLE_CATEGORY = "category";// 表名
+	static String TABLE_CONFIG = "config";// 表名
 	static String FIELD_COMMON_T0 = "id";//id
 	static String FIELD_COMMON_T1 = "datum";//密码信息json
 	static String FIELD_COMMON_T2 = "update_date";//更新时间
@@ -31,6 +32,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	static String FIELD_DBASE_P1 = "identity";//手机唯一标识
 	static String FIELD_CATEGORY_L1 = "id";//id
 	static String FIELD_CATEGORY_L2 = "label";//分类标签名称
+	static String FIELD_CONFIG_P1 = "login_input";//密码防忘记 open开启 shut关闭
+	static String FIELD_CONFIG_P2 = "login_time";//上次登录日期 时间戳
+	static String FIELD_CONFIG_P3 = "last_unlock_time";//上次登录日期 时间戳
 
 
 	DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -69,12 +73,18 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_CATEGORY_L1 + " text primary key  , " +
 				FIELD_CATEGORY_L2 + " text " +
 				");";
+		String sql_config = "CREATE TABLE " + TABLE_CONFIG + "(" +
+				FIELD_CONFIG_P1 + " text , " +
+				FIELD_CONFIG_P2 + " text , " +
+				FIELD_CONFIG_P3 + " text " +
+				");";
 
 		try {
 			db.execSQL(sql_common);
 			db.execSQL(sql_secret);
 			db.execSQL(sql_dbase);
 			db.execSQL(sql_category);
+			db.execSQL(sql_config);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

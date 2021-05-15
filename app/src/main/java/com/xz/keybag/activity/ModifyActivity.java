@@ -131,6 +131,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 调用zxing扫描二维码
 	 */
 	private void startQrCode() {
+		// TODO: 2021/5/15 使用权限工具类获取权限PermissionsUtils
 		// 申请相机权限
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 			// 申请权限

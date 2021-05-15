@@ -13,7 +13,9 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
+import com.xz.keybag.entity.LoginConfig;
 import com.xz.keybag.entity.Project;
+import com.xz.keybag.utils.ConvertUtils;
 import com.xz.keybag.utils.FileTool;
 import com.xz.keybag.utils.UUIDUtil;
 import com.xz.keybag.utils.lock.DES;
@@ -35,6 +37,9 @@ import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P1;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P2;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P3;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_DBASE_P1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
@@ -42,6 +47,7 @@ import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K3;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K4;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_CATEGORY;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_COMMON;
+import static com.xz.keybag.sql.cipher.DBHelper.TABLE_CONFIG;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_DEVICE;
 import static com.xz.keybag.sql.cipher.DBHelper.TABLE_SECRET;
 
@@ -171,7 +177,7 @@ public class DBManager {
 	 */
 	public void updateFingerprintLogin(String fingerprintState) {
 		String tf = fingerprintState;
-		fingerprintState = DES.encryptor(fingerprintState,Local.mAdmin.getDes());
+		fingerprintState = DES.encryptor(fingerprintState, Local.mAdmin.getDes());
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
 		ContentValues cv = new ContentValues();
 		cv.put(FIELD_SECRET_K3, fingerprintState);
@@ -218,9 +224,10 @@ public class DBManager {
 		Admin admin = new Admin();
 		admin.setDes(desSecret);
 		admin.setLoginPwd(loginPwd);
-		admin.setFingerprint(Local.FINGERPRINT_STATE_OPEN);
+		admin.setFingerprint(Local.FINGERPRINT_STATE_OPEN);//默认开启指纹登录
 		admin.setPrivateKey(keyMap.get(1));
 		admin.setPublicKey(keyMap.get(0));
+		admin.setForgetPass(Local.CONFIG_FORGET_OPEN);//默认开启密码防止忘记
 		Local.mAdmin = admin;
 		//6.存入数据库
 		db.insert(TABLE_SECRET, null, cv);
@@ -232,7 +239,12 @@ public class DBManager {
 		insertCategory(new Category("APP", UUIDUtil.getStrUUID()));
 		insertCategory(new Category("网站", UUIDUtil.getStrUUID()));
 		insertCategory(new Category("邮箱", UUIDUtil.getStrUUID()));
-
+		//8.存储配置表
+		db = dbHelper.getWritableDatabase(DB_PWD);
+		cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P1, Local.CONFIG_FORGET_OPEN);
+		db.insert(TABLE_CONFIG, FIELD_CONFIG_P1, cv);
+		db.close();
 	}
 
 	/**
@@ -466,6 +478,45 @@ public class DBManager {
 		}
 
 		return list;
+	}
+
+
+	/**
+	 * 获取登录配置
+	 *
+	 * @return
+	 */
+	public LoginConfig queryLoginConfig() {
+
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = null;
+		cursor = db.query(TABLE_CONFIG, null, null, null, null, null, null);
+		LoginConfig config = new LoginConfig();
+		if (cursor.moveToNext()) {
+			config.setForgetPass(cursor.getString(0));
+			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(1), 1000));
+			config.setLastUnlockTime(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
+		}
+		cursor.close();
+		return config;
+	}
+
+	/**
+	 * 更新登录时间
+	 *
+	 * @param loginTimestamp  登录时间
+	 * @param unlockTimestamp 解锁时间 -1 不需要存储
+	 */
+	public void updateLoginTime(long loginTimestamp, long unlockTimestamp) {
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P2, String.valueOf(loginTimestamp));
+		if (unlockTimestamp != -1) {
+			cv.put(FIELD_CONFIG_P3, String.valueOf(unlockTimestamp));
+		}
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		db.update(TABLE_CONFIG, cv, null, null);
+		db.close();
 	}
 
 
