@@ -350,6 +350,7 @@ public class LoginActivity extends BaseActivity {
 			if (newLoginTime - config.getUnlockTimestamp() >= 259200000L || config.getUnlockTimestamp() == 1000) {
 				//优先显示密码输入
 				inputLayout.setVisibility(View.VISIBLE);
+				tvInputTips.setText("本次进入推荐使用密码");
 			}
 		}
 

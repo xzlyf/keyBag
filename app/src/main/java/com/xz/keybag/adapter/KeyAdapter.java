@@ -2,6 +2,7 @@ package com.xz.keybag.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -18,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.XOnClickListener;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
@@ -55,7 +57,11 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		Project entity = filterDatas.get(position);
 		viewHolder.name.setText(entity.getDatum().getProject());
 		viewHolder.userId.setText(entity.getDatum().getAccount());
-		viewHolder.userPsw.setText(entity.getDatum().getPassword());
+		if (TextUtils.equals(Local.mAdmin.getConfig().getPublicPwd(),Local.CONFIG_PUBLIC_PWD_OPEN)){
+			viewHolder.userPsw.setText("******");
+		}else{
+			viewHolder.userPsw.setText(entity.getDatum().getPassword());
+		}
 		viewHolder.endTime.setText(entity.getUpdateDate());
 
 
