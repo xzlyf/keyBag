@@ -36,7 +36,8 @@ public class LoginSettingActivity extends BaseActivity {
 	TextView tvShare;
 	@BindView(R.id.sw_fingerprint)
 	Switch swFingerprint;
-
+	@BindView(R.id.sw_forget)
+	Switch swForgetPass;
 	private DBManager db;
 
 	@Override
@@ -71,6 +72,16 @@ public class LoginSettingActivity extends BaseActivity {
 				}
 			}
 		});
+		swForgetPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					db.updateForgetPassState(Local.mAdmin.getConfig().getId(), Local.CONFIG_FORGET_OPEN);
+				} else {
+					db.updateForgetPassState(Local.mAdmin.getConfig().getId(), Local.CONFIG_FORGET_SHUT);
+				}
+			}
+		});
 	}
 
 	/**
@@ -78,14 +89,17 @@ public class LoginSettingActivity extends BaseActivity {
 	 */
 	private void initState() {
 		//指纹登录状态
-		if (Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
+		if (TextUtils.equals(Local.mAdmin.getFingerprint(), Local.FINGERPRINT_STATE_OPEN)) {
 			swFingerprint.setChecked(true);
-		} else if (Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_NONSUPPORT)) {
+		} else if (TextUtils.equals(Local.mAdmin.getFingerprint(), Local.FINGERPRINT_STATE_NONSUPPORT)) {
 			swFingerprint.setChecked(false);
 			swFingerprint.setEnabled(false);
 			swFingerprint.setVisibility(View.GONE);
 		} else {
 			swFingerprint.setChecked(false);
+		}
+		if (TextUtils.equals(Local.mAdmin.getConfig().getForgetPass(), Local.CONFIG_FORGET_OPEN)) {
+			swForgetPass.setChecked(true);
 		}
 	}
 

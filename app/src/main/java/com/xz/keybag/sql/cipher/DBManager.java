@@ -11,9 +11,9 @@ import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Admin;
+import com.xz.keybag.entity.AdminConfig;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Datum;
-import com.xz.keybag.entity.LoginConfig;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.utils.ConvertUtils;
 import com.xz.keybag.utils.FileTool;
@@ -37,6 +37,7 @@ import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P3;
@@ -227,7 +228,11 @@ public class DBManager {
 		admin.setFingerprint(Local.FINGERPRINT_STATE_OPEN);//默认开启指纹登录
 		admin.setPrivateKey(keyMap.get(1));
 		admin.setPublicKey(keyMap.get(0));
-		admin.setForgetPass(Local.CONFIG_FORGET_OPEN);//默认开启密码防止忘记
+		//5.2默认配置
+		AdminConfig config = new AdminConfig();
+		config.setId(UUIDUtil.getStrUUID());
+		config.setForgetPass(Local.CONFIG_FORGET_OPEN);
+		admin.setConfig(config);
 		Local.mAdmin = admin;
 		//6.存入数据库
 		db.insert(TABLE_SECRET, null, cv);
@@ -242,6 +247,7 @@ public class DBManager {
 		//8.存储配置表
 		db = dbHelper.getWritableDatabase(DB_PWD);
 		cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P0, config.getId());
 		cv.put(FIELD_CONFIG_P1, Local.CONFIG_FORGET_OPEN);
 		db.insert(TABLE_CONFIG, FIELD_CONFIG_P1, cv);
 		db.close();
@@ -482,20 +488,57 @@ public class DBManager {
 
 
 	/**
+	 * 查询密码防忘记状态
+	 */
+	public String queryForgetPassState() {
+		String state = null;
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = db.query(TABLE_CONFIG, new String[]{FIELD_CONFIG_P1}, null, null, null, null, null);
+		if (cursor.moveToNext()) {
+			state = cursor.getString(0);
+		}
+		cursor.close();
+		return state;
+	}
+
+	/**
+	 * 更新密码防忘记状态
+	 *
+	 * @param state
+	 */
+	public void updateForgetPassState(String id, String state) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P1, state);
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
+		Local.mAdmin.getConfig().setForgetPass(state);
+		db.close();
+	}
+
+	/**
 	 * 获取登录配置
 	 *
 	 * @return
 	 */
-	public LoginConfig queryLoginConfig() {
+	public AdminConfig queryLoginConfig() {
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
 		Cursor cursor = null;
 		cursor = db.query(TABLE_CONFIG, null, null, null, null, null, null);
-		LoginConfig config = new LoginConfig();
+		AdminConfig config = new AdminConfig();
 		if (cursor.moveToNext()) {
-			config.setForgetPass(cursor.getString(0));
-			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(1), 1000));
-			config.setLastUnlockTime(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
+			config.setId(cursor.getString(0));
+			config.setForgetPass(cursor.getString(1));
+			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
+			config.setUnlockTimestamp(ConvertUtils.convertStingToLong(cursor.getString(3), 1000));
+			Local.mAdmin.setConfig(config);
+			Logger.w("id：" + config.getId() +
+					"状态：" + config.getForgetPass() +
+					"登录时间：" + config.getLoginTimestamp() +
+					"解锁时间：" + config.getUnlockTimestamp());
 		}
 		cursor.close();
 		return config;
@@ -507,7 +550,9 @@ public class DBManager {
 	 * @param loginTimestamp  登录时间
 	 * @param unlockTimestamp 解锁时间 -1 不需要存储
 	 */
-	public void updateLoginTime(long loginTimestamp, long unlockTimestamp) {
+	public void updateLoginTime(String id, long loginTimestamp, long unlockTimestamp) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
 		ContentValues cv = new ContentValues();
 		cv.put(FIELD_CONFIG_P2, String.valueOf(loginTimestamp));
 		if (unlockTimestamp != -1) {
@@ -515,7 +560,7 @@ public class DBManager {
 		}
 		//获取写数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
-		db.update(TABLE_CONFIG, cv, null, null);
+		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
 		db.close();
 	}
 

@@ -25,7 +25,7 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
 import com.xz.keybag.custom.PasswordInputDialog;
-import com.xz.keybag.entity.LoginConfig;
+import com.xz.keybag.entity.AdminConfig;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
@@ -68,6 +68,7 @@ public class LoginActivity extends BaseActivity {
 	private String deviceId;
 	private boolean isSaveUnlockTime = false;
 	private long newLoginTime;
+	private String configId;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -90,15 +91,28 @@ public class LoginActivity extends BaseActivity {
 		initView();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-		//initSql
-		DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
-		db = DBManager.getInstance(this);
-		//管理唯一标识
-		initIdentity();
-		//登录初始化
-		initLogin();
-		//登录配置
-		loginConfig();
+
+		if (mode != Local.INTENT_EXTRA_LOGIN_MODE) {
+			//initSql
+			DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
+			db = DBManager.getInstance(this);
+			//管理唯一标识
+			initIdentity();
+			//登录初始化
+			initLogin();
+			//登录配置
+			initLoginConfig();
+		} else {
+			//用户是否开启指纹登录
+			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
+				inputLayout2.setVisibility(View.GONE);
+				inputLayout.setVisibility(View.VISIBLE);
+				inputType.setVisibility(View.GONE);
+			} else {
+				//初始化指纹模块
+				initFingerprint();
+			}
+		}
 
 
 		//todo  测试模式：关闭密码验证
@@ -326,14 +340,14 @@ public class LoginActivity extends BaseActivity {
 	/**
 	 * 启用用户的登录配置
 	 */
-	private void loginConfig() {
+	private void initLoginConfig() {
+		AdminConfig config = db.queryLoginConfig();
 		newLoginTime = System.currentTimeMillis();
-		LoginConfig config = db.queryLoginConfig();
+		configId = config.getId();
 		//获取用户是否开启密码防忘记功能
-		//if (config.getForgetPass().equals(Local.CONFIG_FORGET_OPEN)) {
 		if (TextUtils.equals(config.getForgetPass(), Local.CONFIG_FORGET_OPEN)) {
 			//判断上次解锁日期是否超过3天 或者lastUnlockTime==1000
-			if (newLoginTime - config.getLastUnlockTime() >= 259200000L || config.getLastUnlockTime() == 1000) {
+			if (newLoginTime - config.getUnlockTimestamp() >= 259200000L || config.getUnlockTimestamp() == 1000) {
 				//优先显示密码输入
 				inputLayout.setVisibility(View.VISIBLE);
 			}
@@ -346,9 +360,9 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void updateLoginConfig() {
 		if (isSaveUnlockTime) {
-			db.updateLoginTime(newLoginTime, newLoginTime);
+			db.updateLoginTime(configId, newLoginTime, newLoginTime);
 		} else {
-			db.updateLoginTime(newLoginTime, -1);
+			db.updateLoginTime(configId, newLoginTime, -1);
 		}
 	}
 

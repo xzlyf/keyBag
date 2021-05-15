@@ -32,6 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	static String FIELD_DBASE_P1 = "identity";//手机唯一标识
 	static String FIELD_CATEGORY_L1 = "id";//id
 	static String FIELD_CATEGORY_L2 = "label";//分类标签名称
+	static String FIELD_CONFIG_P0 = "id";//id
 	static String FIELD_CONFIG_P1 = "login_input";//密码防忘记 open开启 shut关闭
 	static String FIELD_CONFIG_P2 = "login_time";//上次登录日期 时间戳
 	static String FIELD_CONFIG_P3 = "last_unlock_time";//上次登录日期 时间戳
@@ -74,6 +75,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_CATEGORY_L2 + " text " +
 				");";
 		String sql_config = "CREATE TABLE " + TABLE_CONFIG + "(" +
+				FIELD_CONFIG_P0 + " text , " +
 				FIELD_CONFIG_P1 + " text , " +
 				FIELD_CONFIG_P2 + " text , " +
 				FIELD_CONFIG_P3 + " text " +
