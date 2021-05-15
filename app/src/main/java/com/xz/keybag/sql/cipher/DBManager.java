@@ -41,6 +41,7 @@ import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P0;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P2;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P3;
+import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P4;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_DBASE_P1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
 import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
@@ -226,12 +227,13 @@ public class DBManager {
 		admin.setDes(desSecret);
 		admin.setLoginPwd(loginPwd);
 		admin.setFingerprint(Local.FINGERPRINT_STATE_OPEN);//默认开启指纹登录
-		admin.setPrivateKey(keyMap.get(1));
-		admin.setPublicKey(keyMap.get(0));
-		//5.2默认配置
+		admin.setPrivateKey(keyMap.get("privateKey"));
+		admin.setPublicKey(keyMap.get("publicKey"));
+		//5.2初始化用户默认配置表
 		AdminConfig config = new AdminConfig();
 		config.setId(UUIDUtil.getStrUUID());
 		config.setForgetPass(Local.CONFIG_FORGET_OPEN);
+		config.setPublicPwd(Local.CONFIG_PUBLIC_PWD_SHUT);
 		admin.setConfig(config);
 		Local.mAdmin = admin;
 		//6.存入数据库
@@ -244,11 +246,12 @@ public class DBManager {
 		insertCategory(new Category("APP", UUIDUtil.getStrUUID()));
 		insertCategory(new Category("网站", UUIDUtil.getStrUUID()));
 		insertCategory(new Category("邮箱", UUIDUtil.getStrUUID()));
-		//8.存储配置表
+		//8.存储默认配置表
 		db = dbHelper.getWritableDatabase(DB_PWD);
 		cv = new ContentValues();
 		cv.put(FIELD_CONFIG_P0, config.getId());
-		cv.put(FIELD_CONFIG_P1, Local.CONFIG_FORGET_OPEN);
+		cv.put(FIELD_CONFIG_P1, config.getForgetPass());
+		cv.put(FIELD_CONFIG_P4, config.getPublicPwd());
 		db.insert(TABLE_CONFIG, FIELD_CONFIG_P1, cv);
 		db.close();
 	}
@@ -488,23 +491,30 @@ public class DBManager {
 
 
 	/**
-	 * 查询密码防忘记状态
+	 * 获取登录配置
+	 *
+	 * @return
 	 */
-	public String queryForgetPassState() {
-		String state = null;
+	public AdminConfig queryAdminConfig() {
+
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
-		Cursor cursor = db.query(TABLE_CONFIG, new String[]{FIELD_CONFIG_P1}, null, null, null, null, null);
+		Cursor cursor = null;
+		cursor = db.query(TABLE_CONFIG, null, null, null, null, null, null);
+		AdminConfig config = new AdminConfig();
 		if (cursor.moveToNext()) {
-			state = cursor.getString(0);
+			config.setId(cursor.getString(0));
+			config.setForgetPass(cursor.getString(1));
+			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
+			config.setUnlockTimestamp(ConvertUtils.convertStingToLong(cursor.getString(3), 1000));
+			config.setPublicPwd(cursor.getString(4));
+			Local.mAdmin.setConfig(config);
 		}
 		cursor.close();
-		return state;
+		return config;
 	}
 
 	/**
 	 * 更新密码防忘记状态
-	 *
-	 * @param state
 	 */
 	public void updateForgetPassState(String id, String state) {
 		StringBuilder whereBuffer = new StringBuilder();
@@ -516,32 +526,6 @@ public class DBManager {
 		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
 		Local.mAdmin.getConfig().setForgetPass(state);
 		db.close();
-	}
-
-	/**
-	 * 获取登录配置
-	 *
-	 * @return
-	 */
-	public AdminConfig queryLoginConfig() {
-
-		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
-		Cursor cursor = null;
-		cursor = db.query(TABLE_CONFIG, null, null, null, null, null, null);
-		AdminConfig config = new AdminConfig();
-		if (cursor.moveToNext()) {
-			config.setId(cursor.getString(0));
-			config.setForgetPass(cursor.getString(1));
-			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
-			config.setUnlockTimestamp(ConvertUtils.convertStingToLong(cursor.getString(3), 1000));
-			Local.mAdmin.setConfig(config);
-			Logger.w("id：" + config.getId() +
-					"状态：" + config.getForgetPass() +
-					"登录时间：" + config.getLoginTimestamp() +
-					"解锁时间：" + config.getUnlockTimestamp());
-		}
-		cursor.close();
-		return config;
 	}
 
 	/**
@@ -564,5 +548,20 @@ public class DBManager {
 		db.close();
 	}
 
+
+	/**
+	 * 更新密码防忘记功能
+	 */
+	public void updatePwdPublic(String id, String state) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P4, state);
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
+		Local.mAdmin.getConfig().setPublicPwd(state);
+		db.close();
+	}
 
 }

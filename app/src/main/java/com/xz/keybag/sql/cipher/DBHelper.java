@@ -36,6 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	static String FIELD_CONFIG_P1 = "login_input";//密码防忘记 open开启 shut关闭
 	static String FIELD_CONFIG_P2 = "login_time";//上次登录日期 时间戳
 	static String FIELD_CONFIG_P3 = "last_unlock_time";//上次登录日期 时间戳
+	static String FIELD_CONFIG_P4 = "pwd_public";//密码明文显示
 
 
 	DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -78,7 +79,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_CONFIG_P0 + " text , " +
 				FIELD_CONFIG_P1 + " text , " +
 				FIELD_CONFIG_P2 + " text , " +
-				FIELD_CONFIG_P3 + " text " +
+				FIELD_CONFIG_P3 + " text , " +
+				FIELD_CONFIG_P4 + " text " +
 				");";
 
 		try {

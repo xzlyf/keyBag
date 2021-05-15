@@ -9,6 +9,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -38,6 +39,9 @@ public class LoginSettingActivity extends BaseActivity {
 	Switch swFingerprint;
 	@BindView(R.id.sw_forget)
 	Switch swForgetPass;
+	@BindView(R.id.sw_pwd_public)
+	Switch swPwdPublic;
+
 	private DBManager db;
 
 	@Override
@@ -82,6 +86,16 @@ public class LoginSettingActivity extends BaseActivity {
 				}
 			}
 		});
+		swPwdPublic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					db.updatePwdPublic(Local.mAdmin.getConfig().getId(), Local.CONFIG_PUBLIC_PWD_OPEN);
+				} else {
+					db.updatePwdPublic(Local.mAdmin.getConfig().getId(), Local.CONFIG_PUBLIC_PWD_SHUT);
+				}
+			}
+		});
 	}
 
 	/**
@@ -98,8 +112,13 @@ public class LoginSettingActivity extends BaseActivity {
 		} else {
 			swFingerprint.setChecked(false);
 		}
+		//密码防忘记
 		if (TextUtils.equals(Local.mAdmin.getConfig().getForgetPass(), Local.CONFIG_FORGET_OPEN)) {
 			swForgetPass.setChecked(true);
+		}
+		//密码明文显示
+		if (TextUtils.equals(Local.mAdmin.getConfig().getPublicPwd(), Local.CONFIG_PUBLIC_PWD_OPEN)) {
+			swPwdPublic.setChecked(true);
 		}
 	}
 

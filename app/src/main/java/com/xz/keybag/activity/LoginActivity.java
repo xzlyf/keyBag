@@ -341,7 +341,7 @@ public class LoginActivity extends BaseActivity {
 	 * 启用用户的登录配置
 	 */
 	private void initLoginConfig() {
-		AdminConfig config = db.queryLoginConfig();
+		AdminConfig config = db.queryAdminConfig();
 		newLoginTime = System.currentTimeMillis();
 		configId = config.getId();
 		//获取用户是否开启密码防忘记功能

@@ -47,6 +47,8 @@ public class Local {
 	public static final String PASSWORD_STATE_ERROR = "error_query_pwd";
 	public static final String CONFIG_FORGET_OPEN = "open";//开启密码防忘记
 	public static final String CONFIG_FORGET_SHUT = "shut";//关闭密码防忘记
+	public static final String CONFIG_PUBLIC_PWD_OPEN = "open";//密码明文显示开启
+	public static final String CONFIG_PUBLIC_PWD_SHUT = "shut";//密码明文显示关闭
 
 	//user
 	public static Admin mAdmin;

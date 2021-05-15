@@ -8,6 +8,8 @@ public class AdminConfig {
 	private String forgetPass;//密码防忘记
 	private long loginTimestamp;
 	private long unlockTimestamp;
+	private String publicPwd;//密码明文显示
+
 
 	public String getId() {
 		return id;
@@ -39,5 +41,13 @@ public class AdminConfig {
 
 	public void setUnlockTimestamp(long unlockTimestamp) {
 		this.unlockTimestamp = unlockTimestamp;
+	}
+
+	public String getPublicPwd() {
+		return publicPwd;
+	}
+
+	public void setPublicPwd(String publicPwd) {
+		this.publicPwd = publicPwd;
 	}
 }
