@@ -27,6 +27,8 @@ import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -447,6 +449,53 @@ public class DBManager {
 		db.close();
 	}
 
+	/**
+	 * 查询项目情况 用于统计
+	 * 建议用子线程处理
+	 * 数据量比较大
+	 */
+	public Map<String, Integer> queryProjectState() {
+		Map<String, Integer> map = new HashMap<>();
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		Cursor cursor = null;
+		try {
+			cursor = db.query(TABLE_COMMON, null, null, null, null, null, null);
+			Datum datum;
+			Integer i;
+			int count;
+			while (cursor.moveToNext()) {
+				datum = mGson.fromJson(DES.decryptor(cursor.getString(1), Local.mAdmin.getDes()), Datum.class);
+				if (!map.containsKey(datum.getCategory())) {
+					//集合里没有标签，则存入标签，数量为1
+					map.put(datum.getCategory(), 1);
+				} else {
+					//集合里存在标签，获取数量，加上1，再替换原先数据
+					i = map.get(datum.getCategory());
+					if (i != null) {
+						count = i;
+					} else {
+						//未知标签
+						map.put(datum.getCategory(), 1);
+						continue;
+					}
+					count += 1;
+					map.put(datum.getCategory(), count);
+				}
+			}
+
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+
+		//测试显示数据
+		for (String key : map.keySet()) {
+			String value = map.get(key).toString();
+			System.out.println("key:" + key + " vlaue:" + value);
+		}
+		return map;
+	}
 
 	/**
 	 * 新建一条分类标签
@@ -563,5 +612,6 @@ public class DBManager {
 		Local.mAdmin.getConfig().setPublicPwd(state);
 		db.close();
 	}
+
 
 }

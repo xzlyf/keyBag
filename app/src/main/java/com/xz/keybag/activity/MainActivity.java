@@ -163,6 +163,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		initState();
 		initView();
 		initRecycler();
+
+		// TODO: 2021/5/16 测试 自动打开BackupActivityV2
+		startActivity(new Intent(this, BackupActivityV2.class));
 	}
 
 	private void initState() {
@@ -320,7 +323,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
 				break;
 			case R.id.btn_3:
-				startActivity(new Intent(MainActivity.this, BackupActivity.class));
+				startActivity(new Intent(MainActivity.this, BackupActivityV2.class));
 				break;
 			case R.id.btn_4:
 				AppleInputDialog dialog = new AppleInputDialog.Builder(mContext)

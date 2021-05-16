@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- 震动权限 -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- 摄像头权限 -->
-    <uses-feature android:name="android.hardware.camera.autofocus" /> <!-- 自动聚焦权限 -->
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -20,6 +21,7 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.BackupActivityV2"></activity>
         <activity android:name=".zxing.activity.CaptureActivity" />
         <activity android:name=".activity.ModifyActivity" />
         <activity android:name=".activity.QRCodeActivity" />
