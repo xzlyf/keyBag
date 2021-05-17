@@ -1,15 +1,19 @@
 package com.xz.keybag.activity;
 
-import com.orhanobut.logger.Logger;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import com.xz.keybag.service.ServerSocketService;
 
 public class DataSendActivity extends BaseActivity {
 
+	private ServiceConnection sc;
+	public ServerSocketService socketService;
+	private Intent serverIntent;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -23,28 +27,51 @@ public class DataSendActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-
+		changeStatusBarTextColor();
+		bindSocketService();
+		initServerSocket();
 	}
 
+	private void bindSocketService() {
+		/*通过binder拿到service*/
+		sc = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+				ServerSocketService.SocketBinder binder = (ServerSocketService.SocketBinder) iBinder;
+				socketService = binder.getService();
 
-
-	/**
-	 * 服务端部署
-	 */
-	private class ServerSocketDeploy extends Thread {
-		@Override
-		public void run() {
-			ServerSocket server = null;
-			try {
-				//backlog 连接队列最大长度  1
-				server = new ServerSocket(20022, 1);
-				Socket client = server.accept();
-
-			} catch (IOException e) {
-				Logger.e("ServerSocketDeploy Error " + e.getMessage());
 			}
 
+			@Override
+			public void onServiceDisconnected(ComponentName componentName) {
 
-		}
+			}
+		};
+		serverIntent = new Intent(getApplicationContext(), ServerSocketService.class);
+		bindService(serverIntent, sc, BIND_AUTO_CREATE);
 	}
+
+
+	private void initServerSocket() {
+		socketService.setCallback(new ServerSocketService.SocketCallBack() {
+			@Override
+			public void created(int port) {
+
+			}
+
+			@Override
+			public void error(Exception e) {
+
+			}
+		});
+		socketService.initSocket();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(sc);
+		stopService(serverIntent);
+	}
+
 }
