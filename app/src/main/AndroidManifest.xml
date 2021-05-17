@@ -21,7 +21,8 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.BackupActivityV2"></activity>
+        <activity android:name=".activity.DataSendActivity"></activity>
+        <activity android:name=".activity.BackupActivity" />
         <activity android:name=".zxing.activity.CaptureActivity" />
         <activity android:name=".activity.ModifyActivity" />
         <activity android:name=".activity.QRCodeActivity" />
@@ -30,7 +31,7 @@
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.BackupActivity"
+            android:name=".activity.BackupActivityOld"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.DetailActivity"
