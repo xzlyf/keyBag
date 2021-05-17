@@ -3,7 +3,9 @@ package com.xz.keybag.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import com.orhanobut.logger.Logger;
 
@@ -15,6 +17,7 @@ public class ServerSocketService extends Service {
 
 	private SocketBinder socketBinder = new SocketBinder();
 	private SocketCallBack mCallback;
+	private Handler mHandler = new Handler(Looper.getMainLooper());
 
 	private ServerSocket mServer = null;
 	private ServerDeployThread mServerThread = null;
@@ -76,7 +79,7 @@ public class ServerSocketService extends Service {
 			try {
 				//backlog 连接队列最大长度  1
 				mServer = new ServerSocket(20022, 1);
-				mCallback.created(mServer.getLocalPort());
+				callBack.created(mServer.getLocalPort());
 				mClient = mServer.accept();
 
 			} catch (IOException e) {
@@ -87,6 +90,31 @@ public class ServerSocketService extends Service {
 
 		}
 	}
+
+	/**
+	 * 回调做回到主线处理
+	 */
+	private SocketCallBack callBack = new SocketCallBack() {
+		@Override
+		public void created(int port) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.created(port);
+				}
+			});
+		}
+
+		@Override
+		public void error(Exception e) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.error(e);
+				}
+			});
+		}
+	};
 
 	public interface SocketCallBack {
 		/**

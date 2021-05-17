@@ -1,24 +1,35 @@
 package com.xz.keybag.activity;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.service.ServerSocketService;
+import com.xz.keybag.utils.NetWorkUtil;
 import com.xz.keybag.utils.ZxingUtils;
 import com.xz.keybag.utils.lock.RSA;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 public class DataSendActivity extends BaseActivity {
+
+	@BindView(R.id.image_qr)
+	ImageView imageQr;
 
 	private ServiceConnection sc;
 	public ServerSocketService socketService;
@@ -38,6 +49,15 @@ public class DataSendActivity extends BaseActivity {
 	public void initData() {
 		changeStatusBarTextColor();
 		bindSocketService();
+	}
+
+	@OnClick(R.id.tv_back)
+	public void onViewClick(View v) {
+		switch (v.getId()) {
+			case R.id.tv_back:
+				finish();
+				break;
+		}
 	}
 
 	private void bindSocketService() {
@@ -61,12 +81,17 @@ public class DataSendActivity extends BaseActivity {
 
 
 	private void initServerSocket() {
+		//获取当前ip
+		String host = checkConnectType();
+		if (host == null) {
+			return;
+		}
 		socketService.setCallback(new ServerSocketService.SocketCallBack() {
 			@Override
 			public void created(int port) {
-				//Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.lanuch_max);
-				//Bitmap qrCode = ZxingUtils.createImage(qrSt, 400, 400, logo);
-				//Glide.with(this).asBitmap().load(qrCode).into(imageQr);
+				Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.lanuch_max);
+				Bitmap qrCode = ZxingUtils.createImage(getQrCode(host, port), 400, 400, logo);
+				Glide.with(mContext).asBitmap().load(qrCode).into(imageQr);
 			}
 
 			@Override
@@ -74,7 +99,42 @@ public class DataSendActivity extends BaseActivity {
 
 			}
 		});
-		//socketService.initSocket();
+		socketService.initSocket();
+	}
+
+	/**
+	 * 检查网络状态是否符合
+	 *
+	 * @return 如果符合返回当前Ip
+	 */
+	public String checkConnectType() {
+		int connectedType = NetWorkUtil.getConnectedType(mContext);
+		if (connectedType == 1) {
+			//网络状态符合 wifi
+			return NetWorkUtil.getIpInWifi(mContext);
+		}
+		//网络状态不符合
+		AlertDialog dialog = new AlertDialog.Builder(mContext)
+				.setMessage("请先开启WIFI\n以确保与接收方在同一个WIFi下")
+				.setPositiveButton("开启wifi", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						//跳转到配置wifi界面
+						startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+						finish();
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						finish();
+					}
+				})
+				.create();
+		dialog.show();
+
+		return null;
 	}
 
 
