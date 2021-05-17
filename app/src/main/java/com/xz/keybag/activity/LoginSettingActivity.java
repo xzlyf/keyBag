@@ -9,7 +9,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -130,11 +129,11 @@ public class LoginSettingActivity extends BaseActivity {
 				break;
 			case R.id.tv_change:
 				startActivity(new Intent(LoginSettingActivity.this, ModifyActivity.class)
-						.putExtra("qr_code", getQrSecret()));
+						.putExtra(Local.INTENT_EXTRA_QR_CODE, getQrSecret()));
 				break;
 			case R.id.tv_share:
 				startActivity(new Intent(LoginSettingActivity.this, QRCodeActivity.class)
-						.putExtra("qr_code", getQrSecret()));
+						.putExtra(Local.INTENT_EXTRA_QR_CODE, getQrSecret()));
 				break;
 			case R.id.tv_login:
 				startActivity(new Intent(LoginSettingActivity.this, LoginPassActivity.class));
@@ -155,8 +154,8 @@ public class LoginSettingActivity extends BaseActivity {
 		}
 		StringBuilder qrSt = new StringBuilder();
 		try {
-			qrSt.append("keybag_secret");
-			qrSt.append("@");
+			qrSt.append(Local.PROTOCOL_QR);
+			qrSt.append(Local.PROTOCOL_SPLIT);
 			qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			e.printStackTrace();

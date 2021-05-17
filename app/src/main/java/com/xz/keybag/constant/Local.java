@@ -8,6 +8,10 @@ public class Local {
 	public static final String TABLE_SECRET = "secret";//表名
 	public static final String TABLE_ACC = "dbase";//表名
 
+	//二维码协议头
+	public static final String PROTOCOL_SPLIT = "@";//分割符号
+	public static final String PROTOCOL_QR = "keybag_secret"; //二维码传输协议:keybag_secret@RSA密文
+
 	//密钥长度必须超过或等于8位
 	public static final String SECRET_PWD = "xiaoze66";
 	public static final String SECRET_KEY = "xzlyf666";
@@ -24,7 +28,6 @@ public class Local {
 	//更新服务器
 	public static String NET_GET_UPDATE = "http://192.168.0.233:28080/keybag/update.json";
 
-
 	//Shard标识
 	public static final String SHARD_BOOLEAN_MODE = "day_or_night";
 	public static final String SHARD_SERVER_URL = "server_url";
@@ -37,6 +40,7 @@ public class Local {
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
 	public static final int INTENT_EXTRA_LOGIN_MODE = 0x14764185;
+	public static final String INTENT_EXTRA_QR_CODE = "qr_code";
 
 	//参数标识
 	public static final String FINGERPRINT_STATE_OPEN = "fingerprint";//开启指纹登录

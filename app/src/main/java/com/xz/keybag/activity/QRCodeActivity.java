@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.utils.ZxingUtils;
 
 import butterknife.BindView;
@@ -37,7 +38,7 @@ public class QRCodeActivity extends BaseActivity {
 	public void initData() {
 		hideStatusBar();
 		hideBottomMenu();
-		String qrSt = getIntent().getStringExtra("qr_code");
+		String qrSt = getIntent().getStringExtra(Local.INTENT_EXTRA_QR_CODE);
 		if (TextUtils.isEmpty(qrSt)) {
 			return;
 		}

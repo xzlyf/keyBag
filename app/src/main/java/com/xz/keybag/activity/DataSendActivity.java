@@ -29,7 +29,7 @@ public class DataSendActivity extends BaseActivity {
 	public void initData() {
 		changeStatusBarTextColor();
 		bindSocketService();
-		initServerSocket();
+		//initServerSocket();
 	}
 
 	private void bindSocketService() {

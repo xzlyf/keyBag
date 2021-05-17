@@ -67,7 +67,7 @@ public class ModifyActivity extends BaseActivity {
 	public void initData() {
 		newSecretLayout.setVisibility(View.GONE);
 		changeStatusBarTextColor();
-		String qrSt = getIntent().getStringExtra("qr_code");
+		String qrSt = getIntent().getStringExtra(Local.INTENT_EXTRA_QR_CODE);
 		if (TextUtils.isEmpty(qrSt)) {
 			finish();
 			return;
@@ -226,13 +226,13 @@ public class ModifyActivity extends BaseActivity {
 	 */
 	private String verifySecret(String secret) {
 		//二维码报文头判断 keybag_secret@RSA密文
-		String[] qrArray = secret.split("@");
+		String[] qrArray = secret.split(Local.PROTOCOL_SPLIT);
 		if (qrArray.length != 2) {
 			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
 			return "no_message";
 		}
 
-		if (!qrArray[0].equals("keybag_secret")) {
+		if (!qrArray[0].equals(Local.PROTOCOL_QR)) {
 			sToast("非法二维码");
 			return "error_code";
 		}
