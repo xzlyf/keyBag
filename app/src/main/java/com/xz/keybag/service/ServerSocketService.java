@@ -10,6 +10,7 @@ import android.os.Looper;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -81,7 +82,9 @@ public class ServerSocketService extends Service {
 				mServer = new ServerSocket(20022, 1);
 				callBack.created(mServer.getLocalPort());
 				mClient = mServer.accept();
-
+				InetAddress clientAddress = mClient.getInetAddress();
+				callBack.isConnected(clientAddress.getHostAddress(), clientAddress.getHostName());
+				// TODO: 2021/5/17 解决AndroidStudio 虚拟机 ip 不和主机同一网段的问题
 			} catch (IOException e) {
 				mCallback.error(e);
 				Logger.e("ServerSocketDeploy Error " + e.getMessage());
@@ -106,6 +109,16 @@ public class ServerSocketService extends Service {
 		}
 
 		@Override
+		public void isConnected(String ip, String name) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.isConnected(ip, name);
+				}
+			});
+		}
+
+		@Override
 		public void error(Exception e) {
 			mHandler.post(new Runnable() {
 				@Override
@@ -121,6 +134,8 @@ public class ServerSocketService extends Service {
 		 * socket创建完成
 		 */
 		void created(int port);
+
+		void isConnected(String ip, String name);
 
 		/**
 		 * 抛异常了

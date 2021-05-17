@@ -10,6 +10,9 @@ import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.xz.keybag.R;
@@ -28,8 +31,12 @@ import butterknife.OnClick;
 
 public class DataSendActivity extends BaseActivity {
 
+	@BindView(R.id.center_layout)
+	CardView centerLayout;
 	@BindView(R.id.image_qr)
 	ImageView imageQr;
+	@BindView(R.id.tv_log)
+	TextView tvLog;
 
 	private ServiceConnection sc;
 	public ServerSocketService socketService;
@@ -89,9 +96,18 @@ public class DataSendActivity extends BaseActivity {
 		socketService.setCallback(new ServerSocketService.SocketCallBack() {
 			@Override
 			public void created(int port) {
+				//服务器部署成功
 				Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.lanuch_max);
 				Bitmap qrCode = ZxingUtils.createImage(getQrCode(host, port), 400, 400, logo);
 				Glide.with(mContext).asBitmap().load(qrCode).into(imageQr);
+			}
+
+			@Override
+			public void isConnected(String ip, String name) {
+				//客户端已连接
+				centerLayout.setVisibility(View.GONE);
+				appendLog("已连接:" + ip);
+				appendLog("设备:" + name);
 			}
 
 			@Override
@@ -115,7 +131,7 @@ public class DataSendActivity extends BaseActivity {
 		}
 		//网络状态不符合
 		AlertDialog dialog = new AlertDialog.Builder(mContext)
-				.setMessage("请先开启WIFI\n以确保与接收方在同一个WIFi下")
+				.setMessage("请先开启WIFI\n确保与接收方在同一个WIFi下")
 				.setPositiveButton("开启wifi", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -157,6 +173,17 @@ public class DataSendActivity extends BaseActivity {
 			sToast("密钥文件已被损坏");
 			return "error_failure";
 		}
+	}
+
+	/**
+	 * 输出log
+	 * 自动滚动到底部
+	 */
+	private void appendLog(String st) {
+		tvLog.append(st);
+		tvLog.append("\n");
+		//滚动到底部
+		tvLog.scrollTo(0, tvLog.getLineCount() * tvLog.getLineHeight() - (tvLog.getHeight() - (tvLog.getPaddingTop() * 2)));
 	}
 
 	@Override
