@@ -13,6 +13,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 
 import java.security.NoSuchAlgorithmException;
@@ -145,6 +146,7 @@ public class LoginSettingActivity extends BaseActivity {
 	 * 获取密钥
 	 * 经过加密的
 	 * 二维码传输协议:keybag_secret@RSA密文
+	 * 格式：RSA(头协议@DES(secret))
 	 */
 	private String getQrSecret() {
 		String secret = Local.mAdmin.getDes();
@@ -154,17 +156,14 @@ public class LoginSettingActivity extends BaseActivity {
 		}
 		StringBuilder qrSt = new StringBuilder();
 		try {
-			qrSt.append(Local.PROTOCOL_QR);
+			qrSt.append(Local.PROTOCOL_QR_SECRET);
 			qrSt.append(Local.PROTOCOL_SPLIT);
-			qrSt.append(RSA.publicEncrypt(secret, RSA.getPublicKey(Local.publicKey)));
+			qrSt.append(DES.encryptor(secret, Local.desKey));
+			return RSA.publicEncrypt(qrSt.toString(), RSA.getPublicKey(Local.publicKey));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			e.printStackTrace();
 			sToast("密钥文件已被损坏");
 			return "error_failure";
 		}
-		//Logger.w("加密：" + Local.mAdmin.getDes());
-		//Logger.w("生成：" + qrSt.toString());
-		//Logger.w("解密：" + RSA.privateDecrypt(qrSt.toString(),RSA.getPrivateKey(Local.privateKey)));
-		return qrSt.toString();
 	}
 }

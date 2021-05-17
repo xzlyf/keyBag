@@ -21,6 +21,7 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlidingVerification;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 import com.xz.utils.TimeUtil;
@@ -198,6 +199,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 处理接收过来的二维码数据
 	 */
 	private void handleQrCode(String qrSt) {
+		//得到加密DES密钥
 		String secret = verifySecret(qrSt);
 		if (secret.equals("no_message") || secret.equals("error_code")) {
 			return;
@@ -213,7 +215,8 @@ public class ModifyActivity extends BaseActivity {
 			mTvTop.setVisibility(View.INVISIBLE);
 		}
 		try {
-			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+			//得到明文DES
+			xtSecret = DES.decryptor(secret,Local.desKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 			xtSecret = null;
@@ -223,16 +226,25 @@ public class ModifyActivity extends BaseActivity {
 
 	/**
 	 * 验证密钥文本
+	 * 格式：RSA(头协议@DES(secret))
 	 */
 	private String verifySecret(String secret) {
-		//二维码报文头判断 keybag_secret@RSA密文
-		String[] qrArray = secret.split(Local.PROTOCOL_SPLIT);
-		if (qrArray.length != 2) {
+		//解密RSA
+		try {
+			secret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+		} catch (Exception e) {
+			e.printStackTrace();
 			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
 			return "no_message";
 		}
+		//二维码报文头判断 keybag_secret@RSA密文
+		String[] qrArray = secret.split(Local.PROTOCOL_SPLIT);
+		if (qrArray.length != 2) {
+			sToast("不支持此协议");
+			return "no_message";
+		}
 
-		if (!qrArray[0].equals(Local.PROTOCOL_QR)) {
+		if (!qrArray[0].equals(Local.PROTOCOL_QR_SECRET)) {
 			sToast("非法二维码");
 			return "error_code";
 		}
