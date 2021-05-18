@@ -11,23 +11,19 @@ import android.text.TextUtils;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class ServerSocketService extends Service {
-
+public class SocketService extends Service {
+	private final int TIME_OUT_CONNECT = 5 * 60 * 1000;
 	private SocketBinder socketBinder = new SocketBinder();
 	private SocketCallBack mCallback;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
 
-	private ServerSocket mServer = null;
 	private ServerDeployThread mServerThread = null;
 	private Socket mClient;
 
-
-	public ServerSocketService() {
+	public SocketService() {
 	}
 
 	@Override
@@ -36,18 +32,16 @@ public class ServerSocketService extends Service {
 	}
 
 	public class SocketBinder extends Binder {
-
-		/*返回SocketService 在需要的地方可以通过ServiceConnection获取到SocketService  */
-		public ServerSocketService getService() {
-			return ServerSocketService.this;
+		public SocketService getService() {
+			return SocketService.this;
 		}
 	}
+
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 	}
-
 
 	@Override
 	public void onDestroy() {
@@ -67,7 +61,7 @@ public class ServerSocketService extends Service {
 	 * 初始化ServerSocket
 	 */
 	public void initSocket() {
-		if (mServer == null && mServerThread == null) {
+		if (mClient == null && mServerThread == null) {
 			mServerThread = new ServerDeployThread();
 			mServerThread.start();
 		}
@@ -85,15 +79,6 @@ public class ServerSocketService extends Service {
 			}
 			mClient = null;
 		}
-		if (mServer != null) {
-			try {
-				mServer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mServer = null;
-		}
-
 		if (mServerThread != null && mServerThread.isAlive()) {
 			mServerThread.interrupt();
 			mServerThread = null;
@@ -109,14 +94,16 @@ public class ServerSocketService extends Service {
 
 			try {
 				//backlog 连接队列最大长度  1
-				mServer = new ServerSocket(20022, 1);
-				callBack.created(mServer.getLocalPort());
-				mClient = mServer.accept();
-				InetAddress clientAddress = mClient.getInetAddress();
-				callBack.isConnected(clientAddress.getHostAddress(), clientAddress.getHostName());
+				mClient = new Socket();
+				mClient.connect(new InetSocketAddress("192.168.1.66", 20022), TIME_OUT_CONNECT);
+				if (mClient.isConnected()) {
+					Logger.e("连接成功");
+				} else {
+					Logger.e("连接失败");
+				}
 			} catch (IOException e) {
 				if (TextUtils.equals(e.getMessage(), "Socket closed")) {
-					Logger.d("Socket Close");
+					Logger.i("Socket Close");
 					return;
 				}
 				mCallback.error(e);
@@ -132,25 +119,6 @@ public class ServerSocketService extends Service {
 	 * 回调做回到主线处理
 	 */
 	private SocketCallBack callBack = new SocketCallBack() {
-		@Override
-		public void created(int port) {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mCallback.created(port);
-				}
-			});
-		}
-
-		@Override
-		public void isConnected(String ip, String name) {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mCallback.isConnected(ip, name);
-				}
-			});
-		}
 
 		@Override
 		public void error(Exception e) {
@@ -164,12 +132,6 @@ public class ServerSocketService extends Service {
 	};
 
 	public interface SocketCallBack {
-		/**
-		 * socket创建完成
-		 */
-		void created(int port);
-
-		void isConnected(String ip, String name);
 
 		/**
 		 * 抛异常了

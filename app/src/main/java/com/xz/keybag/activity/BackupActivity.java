@@ -80,6 +80,7 @@ public class BackupActivity extends BaseActivity {
 				startActivity(new Intent(mContext, DataSendActivity.class));
 				break;
 			case R.id.tv_receive:
+				startActivity(new Intent(mContext, DataReceiveActivity.class));
 				break;
 		}
 	}

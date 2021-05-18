@@ -165,7 +165,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 		initRecycler();
 
 		// TODO: 2021/5/16 测试 自动打开BackupActivityV2
-		startActivity(new Intent(this, DataSendActivity.class));
+		startActivity(new Intent(this, BackupActivity.class));
 	}
 
 	private void initState() {

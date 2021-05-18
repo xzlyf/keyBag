@@ -23,9 +23,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name=".service.ServerSocketService"
+            android:name=".service.SocketService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <activity android:name=".activity.DataReceiveActivity" />
+
+        <service
+            android:name=".service.ServerSocketService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity android:name=".activity.DataSendActivity" />
         <activity android:name=".activity.BackupActivity" />

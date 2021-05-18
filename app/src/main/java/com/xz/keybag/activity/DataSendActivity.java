@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -93,6 +94,7 @@ public class DataSendActivity extends BaseActivity {
 		if (host == null) {
 			return;
 		}
+		Logger.d("服务端ip：" + host);
 		socketService.setCallback(new ServerSocketService.SocketCallBack() {
 			@Override
 			public void created(int port) {
