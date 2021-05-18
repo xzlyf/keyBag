@@ -11,7 +11,7 @@ import android.text.TextUtils;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -109,11 +109,23 @@ public class ServerSocketService extends Service {
 
 			try {
 				//backlog 连接队列最大长度  1
-				mServer = new ServerSocket(20022, 1);
+				mServer = new ServerSocket(20023, 1);
 				callBack.created(mServer.getLocalPort());
 				mClient = mServer.accept();
+				Logger.d("已接入:"+mClient.getInetAddress().getHostAddress());
 				InetAddress clientAddress = mClient.getInetAddress();
 				callBack.isConnected(clientAddress.getHostAddress(), clientAddress.getHostName());
+
+				InputStream inputStream = mClient.getInputStream();
+				//byte[] buff = new byte[1024];
+				//String st;
+				//while (inputStream.read(buff) != -1) {
+				//	Logger.i("接收：" + new String(buff));
+				//}
+
+				Logger.d("结束线程"+inputStream.read());
+
+
 			} catch (IOException e) {
 				if (TextUtils.equals(e.getMessage(), "Socket closed")) {
 					Logger.d("Socket Close");

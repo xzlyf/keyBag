@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_5"
             android:layout_marginEnd="@dimen/dp_10"
-            android:text="发送端"
+            android:text="接收端"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/sp_16" />
 
