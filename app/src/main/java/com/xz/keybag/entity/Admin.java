@@ -11,6 +11,8 @@ public class Admin {
 	private String fingerprint;
 	private String privateKey;
 	private String publicKey;
+	private AdminConfig config;
+
 
 	public String getLoginPwd() {
 		return loginPwd;
@@ -51,4 +53,14 @@ public class Admin {
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
+
+	public AdminConfig getConfig() {
+		return config;
+	}
+
+	public void setConfig(AdminConfig config) {
+		this.config = config;
+	}
+
+
 }

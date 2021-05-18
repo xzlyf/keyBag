@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.NumberKeyboard;
 import com.xz.keybag.custom.PasswordInputDialog;
+import com.xz.keybag.entity.AdminConfig;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
@@ -45,8 +47,10 @@ public class LoginActivity extends BaseActivity {
 	NumberKeyboard numberView;
 	@BindView(R.id.et_pwd)
 	TextView etPwd;
+	//layout1 密码输入
 	@BindView(R.id.input_layout)
 	LinearLayout inputLayout;
+	//layout2 指纹登录
 	@BindView(R.id.input_layout_2)
 	LinearLayout inputLayout2;
 	@BindView(R.id.tv_tips)
@@ -61,6 +65,10 @@ public class LoginActivity extends BaseActivity {
 	private Vibrator vibrator;
 	private int mode;
 	private DBManager db;
+	private String deviceId;
+	private boolean isSaveUnlockTime = false;
+	private long newLoginTime;
+	private String configId;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -69,7 +77,7 @@ public class LoginActivity extends BaseActivity {
 
 	@Override
 	public int getLayoutResource() {
-		return R.layout.activity_load;
+		return R.layout.activity_login;
 	}
 
 	@Override
@@ -83,18 +91,33 @@ public class LoginActivity extends BaseActivity {
 		initView();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-		//initSql
-		DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
-		db = DBManager.getInstance(this);
-		//管理唯一标识
-		initIdentity();
-		//登录初始化
-		initLogin();
+
+		if (mode != Local.INTENT_EXTRA_LOGIN_MODE) {
+			//initSql
+			DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
+			db = DBManager.getInstance(this);
+			//管理唯一标识
+			initIdentity();
+			//登录初始化
+			initLogin();
+			//登录配置
+			initLoginConfig();
+		} else {
+			//用户是否开启指纹登录
+			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
+				inputLayout2.setVisibility(View.GONE);
+				inputLayout.setVisibility(View.VISIBLE);
+				inputType.setVisibility(View.GONE);
+			} else {
+				//初始化指纹模块
+				initFingerprint();
+			}
+		}
+
 
 		//todo  测试模式：关闭密码验证
 		killMySelf();
 	}
-
 
 	private void initView() {
 		inputLayout.setVisibility(View.GONE);
@@ -142,10 +165,10 @@ public class LoginActivity extends BaseActivity {
 				new PermissionsUtils.IPermissionsResult() {
 					@Override
 					public void passPermissons() {
-						String uuid = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
+						deviceId = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
 						String old = db.queryIdentity();
 						if (old != null) {
-							if (!old.equals(uuid)) {
+							if (!old.equals(deviceId)) {
 								//跟之前保存的唯一标识不一致，环境异常，提示是否确认风险，确认同意后后就存入此次新的唯一标识
 								AlertDialog riskDialog = new AlertDialog.Builder(LoginActivity.this)
 										.setTitle("风险提示")
@@ -154,7 +177,7 @@ public class LoginActivity extends BaseActivity {
 											@Override
 											public void onClick(DialogInterface dialog, int which) {
 												dialog.dismiss();
-												db.insertIdentity(uuid);
+												db.insertIdentity(deviceId);
 											}
 										})
 										.setPositiveButton("退出", new DialogInterface.OnClickListener() {
@@ -170,7 +193,7 @@ public class LoginActivity extends BaseActivity {
 							}
 						} else {
 							//存入唯一标识
-							db.insertIdentity(uuid);
+							db.insertIdentity(deviceId);
 						}
 					}
 
@@ -196,9 +219,10 @@ public class LoginActivity extends BaseActivity {
 	 * 初始化登录相关操作
 	 */
 	private void initLogin() {
-		//尝试读取登录密码
-		String loginPwd = db.queryLogin();
-		if (loginPwd.equals("no_password")) {
+		//获取密码状态
+		String loginState = db.login();
+		//没有密码 第一次进入
+		if (loginState.equals(Local.PASSWORD_STATE_NULL)) {
 			PasswordInputDialog pwdInputDialog = new PasswordInputDialog(this);
 			pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
 				@Override
@@ -216,9 +240,9 @@ public class LoginActivity extends BaseActivity {
 			});
 			pwdInputDialog.create();
 			pwdInputDialog.show();
-		} else if (loginPwd.equals("success_password")) {
+		} else if (loginState.equals(Local.PASSWORD_STATE_SUCCESS)) {
 			//用户是否开启指纹登录
-			if (!Local.mAdmin.getFingerprint().equals("fingerprint")) {
+			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
 				inputLayout2.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
@@ -281,6 +305,7 @@ public class LoginActivity extends BaseActivity {
 				inputLayout.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
+				Local.mAdmin.setFingerprint(Local.FINGERPRINT_STATE_NONSUPPORT);
 
 			}
 
@@ -295,11 +320,12 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
-		if (mode == 1) {
-			startActivity(new Intent(mContext, KeyActivity.class));
+		if (mode == Local.INTENT_EXTRA_LOGIN_MODE) {
+			startActivity(new Intent(mContext, LoginSettingActivity.class));
 			finish();
 			return;
 		}
+		updateLoginConfig();
 		startActivity(new Intent(mContext, MainActivity.class));
 		overridePendingTransition(R.anim.translation_finish, R.anim.translation_create);
 		new Handler().postDelayed(new Runnable() {
@@ -311,6 +337,36 @@ public class LoginActivity extends BaseActivity {
 		}, 500);
 	}
 
+	/**
+	 * 启用用户的登录配置
+	 */
+	private void initLoginConfig() {
+		AdminConfig config = db.queryAdminConfig();
+		newLoginTime = System.currentTimeMillis();
+		configId = config.getId();
+		//获取用户是否开启密码防忘记功能
+		if (TextUtils.equals(config.getForgetPass(), Local.CONFIG_FORGET_OPEN)) {
+			//判断上次解锁日期是否超过3天 或者lastUnlockTime==1000
+			if (newLoginTime - config.getUnlockTimestamp() >= 259200000L || config.getUnlockTimestamp() == 1000) {
+				//优先显示密码输入
+				inputLayout.setVisibility(View.VISIBLE);
+				tvInputTips.setText("本次进入推荐使用密码");
+			}
+		}
+
+	}
+
+	/**
+	 * 更新用户配置
+	 */
+	private void updateLoginConfig() {
+		if (isSaveUnlockTime) {
+			db.updateLoginTime(configId, newLoginTime, newLoginTime);
+		} else {
+			db.updateLoginTime(configId, newLoginTime, -1);
+		}
+	}
+
 
 	private void checkPwd() {
 		String temp = etPwd.getText().toString().trim();
@@ -320,6 +376,7 @@ public class LoginActivity extends BaseActivity {
 
 		//temp = MD5Util.getMD5(temp);
 		if (temp.equals(Local.mAdmin.getLoginPwd())) {
+			isSaveUnlockTime = true;
 			killMySelf();
 		} else {
 			//密码错误

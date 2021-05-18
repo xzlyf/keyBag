@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">钥匙包</string>
+    <string name="digits_password">0123456789</string>
     <string name="string_1">密钥初始化</string>
     <string name="string_2">无存档</string>
     <string name="string_3">默认密码0000，及时修改</string>

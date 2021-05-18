@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.BackupActivity">
+    tools:context=".activity.DataSendActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,39 +31,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_5"
             android:layout_marginEnd="@dimen/dp_10"
-            android:text="数据搬家"
+            android:text="发送端"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/sp_16" />
 
     </LinearLayout>
 
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pie_chart"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_180"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/dp_10" />
-
-
     <TextView
-        style="@style/secret_textView"
+        android:id="@+id/tv_log"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要备份" />
-
-    <TextView
-        android:id="@+id/tv_send"
-        style="@style/secret_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要发送" />
-
-    <TextView
-        android:id="@+id/tv_receive"
-        style="@style/secret_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要接收" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

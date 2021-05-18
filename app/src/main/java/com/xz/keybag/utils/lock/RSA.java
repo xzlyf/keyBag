@@ -143,13 +143,13 @@ public class RSA {
 	 * @return
 	 */
 
-	public static String privateDecrypt(String data, RSAPrivateKey privateKey) {
+	public static String privateDecrypt(String data, RSAPrivateKey privateKey) throws Exception {
 		try {
 			Cipher cipher = Cipher.getInstance(RSA);
 			cipher.init(Cipher.DECRYPT_MODE, privateKey);
 			return new String(rsaSplitCodec(cipher, Cipher.DECRYPT_MODE, Base64.decodeBase64(data), privateKey.getModulus().bitLength()), CHARSET);
 		} catch (Exception e) {
-			throw new RuntimeException("解密字符串[" + data + "]时遇到异常", e);
+			throw new Exception("解密字符串[" + data + "]时遇到异常", e);
 		}
 	}
 

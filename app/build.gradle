@@ -69,6 +69,8 @@ dependencies {
     //Google zxing 二维码
 //    implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:core:3.3.2'
+    //图表控件 https://github.com/PhilJay/MPAndroidChart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
 
 }

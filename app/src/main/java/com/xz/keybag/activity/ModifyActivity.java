@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +21,7 @@ import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlidingVerification;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 import com.xz.utils.TimeUtil;
@@ -66,14 +68,14 @@ public class ModifyActivity extends BaseActivity {
 	public void initData() {
 		newSecretLayout.setVisibility(View.GONE);
 		changeStatusBarTextColor();
-		String qrSt = getIntent().getStringExtra("qr_code");
+		String qrSt = getIntent().getStringExtra(Local.INTENT_EXTRA_QR_CODE);
 		if (TextUtils.isEmpty(qrSt)) {
 			finish();
 			return;
 		}
 		db = DBManager.getInstance(this);
 		currentSecret.setText(verifySecret(qrSt));
-
+		tvLog.setMovementMethod(ScrollingMovementMethod.getInstance());
 		mVerifyProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -130,6 +132,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 调用zxing扫描二维码
 	 */
 	private void startQrCode() {
+		// TODO: 2021/5/15 使用权限工具类获取权限PermissionsUtils
 		// 申请相机权限
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 			// 申请权限
@@ -196,6 +199,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 处理接收过来的二维码数据
 	 */
 	private void handleQrCode(String qrSt) {
+		//得到加密DES密钥
 		String secret = verifySecret(qrSt);
 		if (secret.equals("no_message") || secret.equals("error_code")) {
 			return;
@@ -211,7 +215,8 @@ public class ModifyActivity extends BaseActivity {
 			mTvTop.setVisibility(View.INVISIBLE);
 		}
 		try {
-			xtSecret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+			//得到明文DES
+			xtSecret = DES.decryptor(secret,Local.desKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 			xtSecret = null;
@@ -221,16 +226,25 @@ public class ModifyActivity extends BaseActivity {
 
 	/**
 	 * 验证密钥文本
+	 * 格式：RSA(头协议@DES(secret))
 	 */
 	private String verifySecret(String secret) {
-		//二维码报文头判断 keybag_secret@RSA密文
-		String[] qrArray = secret.split("@");
-		if (qrArray.length != 2) {
+		//解密RSA
+		try {
+			secret = RSA.privateDecrypt(secret, RSA.getPrivateKey(Local.privateKey));
+		} catch (Exception e) {
+			e.printStackTrace();
 			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
 			return "no_message";
 		}
+		//二维码报文头判断 keybag_secret@RSA密文
+		String[] qrArray = secret.split(Local.PROTOCOL_SPLIT);
+		if (qrArray.length != 2) {
+			sToast("不支持此协议");
+			return "no_message";
+		}
 
-		if (!qrArray[0].equals("keybag_secret")) {
+		if (!qrArray[0].equals(Local.PROTOCOL_QR_SECRET)) {
 			sToast("非法二维码");
 			return "error_code";
 		}
@@ -243,6 +257,7 @@ public class ModifyActivity extends BaseActivity {
 	 * 开始修改密钥
 	 */
 	private void startChange() {
+		tvBack.setEnabled(false);
 		openCamera.setEnabled(false);
 		tvClose.setEnabled(false);
 		clearLog();
@@ -255,20 +270,25 @@ public class ModifyActivity extends BaseActivity {
 			return;
 		}
 		appendLog("正在测试密钥兼容性...");
-		boolean isOK = db.testSecret(xtSecret);
+		boolean isOK = db.testDES(xtSecret);
 		if (!isOK) {
 			appendLog("密钥可能不兼容");
 		}
 		appendLog("正在替换旧密钥...");
-		int state = db.updateSecret(Local.mAdmin.getDes(), xtSecret);
+		int state = db.updateDES(Local.mAdmin.getDes(), xtSecret);
 		appendLog("更新状态：" + state);
-		Local.mAdmin.setDes(xtSecret);
+		if (state != 1) {
+			appendLog("修改密钥失败");
+			appendLog("----结束修改密钥----");
+			return;
+		}
 		appendLog("修改密钥成功");
 		appendLog(TimeUtil.getSimMilliDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis()));
 		appendLog("----结束修改密钥----");
 
 		openCamera.setEnabled(true);
 		tvClose.setEnabled(true);
+		tvBack.setEnabled(true);
 
 		//显示新的密钥
 		currentSecret.setText(newSecret.getText().toString().trim());
@@ -286,6 +306,8 @@ public class ModifyActivity extends BaseActivity {
 		//}
 		tvLog.append(st);
 		tvLog.append("\n");
+		//滚动到底部
+		tvLog.scrollTo(0, tvLog.getLineCount() * tvLog.getLineHeight() - (tvLog.getHeight() - (tvLog.getPaddingTop() * 2)));
 	}
 
 	private void clearLog() {

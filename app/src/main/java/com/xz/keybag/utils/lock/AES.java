@@ -4,6 +4,10 @@ import android.util.Log;
 
 import com.xz.apache_code_android.binary.Base64;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,13 +23,13 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AES {
 	/*public static void main(String[] args) {
-		String s = "hello world";
-		// 加密
-		System.out.println("加密前：" + s);
-		String encryptResultStr = encrypt(s);
-		System.out.println("加密后：" + encryptResultStr);
-		// 解密
-		System.out.println("解密后：" + decrypt(encryptResultStr));
+		//String s = "hello world";
+		//// 加密
+		//System.out.println("加密前：" + s);
+		//String encryptResultStr = encrypt(s);
+		//System.out.println("加密后：" + encryptResultStr);
+		//// 解密
+		//System.out.println("解密后：" + decrypt(encryptResultStr));
 	}*/
 
 	// 密钥
