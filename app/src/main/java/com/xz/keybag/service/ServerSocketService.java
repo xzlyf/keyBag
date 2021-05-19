@@ -6,25 +6,12 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.text.TextUtils;
-
-import com.orhanobut.logger.Logger;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 public class ServerSocketService extends Service {
 
 	private SocketBinder socketBinder = new SocketBinder();
 	private SocketCallBack mCallback;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
-
-	private ServerSocket mServer = null;
-	private ServerDeployThread mServerThread = null;
-	private Socket mClient;
 
 
 	public ServerSocketService() {
@@ -67,76 +54,12 @@ public class ServerSocketService extends Service {
 	 * 初始化ServerSocket
 	 */
 	public void initSocket() {
-		if (mServer == null && mServerThread == null) {
-			mServerThread = new ServerDeployThread();
-			mServerThread.start();
-		}
 	}
 
 	/**
 	 * 释放连接
 	 */
 	public void releaseSocket() {
-		if (mClient != null) {
-			try {
-				mClient.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mClient = null;
-		}
-		if (mServer != null) {
-			try {
-				mServer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mServer = null;
-		}
-
-		if (mServerThread != null && mServerThread.isAlive()) {
-			mServerThread.interrupt();
-			mServerThread = null;
-		}
-	}
-
-	/**
-	 * 服务端部署
-	 */
-	private class ServerDeployThread extends Thread {
-		@Override
-		public void run() {
-
-			try {
-				//backlog 连接队列最大长度  1
-				mServer = new ServerSocket(20023, 1);
-				callBack.created(mServer.getLocalPort());
-				mClient = mServer.accept();
-				Logger.d("已接入:"+mClient.getInetAddress().getHostAddress());
-				InetAddress clientAddress = mClient.getInetAddress();
-				callBack.isConnected(clientAddress.getHostAddress(), clientAddress.getHostName());
-
-				InputStream inputStream = mClient.getInputStream();
-				//byte[] buff = new byte[1024];
-				//String st;
-				//while (inputStream.read(buff) != -1) {
-				//	Logger.i("接收：" + new String(buff));
-				//}
-
-				Logger.d("结束线程"+inputStream.read());
-
-
-			} catch (IOException e) {
-				if (TextUtils.equals(e.getMessage(), "Socket closed")) {
-					Logger.d("Socket Close");
-					return;
-				}
-				mCallback.error(e);
-				Logger.e("ServerSocketDeploy Error " + e.getMessage());
-			}
-
-
-		}
 	}
 
 
