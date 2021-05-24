@@ -67,7 +67,7 @@ public class DataReceiveActivity extends BaseActivity {
 		if (host == null) {
 			return;
 		}
-		socketService.initSocket();
+		socketService.initSocket("192.168.1.66", 20022);
 	}
 
 	/**
