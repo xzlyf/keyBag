@@ -25,7 +25,7 @@ public class SocketService extends Service {
 	private RunningThread runningThread = null;
 	private ClientSocket cs = null;
 
-	private String ip = "192.168.1.66";// 设置成服务器IP
+	private String ip = "192.168.1.37";// 设置成服务器IP
 
 	private int port = 20022;
 

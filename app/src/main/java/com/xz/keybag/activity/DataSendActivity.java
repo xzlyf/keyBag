@@ -159,7 +159,7 @@ public class DataSendActivity extends BaseActivity {
 	/**
 	 * 生成二维码文本数据
 	 * 根据二维码协议
-	 * 格式：协议头@ip@端口
+	 * 格式：RSA(头协议@ip@port)
 	 */
 	private String getQrCode(String ip, int port) {
 		StringBuilder qrSt = new StringBuilder();
