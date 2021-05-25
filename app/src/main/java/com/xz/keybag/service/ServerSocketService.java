@@ -25,7 +25,7 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 
@@ -35,7 +35,6 @@ public class ServerSocketService extends Service {
 	private SocketCallBack mCallback;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
 
-	private ServerSocket ss;
 	private RunningThread runningThread = null;
 	private DBManager db;
 	private String cachePath;
@@ -94,13 +93,6 @@ public class ServerSocketService extends Service {
 	 * 释放连接
 	 */
 	public void releaseSocket() {
-		if (ss != null) {
-			try {
-				ss.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		if (runningThread != null) {
 			runningThread.interrupt();
 		}
@@ -142,10 +134,18 @@ public class ServerSocketService extends Service {
 				fos = new FileOutputStream(cacheFile);
 				Gson gson = new Gson();
 				byte[] buff;
-				for (Project p : projects) {
-					buff = gson.toJson(p).getBytes();
-					fos.write(buff);
+				//for (Project p : projects) {
+				//	buff = gson.toJson(p).getBytes();
+				//	fos.write(buff);
+				//}
+				buff = gson.toJson(projects).getBytes(StandardCharsets.UTF_8);
+				//位移处理，不要明文输出文本
+				for (int i = 0; i < buff.length; i++) {
+					//buff[i] += 1;
+					buff[i] = (byte) (buff[i] << 1);
 				}
+				fos.write(buff);
+				fos.flush();
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -169,6 +169,7 @@ public class ServerSocketService extends Service {
 		 * 开始部署
 		 */
 		private void deploySocket(int port) {
+			ServerSocket ss;
 
 			//创建服务端
 			try {
@@ -252,6 +253,7 @@ public class ServerSocketService extends Service {
 				}
 				dos.flush();
 				callBack.message("文件传输完成");
+				callBack.finish();
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -298,6 +300,16 @@ public class ServerSocketService extends Service {
 		}
 
 		@Override
+		public void finish() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.finish();
+				}
+			});
+		}
+
+		@Override
 		public void error(Exception e) {
 			mHandler.post(new Runnable() {
 				@Override
@@ -326,6 +338,11 @@ public class ServerSocketService extends Service {
 		 * 消息
 		 */
 		void message(String msg);
+
+		/**
+		 * 完成
+		 */
+		void finish();
 
 
 		/**

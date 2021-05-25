@@ -117,6 +117,11 @@ public class DataSendActivity extends BaseActivity {
 			}
 
 			@Override
+			public void finish() {
+
+			}
+
+			@Override
 			public void error(Exception e) {
 				appendLog("错误:" + e.getMessage());
 			}
