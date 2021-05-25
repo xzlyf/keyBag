@@ -42,6 +42,7 @@ public class DataReceiveActivity extends BaseActivity {
 		bindSocketService();
 	}
 
+
 	private void bindSocketService() {
 		/*通过binder拿到service*/
 		sc = new ServiceConnection() {
@@ -49,7 +50,6 @@ public class DataReceiveActivity extends BaseActivity {
 			public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 				SocketService.SocketBinder binder = (SocketService.SocketBinder) iBinder;
 				socketService = binder.getService();
-				initSocket();
 			}
 
 			@Override
@@ -106,11 +106,14 @@ public class DataReceiveActivity extends BaseActivity {
 	}
 
 
-	@OnClick(R.id.tv_back)
+	@OnClick({R.id.tv_back,R.id.image_scan})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
 			case R.id.tv_back:
 				finish();
+				break;
+			case R.id.image_scan:
+				initSocket();
 				break;
 		}
 	}
