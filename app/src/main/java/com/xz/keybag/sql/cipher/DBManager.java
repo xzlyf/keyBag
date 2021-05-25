@@ -490,10 +490,10 @@ public class DBManager {
 		}
 
 		//测试显示数据
-		for (String key : map.keySet()) {
-			String value = map.get(key).toString();
-			System.out.println("key:" + key + " vlaue:" + value);
-		}
+		//for (String key : map.keySet()) {
+		//	String value = map.get(key).toString();
+		//	System.out.println("key:" + key + " vlaue:" + value);
+		//}
 		return map;
 	}
 

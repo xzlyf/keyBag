@@ -109,17 +109,16 @@ public class DataSendActivity extends BaseActivity {
 				//客户端已连接
 				qrLayout.setVisibility(View.GONE);
 				appendLog("已连接:" + ip);
-				appendLog("设备:" + name);
 			}
 
 			@Override
-			public void close() {
-
+			public void message(String msg) {
+				appendLog(msg);
 			}
 
 			@Override
 			public void error(Exception e) {
-
+				appendLog("错误:" + e.getMessage());
 			}
 		});
 		socketService.initSocket();

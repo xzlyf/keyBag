@@ -10,6 +10,7 @@ import android.os.Looper;
 import com.google.gson.Gson;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.StorageUtil;
 import com.xz.utils.MD5Util;
 
@@ -24,6 +25,7 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Random;
 
@@ -110,9 +112,12 @@ public class ServerSocketService extends Service {
 
 		@Override
 		public void run() {
+			callBack.message("正在整理数据...");
 			createCache();
+			callBack.message("正在部署服务端...");
 			deploySocket(port);
 			clearCache();
+			callBack.message("传输完成，已关闭连接");
 		}
 
 		/**
@@ -122,7 +127,7 @@ public class ServerSocketService extends Service {
 			File file = new File(cachePath);
 			if (file.exists()) {
 				file.delete();
-				System.out.println("缓存文件已清除");
+				callBack.message("缓存文件已清除");
 			}
 		}
 
@@ -171,7 +176,7 @@ public class ServerSocketService extends Service {
 			} catch (IOException e) {
 				if (e instanceof BindException) {
 					if (reTryNum >= 3) {
-						System.out.println("超过重试次数，结束部署");
+						callBack.message("超过重试次数，结束部署");
 						return;
 					}
 					//随机生成40000至50000范围的端口
@@ -183,10 +188,10 @@ public class ServerSocketService extends Service {
 					deploySocket(sPort);
 					return;
 				}
-				System.out.println("服务器部署异常：" + e.getMessage());
+				callBack.message("服务器部署异常：" + e.getMessage());
 				return;
 			}
-			System.out.println("服务端已部署,开始等待");
+			callBack.message("服务端已部署,开始等待接入...");
 			callBack.created(ss.getLocalPort());
 
 
@@ -196,39 +201,42 @@ public class ServerSocketService extends Service {
 			try {
 				while (true) {
 					s = ss.accept();
-					System.out.println("建立socket链接");
+					callBack.message("有设备已接入");
 					dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 					String verify = dis.readUTF();
 					//校验信息
 					String[] split = verify.split("@");
 					if (split.length == 1) {
-						System.out.println("验证不通过，关闭连接");
+						callBack.message("设备验证不通过\n重新等待接入...");
 						dis.close();
 						s.close();
 					} else {
 						InetAddress inetAddress = s.getInetAddress();
 						callBack.isConnected(inetAddress.getHostAddress(), inetAddress.getHostName());
+						ss.close();//关闭服务器等待
 						break;
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-				callBack.close();
+				callBack.message("结束等待");
+				return;
 			}
-
+			callBack.message("开始发送数据，请勿退出或息屏");
+			callBack.message("......");
 			// 选择进行传输的文件
+			DataInputStream fis = null;
+			DataOutputStream dos = null;
 			try {
 				File fi = new File(cachePath);
-				System.out.println("文件长度:" + (int) fi.length());
-				DataInputStream fis = new DataInputStream(new BufferedInputStream(new FileInputStream(cachePath)));
-				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				fis = new DataInputStream(new BufferedInputStream(new FileInputStream(cachePath)));
+				dos = new DataOutputStream(s.getOutputStream());
 				//将文件名及长度传给客户端。这里要真正适用所有平台，例如中文名的处理，还需要加工，具体可以参见Think In Java 4th里有现成的代码。
 				dos.writeUTF(fi.getName());
 				dos.flush();
 				dos.writeLong(fi.length());
 				dos.flush();
 
-				int bufferSize = 8192;
+				int bufferSize = 2048;
 				byte[] buf = new byte[bufferSize];
 
 				while (true) {
@@ -243,24 +251,13 @@ public class ServerSocketService extends Service {
 					dos.write(buf, 0, read);
 				}
 				dos.flush();
-				// 注意关闭socket链接哦，不然客户端会等待server的数据过来，
-				// 直到socket超时，导致数据不完整。
-				fis.close();
-				dos.close();
-				s.close();
-				System.out.println("文件传输完成");
+				callBack.message("文件传输完成");
 
 			} catch (Exception e) {
 				e.printStackTrace();
 				callBack.error(e);
 			} finally {
-				try {
-					if (dis != null) {
-						dis.close();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				IOUtil.closeAll(dos, fis, dis, s);
 			}
 		}
 	}
@@ -291,11 +288,11 @@ public class ServerSocketService extends Service {
 		}
 
 		@Override
-		public void close() {
+		public void message(String msg) {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mCallback.close();
+					mCallback.message(msg);
 				}
 			});
 		}
@@ -326,9 +323,10 @@ public class ServerSocketService extends Service {
 		void isConnected(String ip, String name);
 
 		/**
-		 * 关闭
+		 * 消息
 		 */
-		void close();
+		void message(String msg);
+
 
 		/**
 		 * 抛异常了
