@@ -20,9 +20,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.BindException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Random;
 
 public class ServerSocketService extends Service {
 
@@ -34,6 +37,8 @@ public class ServerSocketService extends Service {
 	private RunningThread runningThread = null;
 	private DBManager db;
 	private String cachePath;
+	private int port = 20022;//主端口
+	private int bPort = 20022;//备用端口
 
 	public ServerSocketService() {
 		db = DBManager.getInstance(this);
@@ -101,11 +106,24 @@ public class ServerSocketService extends Service {
 
 
 	private class RunningThread extends Thread {
+		int reTryNum = 0;
 
 		@Override
 		public void run() {
 			createCache();
-			deploySocket();
+			deploySocket(port);
+			clearCache();
+		}
+
+		/**
+		 * 请里缓存文件
+		 */
+		private void clearCache() {
+			File file = new File(cachePath);
+			if (file.exists()) {
+				file.delete();
+				System.out.println("缓存文件已清除");
+			}
 		}
 
 		/**
@@ -142,65 +160,107 @@ public class ServerSocketService extends Service {
 			cachePath = newCache.getAbsolutePath();
 		}
 
-		private void deploySocket() {
-			int port = 20022;
+		/**
+		 * 开始部署
+		 */
+		private void deploySocket(int port) {
 
-			Socket s = null;
+			//创建服务端
 			try {
 				ss = new ServerSocket(port);
-				while (true) {
+			} catch (IOException e) {
+				if (e instanceof BindException) {
+					if (reTryNum >= 3) {
+						System.out.println("超过重试次数，结束部署");
+						return;
+					}
+					//随机生成40000至50000范围的端口
+					int max = 50000;
+					int min = 40000;
+					Random random = new Random();
+					int sPort = random.nextInt(max) % (max - min + 1) + min;
+					reTryNum++;
+					deploySocket(sPort);
+					return;
+				}
+				System.out.println("服务器部署异常：" + e.getMessage());
+				return;
+			}
+			System.out.println("服务端已部署,开始等待");
+			callBack.created(ss.getLocalPort());
 
+
+			//等待客户端接入
+			Socket s = null;
+			DataInputStream dis = null;
+			try {
+				while (true) {
 					s = ss.accept();
 					System.out.println("建立socket链接");
-					DataInputStream dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+					dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 					String verify = dis.readUTF();
 					//校验信息
-					//String[] split = verify.split("@");
-					//if (split.length == 1) {
-					//	System.out.println("验证不通过，关闭连接");
-					//	dis.close();
-					//	s.close();
-					//	continue;
-					//}
-
-
-					// 选择进行传输的文件
-					File fi = new File(cachePath);
-
-					System.out.println("文件长度:" + (int) fi.length());
-
-					DataInputStream fis = new DataInputStream(new BufferedInputStream(new FileInputStream(cachePath)));
-					DataOutputStream ps = new DataOutputStream(s.getOutputStream());
-					//将文件名及长度传给客户端。这里要真正适用所有平台，例如中文名的处理，还需要加工，具体可以参见Think In Java 4th里有现成的代码。
-					ps.writeUTF(fi.getName());
-					ps.flush();
-					ps.writeLong(fi.length());
-					ps.flush();
-
-					int bufferSize = 8192;
-					byte[] buf = new byte[bufferSize];
-
-					while (true) {
-						int read = 0;
-						if (fis != null) {
-							read = fis.read(buf);
-						}
-
-						if (read == -1) {
-							break;
-						}
-						ps.write(buf, 0, read);
+					String[] split = verify.split("@");
+					if (split.length == 1) {
+						System.out.println("验证不通过，关闭连接");
+						dis.close();
+						s.close();
+					} else {
+						InetAddress inetAddress = s.getInetAddress();
+						callBack.isConnected(inetAddress.getHostAddress(), inetAddress.getHostName());
+						break;
 					}
-					ps.flush();
-					// 注意关闭socket链接哦，不然客户端会等待server的数据过来，
-					// 直到socket超时，导致数据不完整。
-					fis.close();
-					s.close();
-					System.out.println("文件传输完成");
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				callBack.close();
+			}
+
+			// 选择进行传输的文件
+			try {
+				File fi = new File(cachePath);
+				System.out.println("文件长度:" + (int) fi.length());
+				DataInputStream fis = new DataInputStream(new BufferedInputStream(new FileInputStream(cachePath)));
+				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				//将文件名及长度传给客户端。这里要真正适用所有平台，例如中文名的处理，还需要加工，具体可以参见Think In Java 4th里有现成的代码。
+				dos.writeUTF(fi.getName());
+				dos.flush();
+				dos.writeLong(fi.length());
+				dos.flush();
+
+				int bufferSize = 8192;
+				byte[] buf = new byte[bufferSize];
+
+				while (true) {
+					int read = 0;
+					if (fis != null) {
+						read = fis.read(buf);
+					}
+
+					if (read == -1) {
+						break;
+					}
+					dos.write(buf, 0, read);
+				}
+				dos.flush();
+				// 注意关闭socket链接哦，不然客户端会等待server的数据过来，
+				// 直到socket超时，导致数据不完整。
+				fis.close();
+				dos.close();
+				s.close();
+				System.out.println("文件传输完成");
 
 			} catch (Exception e) {
 				e.printStackTrace();
+				callBack.error(e);
+			} finally {
+				try {
+					if (dis != null) {
+						dis.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -231,6 +291,16 @@ public class ServerSocketService extends Service {
 		}
 
 		@Override
+		public void close() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.close();
+				}
+			});
+		}
+
+		@Override
 		public void error(Exception e) {
 			mHandler.post(new Runnable() {
 				@Override
@@ -247,7 +317,18 @@ public class ServerSocketService extends Service {
 		 */
 		void created(int port);
 
+		/**
+		 * 设备已连接
+		 *
+		 * @param ip
+		 * @param name
+		 */
 		void isConnected(String ip, String name);
+
+		/**
+		 * 关闭
+		 */
+		void close();
 
 		/**
 		 * 抛异常了

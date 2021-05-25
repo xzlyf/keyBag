@@ -32,8 +32,8 @@ import butterknife.OnClick;
 
 public class DataSendActivity extends BaseActivity {
 
-	@BindView(R.id.center_layout)
-	CardView centerLayout;
+	@BindView(R.id.qr_layout)
+	CardView qrLayout;
 	@BindView(R.id.image_qr)
 	ImageView imageQr;
 	@BindView(R.id.tv_log)
@@ -107,9 +107,14 @@ public class DataSendActivity extends BaseActivity {
 			@Override
 			public void isConnected(String ip, String name) {
 				//客户端已连接
-				centerLayout.setVisibility(View.GONE);
+				qrLayout.setVisibility(View.GONE);
 				appendLog("已连接:" + ip);
 				appendLog("设备:" + name);
+			}
+
+			@Override
+			public void close() {
+
 			}
 
 			@Override
