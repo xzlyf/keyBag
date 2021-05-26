@@ -32,8 +32,8 @@ import butterknife.OnClick;
 
 public class DataSendActivity extends BaseActivity {
 
-	@BindView(R.id.center_layout)
-	CardView centerLayout;
+	@BindView(R.id.qr_layout)
+	CardView qrLayout;
 	@BindView(R.id.image_qr)
 	ImageView imageQr;
 	@BindView(R.id.tv_log)
@@ -107,14 +107,23 @@ public class DataSendActivity extends BaseActivity {
 			@Override
 			public void isConnected(String ip, String name) {
 				//客户端已连接
-				centerLayout.setVisibility(View.GONE);
+				qrLayout.setVisibility(View.GONE);
 				appendLog("已连接:" + ip);
-				appendLog("设备:" + name);
+			}
+
+			@Override
+			public void message(String msg) {
+				appendLog(msg);
+			}
+
+			@Override
+			public void finish() {
+
 			}
 
 			@Override
 			public void error(Exception e) {
-
+				appendLog("错误:" + e.getMessage());
 			}
 		});
 		socketService.initSocket();
@@ -159,7 +168,7 @@ public class DataSendActivity extends BaseActivity {
 	/**
 	 * 生成二维码文本数据
 	 * 根据二维码协议
-	 * 格式：协议头@ip@端口
+	 * 格式：RSA(头协议@ip@port)
 	 */
 	private String getQrCode(String ip, int port) {
 		StringBuilder qrSt = new StringBuilder();

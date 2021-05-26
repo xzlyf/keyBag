@@ -6,22 +6,21 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.text.TextUtils;
 
-import com.orhanobut.logger.Logger;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class SocketService extends Service {
-	private final int TIME_OUT_CONNECT = 5 * 60 * 1000;
+	private final int TIME_OUT_CONNECT = 5 * 1000;
 	private SocketBinder socketBinder = new SocketBinder();
 	private SocketCallBack mCallback;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
 
-	private ServerDeployThread mServerThread = null;
-	private Socket mClient;
+	private RunningThread runningThread = null;
+
+	private String ip = "192.168.1.37";// 设置成服务器IP
+
+	private int port = 20022;
+
 
 	public SocketService() {
 	}
@@ -60,10 +59,12 @@ public class SocketService extends Service {
 	/**
 	 * 初始化ServerSocket
 	 */
-	public void initSocket() {
-		if (mClient == null && mServerThread == null) {
-			mServerThread = new ServerDeployThread();
-			mServerThread.start();
+	public void initSocket(String ip, int port) {
+		if (runningThread == null) {
+			this.ip = ip;
+			this.port = port;
+			runningThread = new RunningThread();
+			runningThread.start();
 		}
 	}
 
@@ -71,46 +72,23 @@ public class SocketService extends Service {
 	 * 释放连接
 	 */
 	public void releaseSocket() {
-		if (mClient != null) {
-			try {
-				mClient.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mClient = null;
-		}
-		if (mServerThread != null && mServerThread.isAlive()) {
-			mServerThread.interrupt();
-			mServerThread = null;
+		if (runningThread != null) {
+			runningThread.interrupt();
 		}
 	}
 
-	/**
-	 * 服务端部署
-	 */
-	private class ServerDeployThread extends Thread {
+
+	private class RunningThread extends Thread {
 		@Override
 		public void run() {
+			deployClient();
+		}
 
-			try {
-				//backlog 连接队列最大长度  1
-				mClient = new Socket();
-				mClient.connect(new InetSocketAddress("192.168.1.66", 20022), TIME_OUT_CONNECT);
-				if (mClient.isConnected()) {
-					Logger.e("连接成功");
-				} else {
-					Logger.e("连接失败");
-				}
-			} catch (IOException e) {
-				if (TextUtils.equals(e.getMessage(), "Socket closed")) {
-					Logger.i("Socket Close");
-					return;
-				}
-				mCallback.error(e);
-				Logger.e("ServerSocketDeploy Error " + e.getMessage());
-			}
-
-
+		/**
+		 * 部署客户端
+		 */
+		private void deployClient() {
+			Socket s;
 		}
 	}
 
@@ -138,4 +116,5 @@ public class SocketService extends Service {
 		 */
 		void error(Exception e);
 	}
+
 }
