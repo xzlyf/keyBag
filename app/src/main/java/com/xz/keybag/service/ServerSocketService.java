@@ -10,7 +10,6 @@ import android.os.Looper;
 import com.google.gson.Gson;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
-import com.xz.keybag.utils.ArraysTool;
 import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.StorageUtil;
 import com.xz.utils.MD5Util;
@@ -20,7 +19,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -140,33 +139,24 @@ public class ServerSocketService extends Service {
 		private void createCache() {
 			List<Project> projects = db.queryProject();
 			File cacheFile = new File(StorageUtil.getCacheDir(ServerSocketService.this), String.valueOf(System.currentTimeMillis()));
-			FileOutputStream fos = null;
+			FileWriter fw = null;
 			try {
-				fos = new FileOutputStream(cacheFile);
+				fw = new FileWriter(cacheFile);
 				Gson gson = new Gson();
 				char[] buff;
-				//for (Project p : projects) {
-				//	buff = gson.toJson(p).getBytes();
-				//	fos.write(buff);
-				//}
 				buff = gson.toJson(projects).toCharArray();
 				//位移处理，不要明文输出文本
 				for (int i = 0; i < buff.length; i++) {
 					buff[i] = (char) (buff[i] ^ 8);
 				}
-				fos.write(ArraysTool.getBytes(buff));
-				fos.flush();
+				//fos.write(ArraysTool.getBytes(buff));//字节流输出，但是接收全是0，因为ArraysTool char[]转byte[]的转换的问题
+				fw.write(buff);
+				fw.flush();
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (fos != null) {
-					try {
-						fos.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				IOUtil.closeAll(fw);
 			}
 
 			String rename = MD5Util.getFileMD5(cacheFile);

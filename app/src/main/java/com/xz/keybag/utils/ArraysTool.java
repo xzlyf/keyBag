@@ -3,6 +3,7 @@ package com.xz.keybag.utils;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author czr
@@ -16,7 +17,7 @@ public class ArraysTool {
 	 * @return
 	 */
 	public static byte[] getBytes(char[] chars) {
-		Charset cs = Charset.forName("UTF-8");
+		Charset cs = StandardCharsets.UTF_8;
 		CharBuffer cb = CharBuffer.allocate(chars.length);
 		cb.put(chars);
 		cb.flip();
@@ -30,7 +31,7 @@ public class ArraysTool {
 	 * @return
 	 */
 	public static char[] getChars(byte[] bytes) {
-		Charset cs = Charset.forName("UTF-8");
+		Charset cs = StandardCharsets.UTF_8;
 		ByteBuffer bb = ByteBuffer.allocate(bytes.length);
 		bb.put(bytes);
 		bb.flip();
