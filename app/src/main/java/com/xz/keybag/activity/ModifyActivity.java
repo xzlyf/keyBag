@@ -1,8 +1,9 @@
 package com.xz.keybag.activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -11,16 +12,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlidingVerification;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.PermissionsUtils;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
@@ -132,49 +132,38 @@ public class ModifyActivity extends BaseActivity {
 	 * 调用zxing扫描二维码
 	 */
 	private void startQrCode() {
-		// TODO: 2021/5/15 使用权限工具类获取权限PermissionsUtils
-		// 申请相机权限
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-			// 申请权限
-			ActivityCompat.requestPermissions(ModifyActivity.this, new String[]{Manifest.permission.CAMERA}, Local.REQ_PERM_CAMERA);
-			return;
-		}
-		// 申请文件读写权限（部分朋友遇到相册选图需要读写权限的情况，这里一并写一下）
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-			// 申请权限
-			ActivityCompat.requestPermissions(ModifyActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Local.REQ_PERM_EXTERNAL_STORAGE);
-			return;
-		}
-		// 二维码扫码
-		Intent intent = new Intent(ModifyActivity.this, CaptureActivity.class);
-		startActivityForResult(intent, Local.REQ_QR_CODE);
+		PermissionsUtils.getInstance().chekPermissions(this,
+				new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+				new PermissionsUtils.IPermissionsResult() {
+					@Override
+					public void passPermissons() {
+						// 二维码扫码
+						Intent intent = new Intent(ModifyActivity.this, CaptureActivity.class);
+						startActivityForResult(intent, Local.REQ_QR_CODE);
+					}
+
+					@Override
+					public void forbitPermissons() {
+						AlertDialog finallyDialog = new AlertDialog.Builder(ModifyActivity.this)
+								.setMessage("App需要此权限,\n否则无法打开相机扫描二维码")
+								.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+									}
+								})
+								.create();
+						finallyDialog.show();
+
+					}
+				});
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		switch (requestCode) {
-			case Local.REQ_PERM_CAMERA:
-				// 摄像头权限申请
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					// 获得授权
-					startQrCode();
-				} else {
-					// 被禁止授权
-					Toast.makeText(ModifyActivity.this, "请至权限中心打开本应用的相机访问权限", Toast.LENGTH_LONG).show();
-				}
-				break;
-			case Local.REQ_PERM_EXTERNAL_STORAGE:
-				// 文件读写权限申请
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					// 获得授权
-					startQrCode();
-				} else {
-					// 被禁止授权
-					Toast.makeText(ModifyActivity.this, "请至权限中心打开本应用的文件读写权限", Toast.LENGTH_LONG).show();
-				}
-				break;
-		}
+		//就多一个参数this
+		PermissionsUtils.getInstance().onRequestPermissionsResult(this, requestCode, permissions, grantResults);
 	}
 
 	@Override
@@ -216,7 +205,7 @@ public class ModifyActivity extends BaseActivity {
 		}
 		try {
 			//得到明文DES
-			xtSecret = DES.decryptor(secret,Local.desKey);
+			xtSecret = DES.decryptor(secret, Local.desKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 			xtSecret = null;

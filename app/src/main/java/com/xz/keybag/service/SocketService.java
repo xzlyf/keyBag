@@ -22,8 +22,8 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
@@ -198,33 +198,42 @@ public class SocketService extends Service {
 			}
 			System.out.println("正在整合文件...");
 
-			FileInputStream fis;
-			StringBuilder buff = null;
-
+			//读取缓存文件
+			FileReader fileReader;
+			StringBuilder sBuff;
 			try {
-				fis = new FileInputStream(cacheFile);
-				int n = 0;
-				buff = new StringBuilder();
-				while (n != -1) {
-					n = fis.read();
-					buff.append((char) (n ^ 8));
+				fileReader = new FileReader(cacheFile);
+				char[] buf = new char[1024];
+				int num;
+				sBuff = new StringBuilder();
+				while ((num = fileReader.read(buf)) != -1) {
+					//字符异或处理
+					for (int i = 0; i < buf.length; i++) {
+						buf[i] = (char) (buf[i] ^ 8);
+					}
+					sBuff.append(buf, 0, num);
 				}
-
-				Logger.json(buff.toString());
-
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("缓存文件异常\n结束");
 				return;
 			}
 
-			//Gson gson = new Gson();
-			//List<Project> list = gson.fromJson(buff.toString(), new TypeToken<List<Project>>() {
-			//}.getType());
-			//Logger.d("长度:" + list.size());
+			//解析json数据 并写入数据库
+			Gson gson = new Gson();
+			List<Project> list = gson.fromJson(sBuff.toString(), new TypeToken<List<Project>>() {
+			}.getType());
+			for (Project p : list) {
+				db.insertProject(p);
+			}
+
+			System.out.println("数据整合成功");
 
 		}
 
+		/**
+		 * 清理缓存文件
+		 */
 		private void clearCache() {
 			File cacheFile = new File(cachePath);
 			if (!cacheFile.exists()) {
