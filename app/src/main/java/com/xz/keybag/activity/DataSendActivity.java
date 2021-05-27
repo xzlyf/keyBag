@@ -114,6 +114,7 @@ public class DataSendActivity extends BaseActivity {
 			@Override
 			public void message(String msg) {
 				appendLog(msg);
+				System.out.println(msg);
 			}
 
 			@Override
