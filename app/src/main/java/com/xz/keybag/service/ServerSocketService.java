@@ -19,13 +19,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 
@@ -39,7 +38,6 @@ public class ServerSocketService extends Service {
 	private DBManager db;
 	private String cachePath;
 	private int port = 20022;//主端口
-	private int bPort = 20022;//备用端口
 
 	public ServerSocketService() {
 		db = DBManager.getInstance(this);
@@ -94,13 +92,25 @@ public class ServerSocketService extends Service {
 	 */
 	public void releaseSocket() {
 		if (runningThread != null) {
-			runningThread.interrupt();
+			//new Thread(new Runnable() {
+			//	@Override
+			//	public void run() {
+			//		IOUtil.closeAll(runningThread.s, runningThread.ss);
+			//	}
+			//}).start();
+
+			runningThread.releaseAll();
 		}
 	}
 
 
 	private class RunningThread extends Thread {
 		int reTryNum = 0;
+		ServerSocket ss;
+		Socket s = null;
+		DataInputStream dis = null; //socket输入流
+		DataInputStream fis = null; //缓存文件输入流
+		DataOutputStream dos = null; //socket输出流
 
 		@Override
 		public void run() {
@@ -118,8 +128,8 @@ public class ServerSocketService extends Service {
 		private void clearCache() {
 			File file = new File(cachePath);
 			if (file.exists()) {
-				file.delete();
-				callBack.message("缓存文件已清除");
+				boolean b = file.delete();
+				callBack.message(b ? "缓存文件已清除" : "缓存文件清除失败");
 			}
 		}
 
@@ -129,34 +139,24 @@ public class ServerSocketService extends Service {
 		private void createCache() {
 			List<Project> projects = db.queryProject();
 			File cacheFile = new File(StorageUtil.getCacheDir(ServerSocketService.this), String.valueOf(System.currentTimeMillis()));
-			FileOutputStream fos = null;
+			FileWriter fw = null;
 			try {
-				fos = new FileOutputStream(cacheFile);
+				fw = new FileWriter(cacheFile);
 				Gson gson = new Gson();
-				byte[] buff;
-				//for (Project p : projects) {
-				//	buff = gson.toJson(p).getBytes();
-				//	fos.write(buff);
-				//}
-				buff = gson.toJson(projects).getBytes(StandardCharsets.UTF_8);
+				char[] buff;
+				buff = gson.toJson(projects).toCharArray();
 				//位移处理，不要明文输出文本
 				for (int i = 0; i < buff.length; i++) {
-					//buff[i] += 1;
-					buff[i] = (byte) (buff[i] << 1);
+					buff[i] = (char) (buff[i] ^ 8);
 				}
-				fos.write(buff);
-				fos.flush();
+				//fos.write(ArraysTool.getBytes(buff));//字节流输出，但是接收全是0，因为ArraysTool char[]转byte[]的转换的问题
+				fw.write(buff);
+				fw.flush();
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (fos != null) {
-					try {
-						fos.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				IOUtil.closeAll(fw);
 			}
 
 			String rename = MD5Util.getFileMD5(cacheFile);
@@ -169,7 +169,6 @@ public class ServerSocketService extends Service {
 		 * 开始部署
 		 */
 		private void deploySocket(int port) {
-			ServerSocket ss;
 
 			//创建服务端
 			try {
@@ -197,8 +196,6 @@ public class ServerSocketService extends Service {
 
 
 			//等待客户端接入
-			Socket s = null;
-			DataInputStream dis = null;
 			try {
 				while (true) {
 					s = ss.accept();
@@ -219,14 +216,13 @@ public class ServerSocketService extends Service {
 					}
 				}
 			} catch (IOException e) {
+				IOUtil.closeAll(dis);
 				callBack.message("结束等待");
 				return;
 			}
 			callBack.message("开始发送数据，请勿退出或息屏");
 			callBack.message("......");
 			// 选择进行传输的文件
-			DataInputStream fis = null;
-			DataOutputStream dos = null;
 			try {
 				File fi = new File(cachePath);
 				fis = new DataInputStream(new BufferedInputStream(new FileInputStream(cachePath)));
@@ -261,6 +257,13 @@ public class ServerSocketService extends Service {
 			} finally {
 				IOUtil.closeAll(dos, fis, dis, s);
 			}
+		}
+
+		/**
+		 * 释放所有
+		 */
+		public void releaseAll() {
+			IOUtil.closeAll(dos, fis, dis, s, ss);
 		}
 	}
 

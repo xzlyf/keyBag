@@ -10,9 +10,9 @@ public class Local {
 
 	//二维码协议头
 	public static final String PROTOCOL_SPLIT = "@";//分割符号
-	//二维码传输协议:格式：RSA(头协议@DES(secret))
+	//二维码密钥传输协议:格式：RSA(头协议@DES(secret))
 	public static final String PROTOCOL_QR_SECRET = "keybag_secret";
-	//二维码分享协议:格式：RSA(头协议@ip@port)
+	//二维码数据搬家协议:格式：RSA(头协议@ip@port)
 	public static final String PROTOCOL_QR_SHARD = "keybag_shard";
 
 	//密钥长度必须超过或等于8位

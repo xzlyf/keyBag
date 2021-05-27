@@ -376,6 +376,26 @@ public class DBManager {
 	}
 
 	/**
+	 * 插入一条密码数据（整个项目)
+	 */
+	public void insertProject(Project project){
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		ContentValues cv = new ContentValues();
+		if (TextUtils.isEmpty(Local.mAdmin.getDes())) {
+			throw new NullPointerException("not find secret");
+		}
+		cv.put(FIELD_COMMON_T1,DES.encryptor(mGson.toJson(project.getDatum()), Local.mAdmin.getDes()));
+		cv.put(FIELD_COMMON_T2,project.getUpdateDate());
+		cv.put(FIELD_COMMON_T3,project.getCreateDate());
+		try {
+			db.insert(TABLE_COMMON, null, cv);
+		} finally {
+			db.close();
+		}
+	}
+
+	/**
 	 * 查询所有密码数据
 	 *
 	 * @return
