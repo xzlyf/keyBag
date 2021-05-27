@@ -9,7 +9,6 @@ import android.os.Looper;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
@@ -31,7 +30,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 public class SocketService extends Service {
-	private final int TIME_OUT_CONNECT = 5 * 1000;
 	private SocketBinder socketBinder = new SocketBinder();
 	private SocketCallBack mCallback;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -41,7 +39,7 @@ public class SocketService extends Service {
 	private String ip = "192.168.1.37";// 设置成服务器IP
 
 	private int port = 20022;
-	private String cachePath;
+	private String cachePath = "";
 	private DBManager db;
 
 
@@ -98,6 +96,7 @@ public class SocketService extends Service {
 	public void releaseSocket() {
 		if (runningThread != null) {
 			runningThread.interrupt();
+			runningThread = null;
 		}
 	}
 
@@ -105,10 +104,11 @@ public class SocketService extends Service {
 	private class RunningThread extends Thread {
 		@Override
 		public void run() {
-			System.out.println("正在尝试连接...");
+			callBack.message("正在尝试连接...");
 			deployClient();
 			makeProject();
 			clearCache();
+			callBack.finish();
 		}
 
 
@@ -121,17 +121,18 @@ public class SocketService extends Service {
 				socket = new Socket(ip, port);
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.println("连接失败");
+				callBack.message("连接失败");
+				callBack.connectFailed();
+				releaseSocket();
 				return;
 			}
 
-			System.out.println("连接成功");
-
+			callBack.message("连接成功");
+			callBack.isConnected();
 			//输出验证信息 公共RSA(版本号@时间戳)
 			DataOutputStream dos = null;
 			try {
 				dos = new DataOutputStream(socket.getOutputStream());
-
 				StringBuilder verifyBuff = new StringBuilder();
 				verifyBuff.append(AppInfoUtils.getVersionCode(SocketService.this));
 				verifyBuff.append(Local.PROTOCOL_SPLIT);
@@ -140,13 +141,12 @@ public class SocketService extends Service {
 			} catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
 				e.printStackTrace();
 				IOUtil.closeAll(dos, socket);
-				System.out.println("验证失败");
+				callBack.message("验证失败");
+				callBack.verifyFailed();
 				return;
 			}
-			System.out.println("验证成功");
-
-
-			System.out.println("正在接收文件...");
+			callBack.message("验证成功");
+			callBack.message("正在接收文件...");
 			//开始接收数据
 			DataInputStream dis = null;
 			DataOutputStream fileOut = null;
@@ -163,8 +163,8 @@ public class SocketService extends Service {
 				fileOut = new DataOutputStream(new BufferedOutputStream(new BufferedOutputStream(new FileOutputStream(savePath))));
 				len = dis.readLong();
 
-				System.out.println("文件的长度为:" + len + "\n");
-				System.out.println("开始接收文件!" + "\n");
+				callBack.message("文件的长度为:" + len + "\n");
+				callBack.message("开始接收文件!" + "\n");
 
 				while (true) {
 					int read = 0;
@@ -175,14 +175,15 @@ public class SocketService extends Service {
 					if (read == -1) {
 						break;
 					}
-					System.out.println("文件接收了" + (passedlen * 100 / len) + "%\n");
+					callBack.message("文件接收了" + (passedlen * 100 / len) + "%\n");
 					fileOut.write(buf, 0, read);
 				}
-				System.out.println("接收完成，文件存为" + savePath + "\n");
+				callBack.message("接收完成，文件存为" + savePath + "\n");
 				cachePath = savePath;
 				fileOut.close();
 			} catch (Exception e) {
-				System.out.println("接收消息错误" + "\n");
+				e.printStackTrace();
+				callBack.message("接收消息错误" + "\n");
 			} finally {
 				IOUtil.closeAll(dos, dis, fileOut, socket);
 			}
@@ -196,7 +197,7 @@ public class SocketService extends Service {
 			if (!cacheFile.exists()) {
 				return;
 			}
-			System.out.println("正在整合文件...");
+			callBack.message("正在整合文件...");
 
 			//读取缓存文件
 			FileReader fileReader;
@@ -215,7 +216,7 @@ public class SocketService extends Service {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.println("缓存文件异常\n结束");
+				callBack.message("缓存文件异常\n结束");
 				return;
 			}
 
@@ -227,7 +228,7 @@ public class SocketService extends Service {
 				db.insertProject(p);
 			}
 
-			System.out.println("数据整合成功");
+			callBack.message("数据整合成功");
 
 		}
 
@@ -240,7 +241,7 @@ public class SocketService extends Service {
 				return;
 			}
 			boolean delete = cacheFile.delete();
-			System.out.println(delete ? "清理缓存...成功" : "清理缓存...失败");
+			callBack.message(delete ? "清理缓存...成功" : "清理缓存...失败");
 		}
 	}
 
@@ -249,6 +250,57 @@ public class SocketService extends Service {
 	 * 回调做回到主线处理
 	 */
 	private SocketCallBack callBack = new SocketCallBack() {
+
+
+		@Override
+		public void isConnected() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.isConnected();
+				}
+			});
+		}
+
+		@Override
+		public void connectFailed() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.connectFailed();
+				}
+			});
+		}
+
+		@Override
+		public void verifyFailed() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.verifyFailed();
+				}
+			});
+		}
+
+		@Override
+		public void message(String msg) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.message(msg);
+				}
+			});
+		}
+
+		@Override
+		public void finish() {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.finish();
+				}
+			});
+		}
 
 		@Override
 		public void error(Exception e) {
@@ -262,6 +314,32 @@ public class SocketService extends Service {
 	};
 
 	public interface SocketCallBack {
+
+		/**
+		 * 设备已连接
+		 */
+		void isConnected();
+
+		/**
+		 * 连接失败
+		 */
+		void connectFailed();
+
+		/**
+		 * 验证失败
+		 */
+		void verifyFailed();
+
+		/**
+		 * 消息
+		 */
+		void message(String msg);
+
+		/**
+		 * 完成
+		 */
+		void finish();
+
 
 		/**
 		 * 抛异常了

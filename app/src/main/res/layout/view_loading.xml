@@ -6,7 +6,7 @@
     android:gravity="center"
     android:layout_height="match_parent">
 
-    <com.xz.xlogin.widget.ShapeView
+    <com.xz.keybag.custom.ShapeView
         android:id="@+id/shape_view"
         android:layout_width="25dp"
         android:layout_marginBottom="82dp"

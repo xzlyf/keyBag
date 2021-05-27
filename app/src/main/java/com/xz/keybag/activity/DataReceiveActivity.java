@@ -10,17 +10,18 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.service.SocketService;
 import com.xz.keybag.utils.NetWorkUtil;
 import com.xz.keybag.utils.PermissionsUtils;
+import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.zxing.activity.CaptureActivity;
 
 import butterknife.BindView;
@@ -30,6 +31,8 @@ public class DataReceiveActivity extends BaseActivity {
 
 	@BindView(R.id.tv_log)
 	TextView tvLog;
+	@BindView(R.id.image_scan)
+	ImageView imageScan;
 
 	private ServiceConnection sc;
 	public SocketService socketService;
@@ -59,6 +62,39 @@ public class DataReceiveActivity extends BaseActivity {
 			public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 				SocketService.SocketBinder binder = (SocketService.SocketBinder) iBinder;
 				socketService = binder.getService();
+				socketService.setCallback(new SocketService.SocketCallBack() {
+					@Override
+					public void isConnected() {
+						imageScan.setVisibility(View.GONE);
+						disLoading();
+					}
+
+					@Override
+					public void connectFailed() {
+						disLoading();
+					}
+
+					@Override
+					public void verifyFailed() {
+						sToast("发送端app验证异常，不可完成传输");
+					}
+
+					@Override
+					public void message(String msg) {
+						appendLog(msg);
+					}
+
+					@Override
+					public void finish() {
+
+					}
+
+					@Override
+					public void error(Exception e) {
+						appendLog(e.getMessage());
+
+					}
+				});
 			}
 
 			@Override
@@ -70,21 +106,18 @@ public class DataReceiveActivity extends BaseActivity {
 		bindService(serverIntent, sc, BIND_AUTO_CREATE);
 	}
 
-	private void initSocket() {
-		//获取当前ip
-		String host = checkConnectType();
-		if (host == null) {
-			return;
-		}
-		socketService.initSocket("192.168.1.66", 20022);
+	private void initSocket(String ip, int port) {
+		showLoading(" 正在连接发送端", false, null);
+		socketService.initSocket(ip, port);
 	}
+
 
 	/**
 	 * 检查网络状态是否符合
 	 *
 	 * @return 如果符合返回当前Ip
 	 */
-	public String checkConnectType() {
+	private String checkConnectType() {
 		int connectedType = NetWorkUtil.getConnectedType(mContext);
 		if (connectedType == 1) {
 			//网络状态符合 wifi
@@ -122,6 +155,11 @@ public class DataReceiveActivity extends BaseActivity {
 				finish();
 				break;
 			case R.id.image_scan:
+				//获取当前内网ip
+				String host = checkConnectType();
+				if (host == null) {
+					return;
+				}
 				startQrCode();
 				break;
 		}
@@ -184,9 +222,40 @@ public class DataReceiveActivity extends BaseActivity {
 	}
 
 	private void handleQrCode(String scanResult) {
-		Logger.d("报文："+scanResult);
+		//解密RSA
+		try {
+			scanResult = RSA.privateDecrypt(scanResult, RSA.getPrivateKey(Local.privateKey));
+		} catch (Exception e) {
+			sToast("这个二维码没有我想要的信息(ˉ▽ˉ；)...");
+			return;
+		}
+		//头协议判断
+		String[] qrArray = scanResult.split(Local.PROTOCOL_SPLIT);
+		if (qrArray.length != 3) {
+			sToast("不支持此协议");
+			return;
+		}
+		if (!qrArray[0].equals(Local.PROTOCOL_QR_SHARD)) {
+			sToast("非法二维码");
+			return;
+		}
+
+		//开启socket服务
+		initSocket(qrArray[1], Integer.parseInt(qrArray[2]));
+
 	}
 
+
+	/**
+	 * 输出log
+	 * 自动滚动到底部
+	 */
+	private void appendLog(String st) {
+		tvLog.append(st);
+		tvLog.append("\n");
+		//滚动到底部
+		tvLog.scrollTo(0, tvLog.getLineCount() * tvLog.getLineHeight() - (tvLog.getHeight() - (tvLog.getPaddingTop() * 2)));
+	}
 
 	@Override
 	protected void onDestroy() {
