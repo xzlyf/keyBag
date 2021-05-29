@@ -11,57 +11,128 @@
     <!--空白区域点击事件穿透加上clickable="true"即可防止-->
 
     <!--头部-->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/heard"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_160"
         android:background="@color/colorPrimary"
-        android:elevation="@dimen/dp_4">
+        android:elevation="@dimen/dp_4"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/tv_slogan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/dp_10"
+            android:layout_marginStart="@dimen/dp_5"
             android:text="你个大头虾\n成日忘记密码"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp_16"
+            android:textSize="@dimen/sp_18"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_login_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_5"
+            android:text="上次登录："
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <!--body-->
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/nav_background"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-
-        <TextView
-            android:id="@+id/tv_secret"
-            style="@style/secret_textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="密码管理" />
+            android:background="@color/nav_background"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_move"
-            style="@style/secret_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="数据搬家" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_20"
+                android:text="管理" />
 
-        <Switch
-            android:id="@+id/switch_mode"
-            style="@style/secret_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:text="亮色/深色" />
-    </LinearLayout>
+            <com.xz.keybag.custom.IconTextView
+                android:id="@+id/tv_secret"
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="密码管理"
+                app:icon_src="@mipmap/ic_manage" />
+
+            <com.xz.keybag.custom.IconTextView
+                android:id="@+id/tv_move"
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="数据搬家"
+                app:icon_src="@mipmap/ic_move" />
+
+            <Switch
+                android:id="@+id/switch_mode"
+                style="@style/secret_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:text="亮色/深色" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_20"
+                android:text="小工具" />
+
+            <com.xz.keybag.custom.IconTextView
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="密码强度测试"
+                app:icon_src="@mipmap/ic_test" />
+
+            <com.xz.keybag.custom.IconTextView
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="随机密码生成"
+                app:icon_src="@mipmap/ic_random" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_20"
+                android:text="关于" />
+
+            <com.xz.keybag.custom.IconTextView
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="分享/推广"
+                app:icon_src="@mipmap/ic_share" />
+
+            <com.xz.keybag.custom.IconTextView
+                style="@style/icon_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="关于软件！"
+                app:icon_src="@mipmap/ic_about" />
+        </LinearLayout>
+    </ScrollView>
 
 
 </LinearLayout>
