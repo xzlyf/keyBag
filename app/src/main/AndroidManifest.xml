@@ -44,9 +44,6 @@
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.BackupActivityOld"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activity.DetailActivity"
             android:screenOrientation="portrait" />
         <activity

@@ -209,7 +209,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 
-	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.btn_secret, R.id.btn_move})
+	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -219,10 +219,10 @@ public class MainActivity extends BaseActivity {
 			case R.id.tv_add:
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
-			case R.id.btn_secret:
+			case R.id.tv_secret:
 				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
 				break;
-			case R.id.btn_move:
+			case R.id.tv_move:
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));
 				break;
 		}
