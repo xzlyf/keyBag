@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
 
 import java.util.ArrayList;
@@ -101,13 +102,13 @@ public class BackupActivity extends BaseActivity {
 		public void run() {
 			//查询得到项目数据
 			Map<String, Integer> map = db.queryProjectState();
-			//总条数
-			int total = map.size();
 			//填装进pie实体
 			List<PieEntry> pieList = new ArrayList<>();
 			for (Map.Entry<String, Integer> entry : map.entrySet()) {
 				pieList.add(new PieEntry(entry.getValue(), entry.getKey() + " " + entry.getValue() + "条"));
 			}
+			//查询有几条数据
+			long total = db.queryTotal("common");
 
 			PieDataSet dataSet = new PieDataSet(pieList, "数据总览" + total + "条");
 			ArrayList<Integer> colors = new ArrayList<Integer>();
