@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@+id/heard">
 
         <Button
-            android:id="@+id/btn_1"
+            android:id="@+id/btn_secret"
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,25 +54,11 @@
 
 
         <Button
-            android:id="@+id/btn_3"
+            android:id="@+id/btn_move"
             style="@style/menu_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="数据搬家" />
-
-        <Button
-            android:id="@+id/btn_4"
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="一键清空" />
-
-        <Button
-            android:id="@+id/btn_5"
-            style="@style/menu_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="检查更新" />
 
 
     </LinearLayout>

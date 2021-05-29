@@ -22,23 +22,12 @@ public class Local {
 	public static String secret;//密钥
 
 	//handler标识
-	public static final int CODE_1 = 101;
-	public static final int CODE_2 = 102;
-	public static final int CODE_3 = 103;
-	public static final int CODE_4 = 104;
-	public static final int CODE_5 = 105;
-
-	//更新服务器
-	public static String NET_GET_UPDATE = "http://192.168.0.233:28080/keybag/update.json";
 
 	//Shard标识
 	public static final String SHARD_BOOLEAN_MODE = "day_or_night";
-	public static final String SHARD_SERVER_URL = "server_url";
 
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
-	public static final int REQ_PERM_CAMERA = 11003; // 打开摄像头
-	public static final int REQ_PERM_EXTERNAL_STORAGE = 11004; // 读写文件
 
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
