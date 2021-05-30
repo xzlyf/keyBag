@@ -17,6 +17,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
 import com.xz.keybag.constant.Local;
+import com.xz.keybag.entity.Datum;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.CopyUtil;
@@ -222,7 +223,21 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					}
 					break;
 				case R.id.share:
-					//todo  分享功能
+					Datum datum = mList.get(getLayoutPosition()).getDatum();
+					String shareSt = "这里是钥匙包密码分享\n" +
+							"标题：" + datum.getProject() + "\n" +
+							"账号：" + datum.getAccount() + "\n" +
+							"密码：" + datum.getPassword() + "\n" +
+							"备注：" + datum.getRemark();
+					//Intent intent = new Intent(Intent.ACTION_SEND);
+					//intent.putExtra(Intent.EXTRA_TEXT, shareSt);
+					//intent.setType("text/plain");
+					//mContext.startActivity(Intent.createChooser(intent, "密码分享到"));
+					copyUtil.copyToClicp(shareSt);
+					Snackbar.make(v, "已复制", Snackbar.LENGTH_SHORT).show();
+					if (mListener != null) {
+						mListener.closeMenu();
+					}
 					break;
 			}
 
