@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 
 /**
@@ -245,6 +246,12 @@ public class SlideRecyclerView extends RecyclerView {
 	public void closeMenu() {
 		if (mFlingView != null && mFlingView.getScrollX() != 0) {
 			mFlingView.scrollTo(0, 0);
+		}
+	}
+
+	public void openMenu() {
+		if (mFlingView != null && mFlingView.getScrollX() == 0) {
+			mFlingView.scrollTo(mMenuViewWidth, 0);
 		}
 	}
 }

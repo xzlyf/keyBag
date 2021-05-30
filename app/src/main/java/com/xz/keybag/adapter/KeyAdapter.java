@@ -6,21 +6,17 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseRecyclerAdapter;
 import com.xz.keybag.base.BaseRecyclerViewHolder;
 import com.xz.keybag.constant.Local;
-import com.xz.keybag.custom.XOnClickListener;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.CopyUtil;
@@ -29,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 
@@ -36,7 +33,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 	private List<Project> filterDatas;
 	private CopyUtil copyUtil;
 	private DBManager db;
-	private XOnClickListener mListener;
+	private AdapterCallback mListener;
 
 	public KeyAdapter(Context context) {
 		super(context);
@@ -56,13 +53,13 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		ViewHolder viewHolder = (ViewHolder) holder;
 		Project entity = filterDatas.get(position);
 		viewHolder.name.setText(entity.getDatum().getProject());
-		viewHolder.userId.setText(entity.getDatum().getAccount());
-		if (TextUtils.equals(Local.mAdmin.getConfig().getPublicPwd(),Local.CONFIG_PUBLIC_PWD_OPEN)){
-			viewHolder.userPsw.setText("******");
-		}else{
-			viewHolder.userPsw.setText(entity.getDatum().getPassword());
+		viewHolder.userId.setText(String.format("账号：%s", entity.getDatum().getAccount()));
+		if (TextUtils.equals(Local.mAdmin.getConfig().getPublicPwd(), Local.CONFIG_PUBLIC_PWD_OPEN)) {
+			viewHolder.userPsw.setText("密码：******");
+		} else {
+			viewHolder.userPsw.setText(String.format("密码：%s", entity.getDatum().getPassword()));
 		}
-		viewHolder.endTime.setText(entity.getUpdateDate());
+		viewHolder.tvCategory.setText(entity.getDatum().getCategory());
 
 
 	}
@@ -141,7 +138,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		};
 	}
 
-	public void setOnDeleteClickListener(XOnClickListener listener) {
+	public void setAdapterCallBack(AdapterCallback listener) {
 		mListener = listener;
 	}
 
@@ -166,7 +163,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 						notifyDataSetChanged();
 						Toast.makeText(mContext, getString(R.string.string_8), Toast.LENGTH_SHORT).show();
 						if (mListener != null) {
-							mListener.onClick(project.getId(), null);
+							mListener.closeMenu();
 						}
 					}
 				})
@@ -174,7 +171,7 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (mListener != null) {
-							mListener.onClick("", null);
+							mListener.closeMenu();
 						}
 						dialog.dismiss();
 					}
@@ -190,31 +187,16 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 		TextView userId;
 		@BindView(R.id.user_psw)
 		TextView userPsw;
-		@BindView(R.id.state)
-		ImageView state;
-		@BindView(R.id.end_time)
-		TextView endTime;
-		@BindView(R.id.root_layout)
-		LinearLayout rootLayout;
-		@BindView(R.id.layout_2)
-		FrameLayout layout2;
-		@BindView(R.id.layout_1)
-		ConstraintLayout layout1;
-		@BindView(R.id.delete)
-		ImageView delete;
+		@BindView(R.id.tv_category)
+		TextView tvCategory;
 
 		ViewHolder(@NonNull View itemView) {
 			super(itemView);
 
-			layout1.setOnClickListener(this);
-			userId.setOnClickListener(this);
-			userPsw.setOnClickListener(this);
-			delete.setOnClickListener(this);
-
 		}
 
 
-		@Override
+		@OnClick({R.id.layout_1, R.id.delete, R.id.copy_account, R.id.copy_pwd, R.id.item_menu, R.id.share})
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.layout_1:
@@ -222,21 +204,36 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 						mOnItemClickListener.onItemClick(v, getLayoutPosition(), filterDatas.get(getLayoutPosition()));
 					}
 					break;
-				case R.id.user_id:
-					copyUtil.copyToClicp(userId.getText().toString());
-					Toast.makeText(mContext, getString(R.string.string_6), Toast.LENGTH_SHORT).show();
+				case R.id.copy_account:
+					copyUtil.copyToClicp(mList.get(getLayoutPosition()).getDatum().getAccount());
+					Snackbar.make(v, getString(R.string.string_6), Snackbar.LENGTH_SHORT).show();
 					break;
-				case R.id.user_psw:
-					copyUtil.copyToClicp(userPsw.getText().toString());
-					Toast.makeText(mContext, getString(R.string.string_7), Toast.LENGTH_SHORT).show();
+				case R.id.copy_pwd:
+					copyUtil.copyToClicp(mList.get(getLayoutPosition()).getDatum().getPassword());
+					Snackbar.make(v, getString(R.string.string_7), Snackbar.LENGTH_SHORT).show();
 					break;
 				case R.id.delete:
 					int position = getLayoutPosition();
 					affirmDialog(position);
 					break;
+				case R.id.item_menu:
+					if (mListener != null) {
+						mListener.openMenu();
+					}
+					break;
+				case R.id.share:
+					//todo  分享功能
+					break;
 			}
 
 		}
+	}
+
+
+	public interface AdapterCallback {
+		void closeMenu();
+
+		void openMenu();
 	}
 
 }

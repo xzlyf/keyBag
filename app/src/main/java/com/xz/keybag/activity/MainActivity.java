@@ -18,9 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.xz.dialog.event.NegativeOnClickListener;
-import com.xz.dialog.event.PositiveOnClickListener;
-import com.xz.dialog.imitate.AppleInputDialog;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.adapter.KeyAdapter;
@@ -31,9 +29,7 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlideRecyclerView;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Project;
-import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBManager;
-import com.xz.utils.MD5Util;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.widget.textview.SearchEditView;
@@ -173,11 +169,16 @@ public class MainActivity extends BaseActivity {
 
 			}
 		});
-		keyAdapter.setOnDeleteClickListener(new com.xz.keybag.custom.XOnClickListener() {
+		keyAdapter.setAdapterCallBack(new KeyAdapter.AdapterCallback() {
 			@Override
-			public void onClick(String st, View v) {
+			public void closeMenu() {
 				//删除后自动关闭菜单，否则会移动到下一个
 				keyRecycler.closeMenu();
+			}
+
+			@Override
+			public void openMenu() {
+				keyRecycler.openMenu();
 			}
 		});
 
