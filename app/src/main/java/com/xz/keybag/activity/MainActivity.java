@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -18,7 +17,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.adapter.KeyAdapter;
@@ -210,7 +208,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 
-	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move})
+	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -226,6 +224,9 @@ public class MainActivity extends BaseActivity {
 			case R.id.tv_move:
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));
 				break;
+			case R.id.tv_category:
+				startActivity(new Intent(MainActivity.this, CategoryManagerActivity.class));
+				break;
 		}
 		drawerLayout.closeDrawer(GravityCompat.START);
 
@@ -236,8 +237,8 @@ public class MainActivity extends BaseActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-			drawerLayout.closeDrawer(Gravity.LEFT);
+		if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+			drawerLayout.closeDrawer(GravityCompat.START);
 		} else {
 			long i = System.currentTimeMillis();
 			if (i - backOccTime > 2000) {
