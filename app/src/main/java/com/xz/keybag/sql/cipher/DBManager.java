@@ -28,7 +28,6 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +83,30 @@ public class DBManager {
 			}
 		}
 		return mInstance;
+	}
+
+	/**
+	 * 查询表中有几条数据
+	 *
+	 * @param tableName
+	 * @return
+	 */
+	public long queryTotal(String tableName) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DB_PWD);
+		String sql = "select count(*) from " + tableName;
+		Cursor cursor = null;
+		try {
+			cursor = db.rawQuery(sql, null);
+			cursor.moveToFirst();
+			long count = cursor.getLong(0);
+			return count;
+		} catch (Exception e) {
+			return -1;
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 
 
@@ -378,16 +401,16 @@ public class DBManager {
 	/**
 	 * 插入一条密码数据（整个项目)
 	 */
-	public void insertProject(Project project){
+	public void insertProject(Project project) {
 		//获取写数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
 		ContentValues cv = new ContentValues();
 		if (TextUtils.isEmpty(Local.mAdmin.getDes())) {
 			throw new NullPointerException("not find secret");
 		}
-		cv.put(FIELD_COMMON_T1,DES.encryptor(mGson.toJson(project.getDatum()), Local.mAdmin.getDes()));
-		cv.put(FIELD_COMMON_T2,project.getUpdateDate());
-		cv.put(FIELD_COMMON_T3,project.getCreateDate());
+		cv.put(FIELD_COMMON_T1, DES.encryptor(mGson.toJson(project.getDatum()), Local.mAdmin.getDes()));
+		cv.put(FIELD_COMMON_T2, project.getUpdateDate());
+		cv.put(FIELD_COMMON_T3, project.getCreateDate());
 		try {
 			db.insert(TABLE_COMMON, null, cv);
 		} finally {
@@ -556,6 +579,21 @@ public class DBManager {
 		}
 
 		return list;
+	}
+
+	/**
+	 * 删除一条分类标签
+	 *
+	 * @param id
+	 */
+	public void deleteCategory(String id) {
+		//生成条件语句
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CATEGORY_L1).append(" = ").append("'").append(id).append("'");
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.delete(TABLE_CATEGORY, whereBuffer.toString(), null);
+		db.close();
 	}
 
 

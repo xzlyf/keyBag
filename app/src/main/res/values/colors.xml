@@ -17,6 +17,8 @@
     <color name="category_text">#FFFFFF</color>
     <color name="category_text_2">#505050</color>
 
+    <color name="background_home">#F3F3F3</color>
+
     <!-- QRCode scanner color begin -->
     <color name="viewfinder_mask">#60000000</color>
     <color name="result_view">#B0000000</color>

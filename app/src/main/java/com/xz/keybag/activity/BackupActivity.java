@@ -18,7 +18,9 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.utils.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,25 +103,22 @@ public class BackupActivity extends BaseActivity {
 		public void run() {
 			//查询得到项目数据
 			Map<String, Integer> map = db.queryProjectState();
-			//总条数
-			int total = map.size();
 			//填装进pie实体
 			List<PieEntry> pieList = new ArrayList<>();
 			for (Map.Entry<String, Integer> entry : map.entrySet()) {
 				pieList.add(new PieEntry(entry.getValue(), entry.getKey() + " " + entry.getValue() + "条"));
 			}
+			//查询有几条数据
+			long total = db.queryTotal("common");
 
 			PieDataSet dataSet = new PieDataSet(pieList, "数据总览" + total + "条");
 			ArrayList<Integer> colors = new ArrayList<Integer>();
-			colors.add(Color.rgb(205, 205, 205));
-			colors.add(Color.rgb(114, 188, 223));
-			colors.add(Color.rgb(255, 123, 124));
-			colors.add(Color.rgb(57, 135, 200));
-			colors.add(Color.rgb(57, 135, 20));
-			colors.add(Color.rgb(77, 105, 20));
-			colors.add(Color.rgb(107, 142, 35));
-			colors.add(Color.rgb(175, 238, 238));
-			colors.add(Color.rgb(250, 235, 215));
+
+			//随机生成颜色，有多少种标签就生成几种颜色
+			for (int i = 0; i < map.size(); i++) {
+				colors.add(Color.parseColor(ColorUtil.getColor()));
+			}
+
 			//数据颜色
 			dataSet.setColors(colors);
 			//设置饼状图之间的距离

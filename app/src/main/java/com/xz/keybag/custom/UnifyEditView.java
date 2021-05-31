@@ -26,6 +26,8 @@ import com.xz.keybag.R;
  * @email czr2001@outlook.com
  * @date 2021/4/24
  * TODO 集成到MyApp中
+ * <p>
+ * TextView + EditView 输入框
  */
 public class UnifyEditView extends LinearLayout {
 

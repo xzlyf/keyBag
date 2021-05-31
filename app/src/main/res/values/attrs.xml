@@ -43,4 +43,14 @@
         <attr name="label_text_size" format="float" />
     </declare-styleable>
 
+    <declare-styleable name="IconTextView">
+        <attr name="icon_src" format="reference" />
+        <attr name="icon_paddingStart" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="SlideRecyclerView">
+        <!--空数据图片显示-->
+        <attr name="empty_image_src" format="reference" />
+    </declare-styleable>
+
 </resources>

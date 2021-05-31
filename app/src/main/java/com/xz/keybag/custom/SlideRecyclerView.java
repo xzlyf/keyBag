@@ -1,6 +1,11 @@
 package com.xz.keybag.custom;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -14,12 +19,16 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.orhanobut.logger.Logger;
+import com.xz.keybag.R;
+
 /**
  * 支持侧滑删除的RecyclerView
  * <p>
  * Created by DavidChen on 2018/5/29.
  *
  * @author https://blog.csdn.net/sinat_38184748/article/details/96422266
+ * todo 整合到工具包
  */
 
 public class SlideRecyclerView extends RecyclerView {
@@ -40,6 +49,9 @@ public class SlideRecyclerView extends RecyclerView {
 	private int mPosition;  // 触碰的view的位置
 	private int mMenuViewWidth;    // 菜单按钮宽度
 
+	private Bitmap emptyIconBitmap;
+	private Paint paint;
+
 	public SlideRecyclerView(Context context) {
 		this(context, null);
 	}
@@ -52,6 +64,25 @@ public class SlideRecyclerView extends RecyclerView {
 		super(context, attrs, defStyle);
 		mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 		mScroller = new Scroller(context);
+		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SlideRecyclerView);
+		int iconSrc = ta.getResourceId(R.styleable.SlideRecyclerView_empty_image_src, 0);
+		ta.recycle();
+
+		if (iconSrc != 0) {
+			emptyIconBitmap = BitmapFactory.decodeResource(getResources(), iconSrc);
+			paint = new Paint();
+		}
+
+	}
+
+	@Override
+	public void onDraw(Canvas c) {
+		//如果子控件等于0，显示图像
+		if (getChildCount() == 0 && emptyIconBitmap != null) {
+			c.drawBitmap(emptyIconBitmap, (float) ((getMeasuredWidth() / 2) - (emptyIconBitmap.getWidth() / 2))
+					, (float) ((getMeasuredHeight() / 2) - (emptyIconBitmap.getHeight() / 2)), paint);
+		}
+		super.onDraw(c);
 	}
 
 	@Override
@@ -215,6 +246,12 @@ public class SlideRecyclerView extends RecyclerView {
 	public void closeMenu() {
 		if (mFlingView != null && mFlingView.getScrollX() != 0) {
 			mFlingView.scrollTo(0, 0);
+		}
+	}
+
+	public void openMenu() {
+		if (mFlingView != null && mFlingView.getScrollX() == 0) {
+			mFlingView.scrollTo(mMenuViewWidth, 0);
 		}
 	}
 }

@@ -8,9 +8,11 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/background_home"
+        android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/app_bar"
@@ -78,18 +80,16 @@
             android:id="@+id/category_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_6"
-            app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+            android:layout_marginTop="@dimen/dp_6" />
 
         <com.xz.keybag.custom.SlideRecyclerView
             android:id="@+id/key_recycler"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:overScrollMode="never"
             android:padding="@dimen/dp_6"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/category_view" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:empty_image_src="@mipmap/ic_null" />
+    </LinearLayout>
 
     <!--菜单布局-->
     <include layout="@layout/nav_home" />

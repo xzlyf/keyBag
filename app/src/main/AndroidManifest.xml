@@ -22,10 +22,12 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.CategoryManagerActivity"></activity>
+
         <service
             android:name=".service.SocketService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity android:name=".activity.DataReceiveActivity" />
 
@@ -42,9 +44,6 @@
         <activity android:name=".activity.LoginSettingActivity" />
         <activity
             android:name=".activity.AddActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.BackupActivityOld"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.DetailActivity"
