@@ -1,5 +1,7 @@
 package com.xz.keybag.entity;
 
+import androidx.annotation.NonNull;
+
 /**
  * @author czr
  * @email czr2001@outlook.com
@@ -34,5 +36,12 @@ public class Category {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+
+	@NonNull
+	@Override
+	public String toString() {
+		return name;
 	}
 }

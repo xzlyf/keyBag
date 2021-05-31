@@ -581,6 +581,21 @@ public class DBManager {
 		return list;
 	}
 
+	/**
+	 * 删除一条分类标签
+	 *
+	 * @param id
+	 */
+	public void deleteCategory(String id) {
+		//生成条件语句
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CATEGORY_L1).append(" = ").append("'").append(id).append("'");
+		//获取可读数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.delete(TABLE_CATEGORY, whereBuffer.toString(), null);
+		db.close();
+	}
+
 
 	/**
 	 * 获取登录配置

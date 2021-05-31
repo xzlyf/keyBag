@@ -63,7 +63,8 @@ public class MainActivity extends BaseActivity {
 	private DBManager db;
 	private KeyAdapter keyAdapter;
 	private CategoryAdapter categoryAdapter;
-	private List<Project> mList;
+	private List<Project> mListProject;
+	private List<Category> mListCategory;
 	private boolean isNight;//日渐模式false 夜间模式true
 	private static final String CATEGORY_ALL = "所有";
 
@@ -147,10 +148,11 @@ public class MainActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		new ReadDataCommon().start();
+		refreshCategory();
 	}
 
 	private void initRecycler() {
-		mList = new ArrayList<>();
+		mListProject = new ArrayList<>();
 		keyAdapter = new KeyAdapter(mContext);
 		keyAdapter.setHandler(handler);
 		keyRecycler.setLayoutManager(new LinearLayoutManager(mContext));
@@ -181,15 +183,12 @@ public class MainActivity extends BaseActivity {
 		});
 
 		//分类标签
-		List<Category> list = db.queryCategory();
-		list.add(0, new Category(CATEGORY_ALL, "1"));
 		categoryAdapter = new CategoryAdapter(mContext);
 		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
 		linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 		categoryRecycler.setLayoutManager(linearLayoutManager);
 		categoryRecycler.addItemDecoration(new SpacesItemDecorationHorizontal(20));
 		categoryRecycler.setAdapter(categoryAdapter);
-		categoryAdapter.refresh(list);
 		categoryAdapter.setOnItemClickListener(new OnItemClickListener<Category>() {
 			@Override
 			public void onItemClick(View view, int position, Category model) {
@@ -205,6 +204,13 @@ public class MainActivity extends BaseActivity {
 
 			}
 		});
+		refreshCategory();
+	}
+
+	private void refreshCategory(){
+		mListCategory = db.queryCategory();
+		mListCategory.add(0, new Category(CATEGORY_ALL, "1"));
+		categoryAdapter.superRefresh(mListCategory);
 	}
 
 
@@ -257,16 +263,16 @@ public class MainActivity extends BaseActivity {
 		@Override
 		public void run() {
 			super.run();
-			mList = db.queryProject();
+			mListProject = db.queryProject();
 			//反转列表
-			Collections.reverse(mList);
+			Collections.reverse(mListProject);
 
 			//刷新主页
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					//刷新列表
-					keyAdapter.superRefresh(mList);
+					keyAdapter.superRefresh(mListProject);
 				}
 			});
 		}
