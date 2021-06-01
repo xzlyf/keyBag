@@ -1,5 +1,7 @@
 package com.xz.keybag.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -51,6 +53,7 @@ public class LoginSettingActivity extends BaseActivity {
 	EditText etSlogan;
 
 	private DBManager db;
+	private AlertDialog dialog;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -149,7 +152,7 @@ public class LoginSettingActivity extends BaseActivity {
 		etSlogan.setText(slogan);
 	}
 
-	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share, R.id.tv_login, R.id.slogan_save})
+	@OnClick({R.id.tv_back, R.id.tv_change, R.id.tv_share, R.id.tv_login, R.id.slogan_save, R.id.tv_delete})
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
@@ -169,7 +172,30 @@ public class LoginSettingActivity extends BaseActivity {
 			case R.id.slogan_save:
 				saveSlogan();
 				break;
+			case R.id.tv_delete:
+				deleteAll();
+				break;
 		}
+	}
+
+	/**
+	 * 清空Common表
+	 */
+	private void deleteAll() {
+		if (dialog == null) {
+			dialog = new AlertDialog.Builder(mContext)
+					.setTitle("警告")
+					.setMessage("继续讲删除所有已保存的密码数据\n请考虑清除是否要继续")
+					.setNegativeButton("取消", null)
+					.setPositiveButton("是的，我已考虑清楚", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							db.deleteAllProject();
+						}
+					})
+					.create();
+		}
+		dialog.show();
 	}
 
 

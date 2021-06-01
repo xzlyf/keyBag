@@ -493,6 +493,16 @@ public class DBManager {
 	}
 
 	/**
+	 * 清空表
+	 */
+	public void deleteAllProject(){
+		//清空数据库
+		String sql = "delete from " + TABLE_COMMON;
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.execSQL(sql);
+	}
+
+	/**
 	 * 查询项目情况 用于统计
 	 * 建议用子线程处理
 	 * 数据量比较大

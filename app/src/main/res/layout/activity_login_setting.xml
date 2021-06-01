@@ -144,6 +144,7 @@
         <View style="@style/split_line" />
 
         <TextView
+            android:id="@+id/tv_delete"
             style="@style/secret_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
