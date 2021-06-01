@@ -1,11 +1,14 @@
 package com.xz.keybag.activity;
 
+import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryEditAdapter;
 import com.xz.keybag.base.BaseActivity;
@@ -29,6 +32,7 @@ public class CategoryManagerActivity extends BaseActivity {
 	private DBManager db;
 	private CategoryEditAdapter adapter;
 	private List<Category> mList;
+	private AlertDialog dialog;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -85,14 +89,36 @@ public class CategoryManagerActivity extends BaseActivity {
 	}
 
 	private void deleteCategory() {
+		boolean has = false;
 		for (HashMap.Entry<Integer, Boolean> entry : adapter.getCheckMap().entrySet()) {
 			if (entry.getValue()) {
-				db.deleteCategory(mList.get(entry.getKey()).getId());
-				mList.remove((int) entry.getKey());
+				has = true;
 			}
 		}
-		adapter.clearAllCheck();
-		adapter.superRefresh(db.queryCategory());
+		if (!has) {
+			return;
+		}
+
+		if (dialog == null) {
+			dialog = new AlertDialog.Builder(mContext)
+					.setMessage("是否删除已选的标签\n删除标签不会删除已关联标签的密码")
+					.setNegativeButton("否", null)
+					.setPositiveButton("是", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							for (HashMap.Entry<Integer, Boolean> entry : adapter.getCheckMap().entrySet()) {
+								if (entry.getValue()) {
+									db.deleteCategory(mList.get(entry.getKey()).getId());
+									mList.remove((int) entry.getKey());
+								}
+							}
+							adapter.clearAllCheck();
+							adapter.superRefresh(db.queryCategory());
+						}
+					})
+					.create();
+		}
+		dialog.show();
 	}
 
 }
