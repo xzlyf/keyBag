@@ -655,6 +655,23 @@ public class DBManager {
 		db.close();
 	}
 
+	/**
+	 * 查询上一次登录日期
+	 *
+	 * @param configId 配置表id
+	 */
+	public String queryLoginTime(String configId) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(configId).append("'");
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DBHelper.DB_PWD);
+		Cursor cursor = db.query(TABLE_CONFIG, new String[]{FIELD_CONFIG_P2}, whereBuffer.toString(), null, null, null, null);
+		if (cursor.moveToNext()) {
+			return cursor.getString(0);
+		}
+		return null;
+	}
+
 
 	/**
 	 * 更新密码防忘记功能

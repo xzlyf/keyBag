@@ -30,6 +30,7 @@ import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.utils.TimeUtil;
 import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
@@ -58,6 +59,8 @@ public class MainActivity extends BaseActivity {
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
 	RecyclerView categoryRecycler;
+	@BindView(R.id.tv_login_date)
+	TextView tvLoginTime;
 
 
 	private DBManager db;
@@ -95,6 +98,13 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initState() {
+		long loginTime;
+		try {
+			loginTime = Long.parseLong(db.queryLoginTime(Local.mAdmin.getConfig().getId()));
+			tvLoginTime.setText(String.format("上次登录：\n%s", TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss", loginTime)));
+		} catch (NumberFormatException e) {
+			tvLoginTime.setText("上次登录：异常");
+		}
 		isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
 		modeSwitch.setChecked(isNight);
 		if (isNight) {
@@ -207,7 +217,7 @@ public class MainActivity extends BaseActivity {
 		refreshCategory();
 	}
 
-	private void refreshCategory(){
+	private void refreshCategory() {
 		mListCategory = db.queryCategory();
 		mListCategory.add(0, new Category(CATEGORY_ALL, "1"));
 		categoryAdapter.superRefresh(mListCategory);
