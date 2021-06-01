@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:overScrollMode="never"
     tools:context=".activity.LoginSettingActivity">
 
     <LinearLayout
@@ -77,6 +78,8 @@
             android:layout_height="wrap_content"
             android:text="分享密钥" />
 
+        <View style="@style/split_line" />
+
         <TextView
             android:id="@+id/tv_login"
             style="@style/secret_textView"
@@ -91,6 +94,8 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:text="指纹登录" />
+
+        <View style="@style/split_line" />
 
         <Switch
             android:id="@+id/sw_forget"
@@ -136,5 +141,84 @@
             android:textIsSelectable="false"
             android:textSize="12sp" />
 
+        <View style="@style/split_line" />
+
+        <TextView
+            style="@style/secret_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="删除所有密码数据" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_20"
+            android:paddingTop="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_20">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="标语:"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/slogan_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/btn_add"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="@dimen/dp_5"
+                android:paddingEnd="@dimen/dp_5"
+                android:text="保存"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_slogan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginEnd="@dimen/dp_20"
+            android:autoLink="none"
+            android:background="@drawable/bg_slogan"
+            android:gravity="start"
+            android:hint="请输入自定义Slogan..."
+            android:lines="3"
+            android:maxLength="64"
+            android:maxLines="3"
+            android:padding="@dimen/dp_5"
+            android:textSize="16sp" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:lines="1"
+            android:maxLines="1"
+            android:padding="@dimen/dp_5"
+            android:paddingStart="@dimen/dp_20"
+            android:singleLine="true"
+            android:text="自定义一个标语吧~"
+            android:textIsSelectable="false"
+            android:textSize="12sp" />
+
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

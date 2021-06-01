@@ -61,6 +61,8 @@ public class MainActivity extends BaseActivity {
 	RecyclerView categoryRecycler;
 	@BindView(R.id.tv_login_date)
 	TextView tvLoginTime;
+	@BindView(R.id.tv_slogan)
+	TextView tvSlogan;
 
 
 	private DBManager db;
@@ -98,6 +100,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initState() {
+		updateSlogan();
 		long loginTime;
 		try {
 			loginTime = Long.parseLong(db.queryLoginTime(Local.mAdmin.getConfig().getId()));
@@ -159,6 +162,7 @@ public class MainActivity extends BaseActivity {
 		super.onResume();
 		new ReadDataCommon().start();
 		refreshCategory();
+		updateSlogan();
 	}
 
 	private void initRecycler() {
@@ -223,6 +227,10 @@ public class MainActivity extends BaseActivity {
 		categoryAdapter.superRefresh(mListCategory);
 	}
 
+	private void updateSlogan() {
+		String slogan = PreferencesUtilV2.getString(Local.SHARD_SLOGAN, Local.DEFAULT_SLOGAN);
+		tvSlogan.setText(slogan);
+	}
 
 	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category})
 	public void onViewClick(View v) {

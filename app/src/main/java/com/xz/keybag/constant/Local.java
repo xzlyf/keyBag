@@ -8,6 +8,9 @@ public class Local {
 	public static final String TABLE_SECRET = "secret";//表名
 	public static final String TABLE_ACC = "dbase";//表名
 
+	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
+	public static String SLOGAN = "";//当前slogan
+
 	//二维码协议头
 	public static final String PROTOCOL_SPLIT = "@";//分割符号
 	//二维码密钥传输协议:格式：RSA(头协议@DES(secret))
@@ -25,6 +28,7 @@ public class Local {
 
 	//Shard标识
 	public static final String SHARD_BOOLEAN_MODE = "day_or_night";
+	public static final String SHARD_SLOGAN = "slogan";
 
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
