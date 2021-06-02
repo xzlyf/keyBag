@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.content.pm.SigningInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 import com.xz.keybag.entity.AppInfo;
@@ -133,6 +134,7 @@ public class AppInfoUtils {
 
 	/**
 	 * 获取版本号
+	 *
 	 * @param context 上下文
 	 * @return
 	 */
@@ -147,6 +149,7 @@ public class AppInfoUtils {
 		}
 		return versionCode;
 	}
+
 	/**
 	 * 获取版本号名称
 	 *
@@ -162,5 +165,88 @@ public class AppInfoUtils {
 			e.printStackTrace();
 		}
 		return verName;
+	}
+
+
+	/**
+	 * 获取单个App图标
+	 **/
+	public static Drawable getAppIcon(Context context, String packageName) {
+		PackageManager pm = context.getPackageManager();
+		Drawable icon = null;
+		try {
+			icon = pm.getApplicationIcon(packageName);
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return icon;
+	}
+
+	/**
+	 * 获取单个App名称
+	 **/
+	public static String getAppName(Context context, String packageName) {
+		PackageManager pm = context.getPackageManager();
+		ApplicationInfo appInfo = null;
+		String appName = null;
+		try {
+			appInfo = pm.getApplicationInfo(packageName, 0);
+			appName = pm.getApplicationLabel(appInfo).toString();
+
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return appName;
+	}
+
+	/**
+	 * 获取单个App版本号
+	 **/
+	public static String getAppVersion(Context context, String packageName) {
+		PackageManager pm = context.getPackageManager();
+		PackageInfo packageInfo = null;
+		String appVersion = null;
+		try {
+			packageInfo = pm.getPackageInfo(packageName, 0);
+			appVersion = packageInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return appVersion;
+	}
+
+	/**
+	 * 获取单个App的所有权限
+	 **/
+	public static String[] getAppPermission(Context context, String packageName) {
+		PackageManager pm = context.getPackageManager();
+		PackageInfo packageInfo = null;
+		String[] permission = null;
+		try {
+			packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+			permission = packageInfo.requestedPermissions;
+
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return permission;
+	}
+
+	/**
+	 * 获取单个App的签名
+	 **/
+	public static String getAppSignature(Context context, String packageName) {
+		PackageManager pm = context.getPackageManager();
+		PackageInfo packageInfo = null;
+		String allSignature = null;
+		try {
+			packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+			allSignature = packageInfo.signatures[0].toCharsString();
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return allSignature;
 	}
 }

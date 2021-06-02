@@ -232,7 +232,7 @@ public class MainActivity extends BaseActivity {
 		tvSlogan.setText(slogan);
 	}
 
-	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category})
+	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category,R.id.tv_about})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -243,13 +243,17 @@ public class MainActivity extends BaseActivity {
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.tv_secret:
-				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
+				startActivity(new Intent(MainActivity.this, LoginActivity.class)
+						.putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
 				break;
 			case R.id.tv_move:
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));
 				break;
 			case R.id.tv_category:
 				startActivity(new Intent(MainActivity.this, CategoryManagerActivity.class));
+				break;
+			case R.id.tv_about:
+				startActivity(new Intent(MainActivity.this, AboutActivity.class));
 				break;
 		}
 		drawerLayout.closeDrawer(GravityCompat.START);

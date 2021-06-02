@@ -100,7 +100,7 @@ public class DataSendActivity extends BaseActivity {
 			public void created(int port) {
 				//服务器部署成功
 				qrLayout.setVisibility(View.VISIBLE);
-				Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.lanuch_max);
+				Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.launch_max);
 				Bitmap qrCode = ZxingUtils.createImage(getQrCode(host, port), 400, 400, logo);
 				Glide.with(mContext).asBitmap().load(qrCode).into(imageQr);
 			}

@@ -495,7 +495,7 @@ public class DBManager {
 	/**
 	 * 清空表
 	 */
-	public void deleteAllProject(){
+	public void deleteAllProject() {
 		//清空数据库
 		String sql = "delete from " + TABLE_COMMON;
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
@@ -677,8 +677,11 @@ public class DBManager {
 		SQLiteDatabase db = dbHelper.getReadableDatabase(DBHelper.DB_PWD);
 		Cursor cursor = db.query(TABLE_CONFIG, new String[]{FIELD_CONFIG_P2}, whereBuffer.toString(), null, null, null, null);
 		if (cursor.moveToNext()) {
-			return cursor.getString(0);
+			String st = cursor.getString(0);
+			cursor.close();
+			return st;
 		}
+		cursor.close();
 		return null;
 	}
 

@@ -8,6 +8,8 @@ public class Local {
 	public static final String TABLE_SECRET = "secret";//表名
 	public static final String TABLE_ACC = "dbase";//表名
 
+	public static final String PACKAGE_NAME = "com.xz.keybag";
+
 	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
 	public static String SLOGAN = "";//当前slogan
 
