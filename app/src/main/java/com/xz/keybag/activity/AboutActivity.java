@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -46,10 +45,11 @@ public class AboutActivity extends BaseActivity {
 			tvVersion.setText(String.format("v%s", appVersion));
 		}
 
-		String[] appPermission = AppInfoUtils.getAppPermission(mContext, Local.PACKAGE_NAME);
-		for (String s : appPermission) {
-			Logger.d("权限：" + s);
-		}
+		//todo 反馈
+		//留言 POST
+		//http://cc.ys168.com/f_ht/ajcx/lyd.aspx?cz=lytj&pdgk=1&pdgly=0&pdzd=0&tou=1&yzm=undefined&_dlmc=xzlyf&_dlmm=
+		//body : sm留言人,nr内容
+
 	}
 
 

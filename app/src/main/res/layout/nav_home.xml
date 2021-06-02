@@ -112,10 +112,11 @@
                 style="@style/icon_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="密码强度测试"
+                android:text="加密/解密工具"
                 app:icon_src="@mipmap/ic_test" />
 
             <com.xz.keybag.custom.IconTextView
+                android:id="@+id/tv_random"
                 style="@style/icon_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
