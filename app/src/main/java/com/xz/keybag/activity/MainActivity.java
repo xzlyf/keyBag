@@ -233,7 +233,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category
-			, R.id.tv_about, R.id.tv_random, R.id.tv_tool})
+			, R.id.tv_about, R.id.tv_random, R.id.tv_tool,R.id.tv_share})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -261,6 +261,17 @@ public class MainActivity extends BaseActivity {
 				break;
 			case R.id.tv_tool:
 				startActivity(new Intent(MainActivity.this, ToolActivity.class));
+				break;
+			case R.id.tv_share:
+				// TODO: 2021/6/4 分享功能，记得改完主页ite的分享功能
+				//示例代码，带复制按钮
+				Intent share_intent = new Intent();
+				share_intent.setAction(Intent.ACTION_SEND);
+				share_intent.setType("text/plain");
+				share_intent.putExtra(Intent.EXTRA_SUBJECT, "f分享");
+				share_intent.putExtra(Intent.EXTRA_TEXT, "HI 推荐您使用一款软件:" );
+				share_intent = Intent.createChooser(share_intent, "分享");
+				startActivity(share_intent);
 				break;
 		}
 		drawerLayout.closeDrawer(GravityCompat.START);
