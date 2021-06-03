@@ -9,6 +9,8 @@ public class Local {
 	public static final String TABLE_ACC = "dbase";//表名
 
 	public static final String PACKAGE_NAME = "com.xz.keybag";
+	public static final String WeChat = "小泽干货铺";
+	public static final String WeChat_URL = "http://weixin.qq.com/r/SziRicLEyp_1rYbq921Z";
 
 	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
 	public static String SLOGAN = "";//当前slogan

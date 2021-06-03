@@ -1,6 +1,10 @@
 package com.xz.keybag.activity;
 
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -8,6 +12,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.utils.AppInfoUtils;
+import com.xz.utils.CopyUtil;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -20,6 +25,8 @@ public class AboutActivity extends BaseActivity {
 	ImageView imageLaunch;
 	@BindView(R.id.tv_version)
 	TextView tvVersion;
+
+	private CopyUtil copyUtil;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -34,6 +41,7 @@ public class AboutActivity extends BaseActivity {
 	@Override
 	public void initData() {
 		changeStatusBarTextColor();
+		copyUtil = new CopyUtil(mContext);
 		//获取app图标
 		Drawable appIcon = AppInfoUtils.getAppIcon(mContext, Local.PACKAGE_NAME);
 		if (appIcon != null) {
@@ -45,16 +53,37 @@ public class AboutActivity extends BaseActivity {
 			tvVersion.setText(String.format("v%s", appVersion));
 		}
 
-		//todo 反馈
-		//留言 POST
-		//http://cc.ys168.com/f_ht/ajcx/lyd.aspx?cz=lytj&pdgk=1&pdgly=0&pdzd=0&tou=1&yzm=undefined&_dlmc=xzlyf&_dlmm=
-		//body : sm留言人,nr内容
-
 	}
 
 
 	@OnClick(R.id.tv_back)
 	public void onViewClicked() {
 		finish();
+	}
+
+
+	@OnClick(R.id.tv_jump)
+	public void onViewClick(View v) {
+		toWeChat();
+	}
+
+	public void toWeChat() {
+		try {
+			copyUtil.copyToClicp(Local.WeChat);
+			sToast(Local.WeChat + "已复制到粘贴板");
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
+			intent.addCategory(Intent.CATEGORY_LAUNCHER);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setComponent(cmp);
+			startActivity(intent);
+		} catch (Exception e) {
+			if (e instanceof ActivityNotFoundException) {
+				sToast("未找到微信，请手动前往搜索");
+			} else {
+				e.printStackTrace();
+			}
+		}
+
 	}
 }
