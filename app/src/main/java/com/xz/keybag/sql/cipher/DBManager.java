@@ -648,10 +648,13 @@ public class DBManager {
 	/**
 	 * 更新登录时间
 	 *
+	 * @param id              配置表id
 	 * @param loginTimestamp  登录时间
 	 * @param unlockTimestamp 解锁时间 -1 不需要存储
 	 */
 	public void updateLoginTime(String id, long loginTimestamp, long unlockTimestamp) {
+		//存储上一次登录时间
+		Local.mAdmin.setLastLoginTime(queryLoginTime(id));
 		StringBuilder whereBuffer = new StringBuilder();
 		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
 		ContentValues cv = new ContentValues();

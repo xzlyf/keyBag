@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity {
 		updateSlogan();
 		long loginTime;
 		try {
-			loginTime = Long.parseLong(db.queryLoginTime(Local.mAdmin.getConfig().getId()));
+			loginTime = Long.parseLong(Local.mAdmin.getLastLoginTime());
 			tvLoginTime.setText(String.format("上次登录：\n%s", TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss", loginTime)));
 		} catch (NumberFormatException e) {
 			tvLoginTime.setText("上次登录：异常");
