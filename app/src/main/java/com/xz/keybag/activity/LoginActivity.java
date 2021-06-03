@@ -92,7 +92,7 @@ public class LoginActivity extends BaseActivity {
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-		if (mode != Local.INTENT_EXTRA_LOGIN_MODE) {
+		if (mode != Local.START_MODE_LOGIN_MODE) {
 			//initSql
 			DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
 			db = DBManager.getInstance(this);
@@ -320,7 +320,7 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
-		if (mode == Local.INTENT_EXTRA_LOGIN_MODE) {
+		if (mode == Local.START_MODE_LOGIN_MODE) {
 			startActivity(new Intent(mContext, LoginSettingActivity.class));
 			finish();
 			return;

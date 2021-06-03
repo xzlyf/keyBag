@@ -187,6 +187,17 @@
                 android:layout_margin="@dimen/dp_20"
                 android:textColor="@color/primary_text"
                 android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/tv_keep"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:background="@drawable/btn_make"
+                android:text="作为密码使用"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_16" />
         </LinearLayout>
 
     </LinearLayout>

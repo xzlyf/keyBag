@@ -26,6 +26,7 @@ public class Local {
 	public static final String DEFAULT = "0000";
 	public static String secret;//密钥
 
+
 	//handler标识
 
 	//Shard标识
@@ -34,11 +35,17 @@ public class Local {
 
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
+	public static final int REQ_MAKE_PWD = 11003; // // 打开随机密码生成界面
+
+	//Activity启动模式
+	public static final int START_MODE_LOGIN_MODE = 0x14764185;
+	public static final int START_MODE_RANDOM = 0x14764186;
 
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
-	public static final int INTENT_EXTRA_LOGIN_MODE = 0x14764185;
 	public static final String INTENT_EXTRA_QR_CODE = "qr_code";
+	public static final String INTENT_EXTRA_RANDOM = "random";
+
 
 	//参数标识
 	public static final String FINGERPRINT_STATE_OPEN = "fingerprint";//开启指纹登录

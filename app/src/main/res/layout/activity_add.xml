@@ -94,6 +94,20 @@
         app:label="密码"
         app:textColor="@color/category_text_2" />
 
+    <com.xz.keybag.custom.IconTextView
+        android:id="@+id/tv_random"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/dp_10"
+        android:elevation="@dimen/dp_2"
+        android:text="生成随机密码"
+        android:textColor="@color/primary_text"
+        app:icon_paddingStart="@dimen/dp_10"
+        app:icon_src="@mipmap/ic_random" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

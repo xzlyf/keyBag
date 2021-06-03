@@ -245,7 +245,7 @@ public class MainActivity extends BaseActivity {
 				break;
 			case R.id.tv_secret:
 				startActivity(new Intent(MainActivity.this, LoginActivity.class)
-						.putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
+						.putExtra("mode", Local.START_MODE_LOGIN_MODE));
 				break;
 			case R.id.tv_move:
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));

@@ -1,9 +1,9 @@
 package com.xz.keybag.activity;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.constant.Local;
 import com.xz.utils.CopyUtil;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class RandomActivity extends BaseActivity {
 	CheckBox cb4;
 	@BindView(R.id.tv_make)
 	Button tvMake;
+	@BindView(R.id.tv_keep)
+	Button tvKeep;
 	@BindView(R.id.tv_pre)
 	TextView tvPre;
 	@BindView(R.id.seek_len)
@@ -51,6 +54,7 @@ public class RandomActivity extends BaseActivity {
 	private List<String> charList;
 	private Random mRandom;
 	private CopyUtil copyUtil;
+	private int mode;//启动模式
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -64,6 +68,12 @@ public class RandomActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
+		if (getIntent() != null) {
+			mode = getIntent().getIntExtra("mode", 0);
+			if (mode == Local.START_MODE_RANDOM) {
+				tvKeep.setVisibility(View.VISIBLE);
+			}
+		}
 		changeStatusBarTextColor();
 		copyUtil = new CopyUtil(mContext);
 		mRandom = new Random();
@@ -94,7 +104,7 @@ public class RandomActivity extends BaseActivity {
 	}
 
 
-	@OnClick({R.id.tv_back, R.id.tv_make, R.id.tv_copy})
+	@OnClick({R.id.tv_back, R.id.tv_make, R.id.tv_copy, R.id.tv_keep})
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
@@ -106,6 +116,9 @@ public class RandomActivity extends BaseActivity {
 			case R.id.tv_copy:
 				copyUtil.copyToClicp(tvPre.getText().toString().trim());
 				Snackbar.make(view, "已复制", Snackbar.LENGTH_SHORT).show();
+				break;
+			case R.id.tv_keep:
+				saveAndKeep();
 				break;
 		}
 	}
@@ -150,5 +163,13 @@ public class RandomActivity extends BaseActivity {
 			sBuff.append(charList.get(mRandom.nextInt(size)));
 		}
 		return sBuff.toString();
+	}
+
+
+	private void saveAndKeep() {
+		Intent intent = new Intent();
+		intent.putExtra(Local.INTENT_EXTRA_RANDOM, tvPre.getText().toString().trim());
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 }
