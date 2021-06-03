@@ -161,14 +161,14 @@ public class RSA {
 	 * @return
 	 */
 
-	public static String privateEncrypt(String data, RSAPrivateKey privateKey) {
+	public static String privateEncrypt(String data, RSAPrivateKey privateKey) throws Exception {
 		try {
 			Cipher cipher = Cipher.getInstance(RSA);
 			//每个Cipher初始化方法使用一个模式参数opmod，并用此模式初始化Cipher对象。此外还有其他参数，包括密钥key、包含密钥的证书certificate、算法参数params和随机源random。
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
 			return Base64.encodeBase64URLSafeString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(CHARSET), privateKey.getModulus().bitLength()));
 		} catch (Exception e) {
-			throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
+			throw new Exception("加密字符串[" + data + "]时遇到异常", e);
 		}
 	}
 

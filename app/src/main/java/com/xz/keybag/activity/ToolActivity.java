@@ -19,7 +19,10 @@ import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 import com.xz.keybag.utils.lock.SHA256;
 import com.xz.utils.CopyUtil;
+import com.xz.utils.MD5Util;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -41,6 +44,8 @@ public class ToolActivity extends BaseActivity {
 	UnifyEditView ueDes;
 	@BindView(R.id.tv_des)
 	TextView tvDes;
+	@BindView(R.id.spinner_des)
+	Spinner spinnerDes;
 	@BindView(R.id.rsa_layout)
 	LinearLayout rsaLayout;
 	@BindView(R.id.ue_rsa_public)
@@ -49,10 +54,16 @@ public class ToolActivity extends BaseActivity {
 	UnifyEditView ueRsaPrivate;
 	@BindView(R.id.tv_rsa)
 	TextView tvRsa;
+	@BindView(R.id.spinner_rsa)
+	Spinner spinnerRsa;
 
 	private CopyUtil copyUtil;
-	private String[] algorithmArray = {"SHA256", "DES", "RSA"};
-	private int type; //加密模式 0-sha256 1-des 2-rsa
+	private String[] algorithmArray = {"SHA256", "DES", "RSA", "MD5"};
+	private String[] modeArrayByRsa = {"公钥加密", "私钥解密", "私钥加密", "公钥解密"};
+	private String[] modeArrayByDes = {"加密", "解密"};
+	private int type; //加密模式 0-sha256 1-des 2-rsa 3-MD5
+	private int modeByRsa; //0-公钥机密 1-私钥解密 2-私钥加密 3-公钥解密
+	private int modeByDes; //0-加密 1-解密
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -70,6 +81,8 @@ public class ToolActivity extends BaseActivity {
 		copyUtil = new CopyUtil(this);
 		nonType();
 		spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, algorithmArray));
+		spinnerRsa.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modeArrayByRsa));
+		spinnerDes.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modeArrayByDes));
 		etSource.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -100,10 +113,35 @@ public class ToolActivity extends BaseActivity {
 					case 2:
 						rsaType();
 						break;
+					case 3:
+						md5Type();
+						break;
 					default:
 						nonType();
 						break;
 				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
+		spinnerRsa.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				modeByRsa = position;
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
+		spinnerDes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				modeByDes = position;
 			}
 
 			@Override
@@ -166,11 +204,7 @@ public class ToolActivity extends BaseActivity {
 					sToast("请先输入一个密钥");
 					return;
 				}
-				try {
-					tar = DES.encryptor(st, secret);
-				} catch (Exception e) {
-					tar = e.getMessage();
-				}
+				tar = getDes(st, secret);
 				break;
 			case 2:
 				//rsa
@@ -184,8 +218,12 @@ public class ToolActivity extends BaseActivity {
 					sToast("请先输入一个私钥");
 					return;
 				}
+				tar = getRsa(st, publicKey, privateKey);
+				break;
+			case 3:
+				//MD5
 				try {
-					tar = RSA.publicEncrypt(st, RSA.getPublicKey(publicKey));
+					tar = MD5Util.getMD5(st);
 				} catch (Exception e) {
 					tar = e.getMessage();
 				}
@@ -193,6 +231,7 @@ public class ToolActivity extends BaseActivity {
 		}
 		tvPre.setText(tar);
 	}
+
 
 	/**
 	 * 不选择任何模式
@@ -233,4 +272,77 @@ public class ToolActivity extends BaseActivity {
 			ueRsaPrivate.setText(keys.get("privateKey"));
 		}
 	}
+
+	/**
+	 * md5模式
+	 */
+	private void md5Type() {
+		type = 3;
+	}
+
+
+	/**
+	 * rsa加解密
+	 *
+	 * @param s          原文
+	 * @param publicKey  私钥
+	 * @param privateKey 公钥
+	 * @return
+	 */
+	private String getRsa(String s, String publicKey, String privateKey) {
+		String tar = "";
+		try {
+
+			switch (modeByRsa) {
+				case 0:
+					//公钥加密
+					tar = RSA.publicEncrypt(s, RSA.getPublicKey(publicKey));
+					break;
+				case 1:
+					//私钥解密
+					tar = RSA.privateDecrypt(s, RSA.getPrivateKey(privateKey));
+					break;
+				case 2:
+					//私钥加密
+					tar = RSA.privateEncrypt(s, RSA.getPrivateKey(privateKey));
+					break;
+				case 3:
+					//公钥解密
+					tar = RSA.publicDecrypt(s, RSA.getPublicKey(publicKey));
+					break;
+			}
+
+		} catch (Exception e) {
+			if (e instanceof NoSuchAlgorithmException || e instanceof InvalidKeySpecException) {
+				tar = "非正常RSA密钥";
+			} else {
+				tar = "非正常RSA密文\n公钥解密→私钥解密\n私钥加密→公钥解密";
+			}
+		}
+		return tar;
+	}
+
+	/**
+	 * des 加解密
+	 *
+	 * @param st     原文
+	 * @param secret des密钥
+	 */
+	private String getDes(String st, String secret) {
+		String tar = "";
+		try {
+			switch (modeByDes) {
+				case 0:
+					tar = DES.encryptor(st, secret);
+					break;
+				case 1:
+					tar = DES.decryptor(st, secret);
+					break;
+			}
+		} catch (Exception e) {
+			tar = "非正常DES密钥";
+		}
+		return tar;
+	}
+
 }

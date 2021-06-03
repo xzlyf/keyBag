@@ -86,19 +86,40 @@
                 app:mode="vertical"
                 app:textColor="@color/category_text_2" />
 
-            <TextView
-                android:id="@+id/tv_des"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:background="@drawable/btn_add"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingStart="@dimen/dp_10"
-                android:paddingEnd="@dimen/dp_10"
-                android:text="生成密钥"
-                android:textColor="@color/primary_text"
-                android:textSize="@dimen/sp_16" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/dp_10">
+
+                <TextView
+                    android:id="@+id/tv_des"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_add"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:text="生成密钥"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="模式"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <Spinner
+                    android:id="@+id/spinner_des"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
         </LinearLayout>
         <!--RSA密钥-->
@@ -130,19 +151,40 @@
                 app:mode="vertical"
                 app:textColor="@color/category_text_2" />
 
-            <TextView
-                android:id="@+id/tv_rsa"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:background="@drawable/btn_add"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingStart="@dimen/dp_10"
-                android:paddingEnd="@dimen/dp_10"
-                android:text="生成密钥对"
-                android:textColor="@color/primary_text"
-                android:textSize="@dimen/sp_16" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/dp_10">
+
+                <TextView
+                    android:id="@+id/tv_rsa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_add"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:text="生成密钥对"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="模式"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <Spinner
+                    android:id="@+id/spinner_rsa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -167,7 +209,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="明文"
+                    android:text="原文"
                     android:textColor="@color/primary_text"
                     android:textSize="@dimen/sp_16" />
 
@@ -258,7 +300,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="生成结果"
+                    android:text="结果"
                     android:textColor="@color/primary_text"
                     android:textSize="@dimen/sp_16" />
 
