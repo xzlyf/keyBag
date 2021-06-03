@@ -4,7 +4,10 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -24,8 +27,11 @@ public class ToolActivity extends BaseActivity {
 	TextView tvNumber;
 	@BindView(R.id.tv_pre)
 	TextView tvPre;
+	@BindView(R.id.spinner)
+	Spinner spinner;
 
 	private CopyUtil copyUtil;
+	private String[] algorithmArray = {"SHA256", "DES", "RSA"};
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -41,6 +47,8 @@ public class ToolActivity extends BaseActivity {
 	public void initData() {
 		changeStatusBarTextColor();
 		copyUtil = new CopyUtil(this);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, algorithmArray);
+		spinner.setAdapter(adapter);
 		etSource.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -57,6 +65,19 @@ public class ToolActivity extends BaseActivity {
 				tvNumber.setText(String.format("%s/1024", s.toString().length()));
 			}
 		});
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if (position == 1) {
+
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
 	}
 
 
@@ -71,15 +92,15 @@ public class ToolActivity extends BaseActivity {
 				break;
 			case R.id.tv_copy:
 				copyUtil.copyToClicp(etSource.getText().toString());
-				Snackbar.make(view,"已复制",Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(view, "已复制", Snackbar.LENGTH_SHORT).show();
 				break;
 			case R.id.tv_paste:
 				etSource.setText(copyUtil.getClicp());
-				Snackbar.make(view,"已粘贴",Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(view, "已粘贴", Snackbar.LENGTH_SHORT).show();
 				break;
 			case R.id.tv_copy_clip:
 				copyUtil.copyToClicp(tvPre.getText().toString());
-				Snackbar.make(view,"已复制",Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(view, "已复制", Snackbar.LENGTH_SHORT).show();
 				break;
 		}
 	}

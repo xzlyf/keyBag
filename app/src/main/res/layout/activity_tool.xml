@@ -10,6 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
         <LinearLayout
@@ -40,6 +42,61 @@
                 android:layout_marginEnd="@dimen/dp_10"
                 android:layout_weight="1"
                 android:text="工具类"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/sp_16" />
+
+        </LinearLayout>
+
+        <!--加密算法选择-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_10"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加密算法"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/sp_16" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <!--DES密钥-->
+        <LinearLayout
+            android:id="@+id/des_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:background="@drawable/bg_border"
+            android:orientation="vertical">
+
+            <com.xz.keybag.custom.UnifyEditView
+                android:id="@+id/ue_des"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint="请输入..."
+                app:hintColor="@color/secTextColor"
+                app:label="密钥"
+                app:minLines="2"
+                app:mode="vertical"
+                app:textColor="@color/category_text_2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:background="@drawable/btn_add"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:text="生成密钥"
                 android:textColor="@color/primary_text"
                 android:textSize="@dimen/sp_16" />
 

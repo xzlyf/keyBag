@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 
 /**
@@ -65,6 +66,7 @@ public class UnifyEditView extends LinearLayout {
 		editAttrs.setTextColor(ta.getColor(R.styleable.UnifyEditView_textColor, Color.parseColor("#212121")));
 		editAttrs.setTextSize(ta.getDimensionPixelSize(R.styleable.UnifyEditView_textSize, 16));
 		editAttrs.setLines(ta.getInt(R.styleable.UnifyEditView_lines, 1));
+		editAttrs.setMinLines(ta.getInt(R.styleable.UnifyEditView_minLines, 1));
 		editAttrs.setMaxLines(ta.getInt(R.styleable.UnifyEditView_maxLines, 1));
 		editAttrs.setMaxLength(ta.getInt(R.styleable.UnifyEditView_maxLength, -1));
 		editAttrs.setPassword(ta.getBoolean(R.styleable.UnifyEditView_isPassword, false));
@@ -117,8 +119,15 @@ public class UnifyEditView extends LinearLayout {
 		mInput.setTextSize(editAttrs.getTextSize());
 		mInput.setTextColor(editAttrs.getTextColor());
 		mInput.setHint(editAttrs.getHint());
-		mInput.setLines(editAttrs.getLines());
-		mInput.setMaxLines(editAttrs.getMaxLines());
+		mInput.setMinLines(editAttrs.getMinLines());
+		//设置行
+		if (editAttrs.getLines()!=1){
+			mInput.setLines(editAttrs.getLines());
+		}
+		//设置maxLines
+		if (editAttrs.getMaxLines()!=1){
+			mInput.setMaxLines(editAttrs.getMaxLines());
+		}
 		//手动设置maxLength
 		if (editAttrs.getMaxLength() != -1) {
 			InputFilter[] filters = {new InputFilter.LengthFilter(editAttrs.getMaxLength())};
@@ -194,6 +203,15 @@ public class UnifyEditView extends LinearLayout {
 		private int maxLines;
 		private int maxLength;
 		private boolean isPassword;
+		private int minLines;
+
+		public int getMinLines() {
+			return minLines;
+		}
+
+		public void setMinLines(int minLines) {
+			this.minLines = minLines;
+		}
 
 		public String getText() {
 			return text;
