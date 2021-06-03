@@ -109,6 +109,7 @@
                 android:text="小工具" />
 
             <com.xz.keybag.custom.IconTextView
+                android:id="@+id/tv_tool"
                 style="@style/icon_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

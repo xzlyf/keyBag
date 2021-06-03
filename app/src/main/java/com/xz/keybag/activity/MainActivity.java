@@ -233,7 +233,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category
-			, R.id.tv_about, R.id.tv_random})
+			, R.id.tv_about, R.id.tv_random, R.id.tv_tool})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -258,6 +258,9 @@ public class MainActivity extends BaseActivity {
 				break;
 			case R.id.tv_random:
 				startActivity(new Intent(MainActivity.this, RandomActivity.class));
+				break;
+			case R.id.tv_tool:
+				startActivity(new Intent(MainActivity.this, ToolActivity.class));
 				break;
 		}
 		drawerLayout.closeDrawer(GravityCompat.START);
