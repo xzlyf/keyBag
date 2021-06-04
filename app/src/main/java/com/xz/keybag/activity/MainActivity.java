@@ -3,16 +3,14 @@ package com.xz.keybag.activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,7 +52,7 @@ public class MainActivity extends BaseActivity {
 	@BindView(R.id.tv_title)
 	TextView tvTitle;
 	@BindView(R.id.et_search)
-	EditText etSearch;
+	SearchView etSearch;
 	@BindView(R.id.switch_mode)
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
@@ -126,24 +124,18 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initView() {
-		etSearch.addTextChangedListener(new TextWatcher() {
+		etSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+			public boolean onQueryTextSubmit(String query) {
+				return false;
 			}
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				keyAdapter.getFilter().filter(s);
+			public boolean onQueryTextChange(String newText) {
+				keyAdapter.getFilter().filter(newText);
+				return true;
 			}
 		});
-
-
 	}
 
 	@Override
