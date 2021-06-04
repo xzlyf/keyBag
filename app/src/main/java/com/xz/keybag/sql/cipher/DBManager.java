@@ -461,14 +461,15 @@ public class DBManager {
 	 *
 	 * @param id 项目id
 	 */
-	public void deleteProject(String id) {
+	public int deleteProject(String id) {
 		//生成条件语句
 		StringBuilder whereBuffer = new StringBuilder();
 		whereBuffer.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
 		//获取可读数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
-		db.delete(TABLE_COMMON, whereBuffer.toString(), null);
+		int i = db.delete(TABLE_COMMON, whereBuffer.toString(), null);
 		db.close();
+		return i;
 	}
 
 

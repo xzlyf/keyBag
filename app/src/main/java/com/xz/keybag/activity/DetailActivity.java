@@ -1,10 +1,12 @@
 package com.xz.keybag.activity;
 
+import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,6 +49,7 @@ public class DetailActivity extends BaseActivity {
 	private DBManager db;
 	private CategoryAdapter categoryAdapter;
 	private String mCategorySt;
+	private AlertDialog mAffirmDialog;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -104,7 +107,7 @@ public class DetailActivity extends BaseActivity {
 	}
 
 
-	@OnClick({R.id.back, R.id.submit})
+	@OnClick({R.id.back, R.id.submit, R.id.delete})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -113,6 +116,9 @@ public class DetailActivity extends BaseActivity {
 				break;
 			case R.id.submit:
 				submit();
+				break;
+			case R.id.delete:
+				affirmDialog();
 				break;
 		}
 	}
@@ -146,6 +152,28 @@ public class DetailActivity extends BaseActivity {
 		db.updateProject(project.getId(), project);
 		sToast("修改成功");
 
+	}
+
+	/**
+	 * 显示删除前确认对话框
+	 */
+	private void affirmDialog() {
+		if (mAffirmDialog != null) {
+			mAffirmDialog.cancel();
+		}
+		mAffirmDialog = new AlertDialog.Builder(mContext)
+				.setMessage("确定删除吗")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						db.deleteProject(project.getId());
+						dialog.dismiss();
+						finish();
+					}
+				})
+				.setNegativeButton("取消", null)
+				.create();
+		mAffirmDialog.show();
 	}
 
 
