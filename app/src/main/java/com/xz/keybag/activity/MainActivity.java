@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,7 +32,6 @@ import com.xz.keybag.sql.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.TimeUtil;
-import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
 	@BindView(R.id.tv_title)
 	TextView tvTitle;
 	@BindView(R.id.et_search)
-	SearchEditView etSearch;
+	EditText etSearch;
 	@BindView(R.id.switch_mode)
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initView() {
-		etSearch.addTextChangeListener(new TextWatcher() {
+		etSearch.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 

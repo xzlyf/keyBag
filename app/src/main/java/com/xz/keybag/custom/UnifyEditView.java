@@ -55,7 +55,7 @@ public class UnifyEditView extends LinearLayout {
 		int mode = ta.getInt(R.styleable.UnifyEditView_mode, 0);
 		//获取标签属性
 		AttrsByLabel labelAttrs = new AttrsByLabel();
-		labelAttrs.setColor(ta.getColor(R.styleable.UnifyEditView_labelColor, context.getColor(R.color.mainTextColor)));
+		labelAttrs.setColor(ta.getColor(R.styleable.UnifyEditView_labelColor, context.getColor(R.color.primary_text)));
 		labelAttrs.setSize(ta.getDimensionPixelSize(R.styleable.UnifyEditView_labelSize, 16));
 		labelAttrs.setText(ta.getString(R.styleable.UnifyEditView_label));
 		//获取EditView属性
@@ -92,7 +92,7 @@ public class UnifyEditView extends LinearLayout {
 		mLabel.setText(labelAttrs.getText());
 		mLabel.setTextSize(labelAttrs.getSize());
 		mLabel.setTextColor(labelAttrs.getColor());
-		mLabel.setTextColor(context.getColor(R.color.mainTextColor));
+		mLabel.setTextColor(context.getColor(R.color.primary_text));
 		return mLabel;
 	}
 

@@ -67,7 +67,7 @@ public class AppListDialog extends BaseDialog {
 		setCancelable(true);
 		Window window = getWindow();
 		if (window != null) {
-			window.setBackgroundDrawableResource(com.xz.xzwidget.R.color.transparent);
+			window.setBackgroundDrawableResource(R.color.transparent);
 			WindowManager.LayoutParams lp = window.getAttributes();
 			DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
 			lp.height = (int) (dm.heightPixels * 0.8);

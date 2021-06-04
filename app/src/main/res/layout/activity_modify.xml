@@ -174,7 +174,7 @@
         android:fadeScrollbars="false"
         android:padding="@dimen/dp_5"
         android:scrollbars="vertical"
-        android:textColor="@color/secTextColor" />
+        android:textColor="@color/secondary_text" />
 
     <LinearLayout
         android:id="@+id/open_camera"
