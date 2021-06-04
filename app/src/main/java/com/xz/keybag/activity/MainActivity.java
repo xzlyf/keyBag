@@ -27,7 +27,7 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlideRecyclerView;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Project;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.TimeUtil;

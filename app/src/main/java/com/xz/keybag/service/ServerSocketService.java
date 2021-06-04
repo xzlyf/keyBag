@@ -9,7 +9,7 @@ import android.os.Looper;
 
 import com.google.gson.Gson;
 import com.xz.keybag.entity.Project;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.StorageUtil;
 import com.xz.utils.MD5Util;

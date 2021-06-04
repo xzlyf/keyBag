@@ -28,8 +28,8 @@ import com.xz.keybag.entity.AdminConfig;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
-import com.xz.keybag.sql.cipher.DBHelper;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBHelper;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.DeviceUniqueUtils;
 import com.xz.keybag.utils.PermissionsUtils;
 

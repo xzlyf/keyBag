@@ -18,7 +18,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.utils.PreferencesUtilV2;
 import com.xz.keybag.constant.Local;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
 

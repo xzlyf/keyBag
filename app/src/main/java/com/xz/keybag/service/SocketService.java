@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Project;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.StorageUtil;

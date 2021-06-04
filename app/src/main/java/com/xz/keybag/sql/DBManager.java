@@ -1,4 +1,4 @@
-package com.xz.keybag.sql.cipher;
+package com.xz.keybag.sql;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,28 +31,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.xz.keybag.sql.cipher.DBHelper.DB_PWD;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L1;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CATEGORY_L2;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T0;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T1;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T2;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_COMMON_T3;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P0;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P1;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P2;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P3;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_CONFIG_P4;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_DBASE_P1;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K1;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K2;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K3;
-import static com.xz.keybag.sql.cipher.DBHelper.FIELD_SECRET_K4;
-import static com.xz.keybag.sql.cipher.DBHelper.TABLE_CATEGORY;
-import static com.xz.keybag.sql.cipher.DBHelper.TABLE_COMMON;
-import static com.xz.keybag.sql.cipher.DBHelper.TABLE_CONFIG;
-import static com.xz.keybag.sql.cipher.DBHelper.TABLE_DEVICE;
-import static com.xz.keybag.sql.cipher.DBHelper.TABLE_SECRET;
+import static com.xz.keybag.sql.DBHelper.DB_PWD;
+import static com.xz.keybag.sql.DBHelper.FIELD_CATEGORY_L1;
+import static com.xz.keybag.sql.DBHelper.FIELD_CATEGORY_L2;
+import static com.xz.keybag.sql.DBHelper.FIELD_COMMON_T0;
+import static com.xz.keybag.sql.DBHelper.FIELD_COMMON_T1;
+import static com.xz.keybag.sql.DBHelper.FIELD_COMMON_T2;
+import static com.xz.keybag.sql.DBHelper.FIELD_COMMON_T3;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P0;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P1;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P2;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P3;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P4;
+import static com.xz.keybag.sql.DBHelper.FIELD_DBASE_P1;
+import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K1;
+import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K2;
+import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K3;
+import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K4;
+import static com.xz.keybag.sql.DBHelper.TABLE_CATEGORY;
+import static com.xz.keybag.sql.DBHelper.TABLE_COMMON;
+import static com.xz.keybag.sql.DBHelper.TABLE_CONFIG;
+import static com.xz.keybag.sql.DBHelper.TABLE_DEVICE;
+import static com.xz.keybag.sql.DBHelper.TABLE_SECRET;
 
 
 /**
