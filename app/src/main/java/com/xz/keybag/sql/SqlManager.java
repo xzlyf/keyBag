@@ -7,7 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 
 
 public class SqlManager {
-
+    public static final String SECRET_PWD = "xiaoze66";
+    public static final String SECRET_KEY = "xzlyf666";
+    public static final String DEFAULT = "0000";
+    public static final String TABLE_COMMON = "common";//表名
+    public static final String TABLE_SECRET = "secret";//表名
+    public static final String TABLE_ACC = "dbase";//表名
     private static final String TAG = "SqlManager.class";
     private static final String DB_NAME = "user.db";//数据库名称
     private static final int DB_VERSION = 9;//数据版本

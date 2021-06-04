@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
 import android.os.VibrationEffect;
@@ -29,13 +28,10 @@ import com.xz.keybag.entity.AdminConfig;
 import com.xz.keybag.fingerprint.FingerprintHelper;
 import com.xz.keybag.fingerprint.OnAuthResultListener;
 import com.xz.keybag.jni.NativeUtils;
-import com.xz.keybag.sql.EOD;
-import com.xz.keybag.sql.SqlManager;
 import com.xz.keybag.sql.cipher.DBHelper;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.keybag.utils.DeviceUniqueUtils;
 import com.xz.keybag.utils.PermissionsUtils;
-import com.xz.utils.MD5Util;
 
 import butterknife.BindView;
 
@@ -87,7 +83,6 @@ public class LoginActivity extends BaseActivity {
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
-		new ReadThread().start();
 		initView();
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -116,7 +111,7 @@ public class LoginActivity extends BaseActivity {
 
 
 		//todo  测试模式：关闭密码验证
-		killMySelf();
+		//killMySelf();
 	}
 
 	private void initView() {
@@ -200,7 +195,8 @@ public class LoginActivity extends BaseActivity {
 					@Override
 					public void forbitPermissons() {
 						AlertDialog finallyDialog = new AlertDialog.Builder(LoginActivity.this)
-								.setMessage("App需要此权限，\n以确保数据安全性。\n否则无法进行下一步")
+								.setMessage("App需要通过此权限获取设备id，\n以确保数据安全性。\n否则无法进行下一步")
+								.setCancelable(false)
 								.setPositiveButton("退出", new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
@@ -456,21 +452,4 @@ public class LoginActivity extends BaseActivity {
 	}
 
 
-	private class ReadThread extends Thread {
-		@Override
-		public void run() {
-			super.run();
-
-
-			Cursor cursor = SqlManager.queryAll(mContext, Local.TABLE_ACC);
-			//如果游标为空则返回false
-			if (!cursor.moveToFirst()) {
-				Local.User.loginPwd = MD5Util.getMD5(Local.DEFAULT);
-				return;
-			}
-
-			Local.User.loginPwd = EOD.decrypt(cursor.getString(cursor.getColumnIndex("p2")), Local.SECRET_PWD);
-			cursor.close();
-		}
-	}
 }

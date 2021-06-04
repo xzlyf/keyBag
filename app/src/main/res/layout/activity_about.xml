@@ -143,6 +143,15 @@
             android:textColor="@color/primary_text"
             android:textSize="@dimen/sp_22" />
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/dp_20"
+            android:text="©2021 Xzlyf Studio.All rights reserved."
+            android:textColor="@color/secondary_text"
+            android:textSize="@dimen/sp_12" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

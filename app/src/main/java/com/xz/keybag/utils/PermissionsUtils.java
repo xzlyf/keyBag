@@ -110,6 +110,7 @@ public class PermissionsUtils {
 		if (mPermissionDialog == null) {
 			mPermissionDialog = new AlertDialog.Builder(context)
 					.setMessage("已禁用权限，请手动授予")
+					.setCancelable(false)
 					.setPositiveButton("设置", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
