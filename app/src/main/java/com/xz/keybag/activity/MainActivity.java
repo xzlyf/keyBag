@@ -30,6 +30,7 @@ import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.cipher.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
+import com.xz.utils.TimeUtil;
 import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
@@ -58,6 +59,10 @@ public class MainActivity extends BaseActivity {
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
 	RecyclerView categoryRecycler;
+	@BindView(R.id.tv_login_date)
+	TextView tvLoginTime;
+	@BindView(R.id.tv_slogan)
+	TextView tvSlogan;
 
 
 	private DBManager db;
@@ -95,6 +100,14 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initState() {
+		updateSlogan();
+		long loginTime;
+		try {
+			loginTime = Long.parseLong(Local.mAdmin.getLastLoginTime());
+			tvLoginTime.setText(String.format("上次登录：\n%s", TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss", loginTime)));
+		} catch (NumberFormatException e) {
+			tvLoginTime.setText("上次登录：异常");
+		}
 		isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
 		modeSwitch.setChecked(isNight);
 		if (isNight) {
@@ -149,6 +162,7 @@ public class MainActivity extends BaseActivity {
 		super.onResume();
 		new ReadDataCommon().start();
 		refreshCategory();
+		updateSlogan();
 	}
 
 	private void initRecycler() {
@@ -207,14 +221,19 @@ public class MainActivity extends BaseActivity {
 		refreshCategory();
 	}
 
-	private void refreshCategory(){
+	private void refreshCategory() {
 		mListCategory = db.queryCategory();
 		mListCategory.add(0, new Category(CATEGORY_ALL, "1"));
 		categoryAdapter.superRefresh(mListCategory);
 	}
 
+	private void updateSlogan() {
+		String slogan = PreferencesUtilV2.getString(Local.SHARD_SLOGAN, Local.DEFAULT_SLOGAN);
+		tvSlogan.setText(slogan);
+	}
 
-	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category})
+	@OnClick({R.id.tv_menu, R.id.tv_add, R.id.tv_secret, R.id.tv_move, R.id.tv_category
+			, R.id.tv_about, R.id.tv_random, R.id.tv_tool, R.id.tv_share})
 	public void onViewClick(View v) {
 
 		switch (v.getId()) {
@@ -225,13 +244,32 @@ public class MainActivity extends BaseActivity {
 				startActivity(new Intent(MainActivity.this, AddActivity.class));
 				break;
 			case R.id.tv_secret:
-				startActivity(new Intent(MainActivity.this, LoginActivity.class).putExtra("mode", Local.INTENT_EXTRA_LOGIN_MODE));
+				startActivity(new Intent(MainActivity.this, LoginActivity.class)
+						.putExtra("mode", Local.START_MODE_LOGIN_MODE));
 				break;
 			case R.id.tv_move:
 				startActivity(new Intent(MainActivity.this, BackupActivity.class));
 				break;
 			case R.id.tv_category:
 				startActivity(new Intent(MainActivity.this, CategoryManagerActivity.class));
+				break;
+			case R.id.tv_about:
+				startActivity(new Intent(MainActivity.this, AboutActivity.class));
+				break;
+			case R.id.tv_random:
+				startActivity(new Intent(MainActivity.this, RandomActivity.class));
+				break;
+			case R.id.tv_tool:
+				startActivity(new Intent(MainActivity.this, ToolActivity.class));
+				break;
+			case R.id.tv_share:
+				Intent share_intent = new Intent();
+				share_intent.setAction(Intent.ACTION_SEND);
+				share_intent.setType("text/plain");
+				share_intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
+				share_intent.putExtra(Intent.EXTRA_TEXT, "[钥匙包]是一款省心安全简洁的密码记录App,拥有有好的使用界面和一些小工具。欢迎关注[" + Local.WeChat + "]订阅号获取最新版本下载。");
+				share_intent = Intent.createChooser(share_intent, "分享");
+				startActivity(share_intent);
 				break;
 		}
 		drawerLayout.closeDrawer(GravityCompat.START);

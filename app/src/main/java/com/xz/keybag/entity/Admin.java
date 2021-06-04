@@ -11,6 +11,7 @@ public class Admin {
 	private String fingerprint;
 	private String privateKey;
 	private String publicKey;
+	private String lastLoginTime;
 	private AdminConfig config;
 
 
@@ -52,6 +53,14 @@ public class Admin {
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public String getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(String lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
 	}
 
 	public AdminConfig getConfig() {

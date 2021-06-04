@@ -8,6 +8,13 @@ public class Local {
 	public static final String TABLE_SECRET = "secret";//表名
 	public static final String TABLE_ACC = "dbase";//表名
 
+	public static final String PACKAGE_NAME = "com.xz.keybag";
+	public static final String WeChat = "小泽干货铺";
+	public static final String WeChat_URL = "http://weixin.qq.com/r/SziRicLEyp_1rYbq921Z";
+
+	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
+	public static String SLOGAN = "";//当前slogan
+
 	//二维码协议头
 	public static final String PROTOCOL_SPLIT = "@";//分割符号
 	//二维码密钥传输协议:格式：RSA(头协议@DES(secret))
@@ -21,18 +28,26 @@ public class Local {
 	public static final String DEFAULT = "0000";
 	public static String secret;//密钥
 
+
 	//handler标识
 
 	//Shard标识
 	public static final String SHARD_BOOLEAN_MODE = "day_or_night";
+	public static final String SHARD_SLOGAN = "slogan";
 
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
+	public static final int REQ_MAKE_PWD = 11003; // // 打开随机密码生成界面
+
+	//Activity启动模式
+	public static final int START_MODE_LOGIN_MODE = 0x14764185;
+	public static final int START_MODE_RANDOM = 0x14764186;
 
 	//EXTRA标识
 	public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
-	public static final int INTENT_EXTRA_LOGIN_MODE = 0x14764185;
 	public static final String INTENT_EXTRA_QR_CODE = "qr_code";
+	public static final String INTENT_EXTRA_RANDOM = "random";
+
 
 	//参数标识
 	public static final String FINGERPRINT_STATE_OPEN = "fingerprint";//开启指纹登录

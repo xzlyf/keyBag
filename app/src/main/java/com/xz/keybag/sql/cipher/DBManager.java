@@ -461,14 +461,15 @@ public class DBManager {
 	 *
 	 * @param id 项目id
 	 */
-	public void deleteProject(String id) {
+	public int deleteProject(String id) {
 		//生成条件语句
 		StringBuilder whereBuffer = new StringBuilder();
 		whereBuffer.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
 		//获取可读数据库
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
-		db.delete(TABLE_COMMON, whereBuffer.toString(), null);
+		int i = db.delete(TABLE_COMMON, whereBuffer.toString(), null);
 		db.close();
+		return i;
 	}
 
 
@@ -490,6 +491,16 @@ public class DBManager {
 		whereBuild.append(FIELD_COMMON_T0).append(" = ").append("'").append(id).append("'");
 		db.update(TABLE_COMMON, cv, whereBuild.toString(), null);
 		db.close();
+	}
+
+	/**
+	 * 清空表
+	 */
+	public void deleteAllProject() {
+		//清空数据库
+		String sql = "delete from " + TABLE_COMMON;
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DB_PWD);
+		db.execSQL(sql);
 	}
 
 	/**
@@ -638,10 +649,13 @@ public class DBManager {
 	/**
 	 * 更新登录时间
 	 *
+	 * @param id              配置表id
 	 * @param loginTimestamp  登录时间
 	 * @param unlockTimestamp 解锁时间 -1 不需要存储
 	 */
 	public void updateLoginTime(String id, long loginTimestamp, long unlockTimestamp) {
+		//存储上一次登录时间
+		Local.mAdmin.setLastLoginTime(queryLoginTime(id));
 		StringBuilder whereBuffer = new StringBuilder();
 		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
 		ContentValues cv = new ContentValues();
@@ -653,6 +667,26 @@ public class DBManager {
 		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
 		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
 		db.close();
+	}
+
+	/**
+	 * 查询上一次登录日期
+	 *
+	 * @param configId 配置表id
+	 */
+	public String queryLoginTime(String configId) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(configId).append("'");
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getReadableDatabase(DBHelper.DB_PWD);
+		Cursor cursor = db.query(TABLE_CONFIG, new String[]{FIELD_CONFIG_P2}, whereBuffer.toString(), null, null, null, null);
+		if (cursor.moveToNext()) {
+			String st = cursor.getString(0);
+			cursor.close();
+			return st;
+		}
+		cursor.close();
+		return null;
 	}
 
 

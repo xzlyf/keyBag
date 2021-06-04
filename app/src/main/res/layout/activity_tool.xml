@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:overScrollMode="never"
+    tools:context=".activity.ToolActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/transparent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/tv_back"
+                style="@style/img_onclick_yuanxing"
+                android:layout_width="@dimen/dp_35"
+                android:layout_height="@dimen/dp_35"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:padding="@dimen/dp_5"
+                android:src="@mipmap/ic_back"
+                android:tint="@color/primary_text" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_5"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:layout_weight="1"
+                android:text="工具类"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/sp_16" />
+
+        </LinearLayout>
+
+        <!--加密算法选择-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_10"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加密算法"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/sp_16" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <!--DES密钥-->
+        <LinearLayout
+            android:id="@+id/des_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:background="@drawable/bg_border"
+            android:orientation="vertical">
+
+            <com.xz.keybag.custom.UnifyEditView
+                android:id="@+id/ue_des"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint="请输入..."
+                app:hintColor="@color/secTextColor"
+                app:label="密钥"
+                app:mode="vertical"
+                app:textColor="@color/category_text_2" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/dp_10">
+
+                <TextView
+                    android:id="@+id/tv_des"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_add"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:text="生成密钥"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="模式"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <Spinner
+                    android:id="@+id/spinner_des"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+        <!--RSA密钥-->
+        <LinearLayout
+            android:id="@+id/rsa_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_10"
+            android:background="@drawable/bg_border"
+            android:orientation="vertical">
+
+            <com.xz.keybag.custom.UnifyEditView
+                android:id="@+id/ue_rsa_public"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint="请输入..."
+                app:hintColor="@color/secTextColor"
+                app:label="公钥"
+                app:mode="vertical"
+                app:textColor="@color/category_text_2" />
+
+            <com.xz.keybag.custom.UnifyEditView
+                android:id="@+id/ue_rsa_private"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint="请输入..."
+                app:hintColor="@color/secTextColor"
+                app:label="私钥"
+                app:mode="vertical"
+                app:textColor="@color/category_text_2" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/dp_10">
+
+                <TextView
+                    android:id="@+id/tv_rsa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_add"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:text="生成密钥对"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="模式"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <Spinner
+                    android:id="@+id/spinner_rsa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_10"
+            android:background="@drawable/bg_border"
+            android:orientation="vertical"
+            android:padding="@dimen/dp_5">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_20"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="原文"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <com.xz.keybag.custom.IconTextView
+                    android:id="@+id/tv_copy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/dp_3"
+                    android:paddingEnd="@dimen/dp_20"
+                    android:text="复制"
+                    android:textColor="@color/secondary_text"
+                    app:icon_paddingStart="@dimen/dp_3"
+                    app:icon_src="@mipmap/ic_copy" />
+
+                <View
+                    android:layout_width="@dimen/dp_10"
+                    android:layout_height="0dp" />
+
+                <com.xz.keybag.custom.IconTextView
+                    android:id="@+id/tv_paste"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/dp_3"
+                    android:paddingEnd="@dimen/dp_20"
+                    android:text="粘贴"
+                    android:textColor="@color/secondary_text"
+                    app:icon_paddingStart="@dimen/dp_3"
+                    app:icon_src="@mipmap/ic_paste" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/et_source"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/dp_10"
+                android:background="@null"
+                android:gravity="start"
+                android:hint="在此输入..."
+                android:inputType="textMultiLine"
+                android:maxLength="1024"
+                android:minLines="3"
+                android:scrollbars="vertical"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:text="0/1024"
+                android:textColor="@color/secondary_text" />
+
+            <Button
+                android:id="@+id/tv_make"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:background="@drawable/btn_make"
+                android:text="加密"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_18" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp_10"
+            android:background="@drawable/bg_border"
+            android:orientation="vertical"
+            android:padding="@dimen/dp_5">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_20"
+                android:layout_marginBottom="@dimen/dp_10"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="结果"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/sp_16" />
+
+                <com.xz.keybag.custom.IconTextView
+                    android:id="@+id/tv_copy_clip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="@dimen/dp_3"
+                    android:paddingEnd="@dimen/dp_20"
+                    android:text="复制"
+                    android:textColor="@color/secondary_text"
+                    app:icon_paddingStart="@dimen/dp_3"
+                    app:icon_src="@mipmap/ic_copy" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_pre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/dp_20"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

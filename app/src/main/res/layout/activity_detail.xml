@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/dp_5"
                 android:layout_marginEnd="@dimen/dp_10"
-                android:text=""
+                android:text="详情"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_16" />
 
@@ -45,6 +45,23 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_5"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:background="@drawable/btn_yuanxin_common"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="@dimen/dp_5"
+                android:paddingTop="@dimen/dp_2"
+                android:paddingEnd="@dimen/dp_5"
+                android:paddingBottom="@dimen/dp_2"
+                android:text="删除"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_16" />
 
             <TextView
                 android:id="@+id/submit"
@@ -138,28 +155,28 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_25"
             android:layout_marginTop="@dimen/dp_20"
-            android:layout_height="wrap_content"
             android:text="更新时间：" />
 
         <TextView
             android:id="@+id/update_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_25"
-             />
+            android:layout_marginStart="@dimen/dp_25" />
+
         <TextView
             android:layout_width="wrap_content"
-            android:layout_marginStart="@dimen/dp_25"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
             android:text="创建时间：" />
+
         <TextView
             android:id="@+id/create_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_25"
-            />
+            android:layout_marginStart="@dimen/dp_25" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

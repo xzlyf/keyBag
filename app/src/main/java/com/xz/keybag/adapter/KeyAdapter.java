@@ -2,6 +2,7 @@ package com.xz.keybag.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -224,20 +225,24 @@ public class KeyAdapter extends BaseRecyclerAdapter<Project> {
 					break;
 				case R.id.share:
 					Datum datum = mList.get(getLayoutPosition()).getDatum();
-					String shareSt = "这里是钥匙包密码分享\n" +
+					String shareSt = "这里是[钥匙包]密码分享\n" +
 							"标题：" + datum.getProject() + "\n" +
 							"账号：" + datum.getAccount() + "\n" +
 							"密码：" + datum.getPassword() + "\n" +
 							"备注：" + datum.getRemark();
-					//Intent intent = new Intent(Intent.ACTION_SEND);
-					//intent.putExtra(Intent.EXTRA_TEXT, shareSt);
-					//intent.setType("text/plain");
-					//mContext.startActivity(Intent.createChooser(intent, "密码分享到"));
-					copyUtil.copyToClicp(shareSt);
-					Snackbar.make(v, "已复制", Snackbar.LENGTH_SHORT).show();
-					if (mListener != null) {
-						mListener.closeMenu();
-					}
+					Intent intent = new Intent();
+					intent.setAction(Intent.ACTION_SEND);
+					intent.setType("text/plain");
+					intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
+					intent.putExtra(Intent.EXTRA_TEXT, shareSt);
+					intent = Intent.createChooser(intent, "分享");
+					mListener.closeMenu();
+					mContext.startActivity(intent);
+					//copyUtil.copyToClicp(shareSt);
+					//Snackbar.make(v, "已复制", Snackbar.LENGTH_SHORT).show();
+					//if (mListener != null) {
+					//	mListener.closeMenu();
+					//}
 					break;
 			}
 

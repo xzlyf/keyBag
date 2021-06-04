@@ -1,10 +1,12 @@
 package com.xz.keybag.activity;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,6 +14,7 @@ import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryAdapter;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.OnItemClickListener;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.AppListDialog;
 import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.AppInfo;
@@ -104,7 +107,7 @@ public class AddActivity extends BaseActivity {
 	}
 
 
-	@OnClick({R.id.tv_back, R.id.tv_save})
+	@OnClick({R.id.tv_back, R.id.tv_save, R.id.tv_random})
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
 			case R.id.tv_back:
@@ -112,6 +115,9 @@ public class AddActivity extends BaseActivity {
 				break;
 			case R.id.tv_save:
 				saveAndExit();
+				break;
+			case R.id.tv_random:
+				startActivityForResult(new Intent(mContext, RandomActivity.class).putExtra("mode", Local.START_MODE_RANDOM), Local.REQ_MAKE_PWD);
 				break;
 		}
 	}
@@ -167,6 +173,22 @@ public class AddActivity extends BaseActivity {
 		finish();
 	}
 
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		//扫描结果回调
+		if (requestCode == Local.REQ_MAKE_PWD && resultCode == RESULT_OK) {
+			if (data == null) {
+				return;
+			}
+			String result = data.getStringExtra(Local.INTENT_EXTRA_RANDOM);
+			if (TextUtils.isEmpty(result)) {
+				return;
+			}
+			uePwd.setText(result);
+		}
+	}
 
 	@Override
 	protected void onDestroy() {
