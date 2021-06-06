@@ -29,6 +29,7 @@ public class Local {
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
 	public static final int REQ_MAKE_PWD = 11003; // // 打开随机密码生成界面
+	public static final int REQ_OPEN_DOCUMENT = 11004; // // 打开安卓原生文件选择器
 
 	//Activity启动模式
 	public static final int START_MODE_LOGIN_MODE = 0x14764185;

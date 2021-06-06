@@ -2,7 +2,7 @@ package com.xz.keybag.entity;
 
 import java.io.Serializable;
 
-public class KeyEntity implements Serializable {
+public class OldKeyEntity implements Serializable {
     private String t1, t2, t3, t4, t5;
 
 
@@ -46,4 +46,14 @@ public class KeyEntity implements Serializable {
         this.t5 = t5;
     }
 
+    @Override
+    public String toString() {
+        return "OldKeyEntity{" +
+                "t1='" + t1 + '\'' +
+                ", t2='" + t2 + '\'' +
+                ", t3='" + t3 + '\'' +
+                ", t4='" + t4 + '\'' +
+                ", t5='" + t5 + '\'' +
+                '}';
+    }
 }
