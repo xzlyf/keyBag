@@ -8,9 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.TextUtils;
 import android.view.View;
@@ -65,6 +63,8 @@ public class LoginActivity extends BaseActivity {
 	private boolean isSaveUnlockTime = false;
 	private long newLoginTime;
 	private String configId;
+	private final long[] VIBRATE_ERROR = new long[]{0, 80, 80, 80};
+	private final int VIBRATE_CLICK = 50;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -160,6 +160,16 @@ public class LoginActivity extends BaseActivity {
 				new PermissionsUtils.IPermissionsResult() {
 					@Override
 					public void passPermissons() {
+						// TODO: 2021/6/7 现在 Android 10已近无法获取设备imei id 了 现在解决方案是
+						/*
+						 * 现在的解决方案是 参考连接：https://www.jianshu.com/p/477c7b5d58e3
+						 * 如果Android10以上 -> 在设备的外部目录创建UUID，只要用户没有手动删除该文件UUID一直存在。
+						 *
+						 * 如果Android10以下，获取设备IMEI
+						 *     如果没有获取到IMEI -> 在设备外部目录创建UUIID
+						 *
+						 * 如果考虑IMEI是私密信息，可以对IMEI做MD5再返回。
+						 */
 						deviceId = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
 						String old = db.queryIdentity();
 						if (old != null) {
@@ -387,7 +397,7 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void playErrState(View v) {
 		ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(v, rotateValuesHolder);
-		objectAnimator.setDuration(1500);
+		objectAnimator.setDuration(1000);
 		objectAnimator.start();
 	}
 
@@ -395,18 +405,14 @@ public class LoginActivity extends BaseActivity {
 	 * 数字点击震动效果
 	 */
 	private void playVibration() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-			vibrator.vibrate(VibrationEffect.EFFECT_CLICK);
-		} else {
-			vibrator.vibrate(30);
-		}
+		vibrator.vibrate(VIBRATE_CLICK);
 	}
 
 	/**
 	 * 错误震动
 	 */
 	private void playErrorVibration() {
-		vibrator.vibrate(2000);
+		vibrator.vibrate(VIBRATE_ERROR, -1);
 	}
 
 	/**
