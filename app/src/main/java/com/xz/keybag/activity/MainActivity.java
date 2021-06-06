@@ -98,7 +98,6 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initState() {
-		updateSlogan();
 		long loginTime;
 		try {
 			loginTime = Long.parseLong(Local.mAdmin.getLastLoginTime());
@@ -210,7 +209,6 @@ public class MainActivity extends BaseActivity {
 
 			}
 		});
-		refreshCategory();
 	}
 
 	private void refreshCategory() {
