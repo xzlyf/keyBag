@@ -8,13 +8,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.CategoryEditAdapter;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.custom.UnifyEditView;
 import com.xz.keybag.entity.Category;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.UUIDUtil;
 
 import java.util.HashMap;

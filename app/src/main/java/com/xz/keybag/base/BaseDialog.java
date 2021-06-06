@@ -7,6 +7,8 @@ import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.xz.keybag.R;
+
 public abstract class BaseDialog extends Dialog {
     protected Context mContext;
     private OnCancelListener cancelListener;
@@ -35,7 +37,7 @@ public abstract class BaseDialog extends Dialog {
         setContentView(getLayoutResource());
         Window window = getWindow();
         assert window != null;
-        window.setBackgroundDrawableResource(com.xz.xzwidget.R.color.transparent);
+        window.setBackgroundDrawableResource(R.color.transparent);
         WindowManager.LayoutParams lp = window.getAttributes();
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
         lp.width = (int) (dm.widthPixels * 0.8);

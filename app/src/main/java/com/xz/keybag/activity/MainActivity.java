@@ -3,8 +3,6 @@ package com.xz.keybag.activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -12,6 +10,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,11 +26,10 @@ import com.xz.keybag.constant.Local;
 import com.xz.keybag.custom.SlideRecyclerView;
 import com.xz.keybag.entity.Category;
 import com.xz.keybag.entity.Project;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.utils.SpacesItemDecorationHorizontal;
 import com.xz.utils.SpacesItemDecorationVertical;
 import com.xz.utils.TimeUtil;
-import com.xz.widget.textview.SearchEditView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +52,7 @@ public class MainActivity extends BaseActivity {
 	@BindView(R.id.tv_title)
 	TextView tvTitle;
 	@BindView(R.id.et_search)
-	SearchEditView etSearch;
+	SearchView etSearch;
 	@BindView(R.id.switch_mode)
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
@@ -100,7 +98,6 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initState() {
-		updateSlogan();
 		long loginTime;
 		try {
 			loginTime = Long.parseLong(Local.mAdmin.getLastLoginTime());
@@ -126,24 +123,18 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initView() {
-		etSearch.addTextChangeListener(new TextWatcher() {
+		etSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+			public boolean onQueryTextSubmit(String query) {
+				return false;
 			}
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				keyAdapter.getFilter().filter(s);
+			public boolean onQueryTextChange(String newText) {
+				keyAdapter.getFilter().filter(newText);
+				return true;
 			}
 		});
-
-
 	}
 
 	@Override
@@ -218,7 +209,6 @@ public class MainActivity extends BaseActivity {
 
 			}
 		});
-		refreshCategory();
 	}
 
 	private void refreshCategory() {

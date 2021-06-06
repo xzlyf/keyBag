@@ -5,7 +5,7 @@
     <color name="primary_light">#B2EBF2</color>
     <color name="colorAccent">#8BC34A</color>
     <color name="primary_text">#212121</color>
-    <color name="secondary_text">#757575</color>
+    <color name="secondary_text">#505050</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#E4E4E4</color>
     <color name="nav_background">#fff</color>
@@ -16,7 +16,12 @@
     <color name="category_icon">#5E5E5E</color>
     <color name="category_text">#FFFFFF</color>
     <color name="category_text_2">#505050</color>
-
+    <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color><!-- 透明色 -->
+    <color name="INFO_COLOR">#3F51B5</color>
+    <color name="orange">#f8b62d</color>
+    <color name="primary">#4CAF50</color>
+    <color name="deep_gray">#afaeae</color>
     <color name="background_home">#F3F3F3</color>
 
     <!-- QRCode scanner color begin -->
@@ -35,5 +40,10 @@
     <color name="btn_scan_start">#FFFFFF</color>
     <color name="btn_scan_center">#FFFFFF</color>
     <color name="btn_scan_end">#A4B3BF</color>
+
+    <!--加载对话框的那个动画-->
+    <color name="triangle">#aa72d572</color>
+    <color name="circle">#aa738ffe</color>
+    <color name="rect">#aae84e40</color>
 
 </resources>

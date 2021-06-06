@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.custom.UnifyEditView;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 
 import butterknife.BindView;
 import butterknife.OnClick;

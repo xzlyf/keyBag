@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -23,21 +22,15 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.utils.ToastUtil;
 import com.xz.keybag.custom.LoadingDialog;
 import com.xz.keybag.utils.ColorUtil;
 import com.xz.keybag.utils.TransparentBarUtil;
-import com.xz.widget.dialog.XOnClickListener;
-import com.xz.widget.dialog.XzTipsDialog;
 
 import butterknife.ButterKnife;
 
@@ -45,8 +38,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 	protected final String TAG = this.getClass().getSimpleName();
 
 	protected Activity mContext;
-	private XzTipsDialog xzTipsDialog;
 	private LoadingDialog loadingDialog;
+	private AlertDialog alertDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +57,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 
 			}
 		}
-
-		//申请权限
-		initPermission();
-
-
+		initData();
 	}
 
 
@@ -85,84 +74,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 
 	public abstract void initData();
 
-	/**
-	 * 申请权限
-	 */
-	public void initPermission() {
-		if (Local.flag == -1) {
-			Local.flag = 0;
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-				boolean noPermission = false;
-				//权限列表在Local全局类里，需要增加权限去local里增加
-				for (String s : Local.permission) {
-					if (ContextCompat.checkSelfPermission(this, s) != PackageManager.PERMISSION_GRANTED) {
-						//没有权限
-						noPermission = true;
-						Logger.w(s);
-					}
-				}
-
-				if (noPermission) {
-
-					AlertDialog dialog = new AlertDialog.Builder(this)
-							.setTitle(getString(R.string.string_tips))
-							.setMessage(getString(R.string.string_premission))
-							.setPositiveButton(getString(R.string.string_agreed), new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									ActivityCompat.requestPermissions(BaseActivity.this, Local.permission, 456);
-								}
-							})
-							.setNegativeButton(getString(R.string.string_sidagree), new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									lToast(getString(R.string.string_error));
-								}
-							})
-							.create();
-
-					dialog.show();
-				} else {
-					initData();
-				}
-
-			} else {
-				initData();
-			}
-
-		} else {
-			initData();
-		}
-	}
-
-	/**
-	 * 权限结果回调
-	 *
-	 * @param requestCode
-	 * @param permissions
-	 * @param grantResults
-	 */
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-		if (requestCode == 456) {
-			for (int i = 0; i < permissions.length; i++) {
-				if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-					//成功
-				} else {
-					//失败
-				}
-			}
-			//给不给权限都给进了
-			initData();
-
-		}
-
-
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -215,28 +126,25 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 
 	@Override
 	public void sDialog(String title, String msg) {
-		if (xzTipsDialog == null) {
-			xzTipsDialog = new XzTipsDialog.Builder(this)
+		if (alertDialog == null) {
+			alertDialog = new AlertDialog.Builder(mContext)
 					.setTitle(title)
-					.setContent(msg)
-					.setCancelOnclickListener(getString(R.string.string_right), new XOnClickListener() {
+					.setMessage(msg)
+					.setPositiveButton("好的", new DialogInterface.OnClickListener() {
 						@Override
-						public void onClick(int viewId, String s, int position) {
-							dDialog();
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
 						}
 					})
 					.create();
-			xzTipsDialog.setCancelable(false);
-			xzTipsDialog.setCanceledOnTouchOutside(false);
 		}
-		xzTipsDialog.show();
+		alertDialog.show();
 	}
 
 	@Override
 	public void dDialog() {
-		if (xzTipsDialog != null || xzTipsDialog.isShowing()) {
-			xzTipsDialog.dismiss();
-			xzTipsDialog = null;
+		if (alertDialog != null) {
+			alertDialog.cancel();
 		}
 	}
 

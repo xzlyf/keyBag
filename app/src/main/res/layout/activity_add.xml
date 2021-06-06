@@ -68,7 +68,7 @@
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
-        app:hintColor="@color/secTextColor"
+        app:hintColor="@color/secondary_text"
         app:label="名称 >"
         app:textColor="@color/category_text_2" />
 
@@ -79,7 +79,7 @@
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
-        app:hintColor="@color/secTextColor"
+        app:hintColor="@color/secondary_text"
         app:label="账号"
         app:textColor="@color/category_text_2" />
 
@@ -90,7 +90,7 @@
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
-        app:hintColor="@color/secTextColor"
+        app:hintColor="@color/secondary_text"
         app:label="密码"
         app:textColor="@color/category_text_2" />
 
@@ -138,7 +138,7 @@
         android:background="@color/category_background"
         android:elevation="@dimen/dp_2"
         app:hint="请输入..."
-        app:hintColor="@color/secTextColor"
+        app:hintColor="@color/secondary_text"
         app:label="备注"
         app:lines="4"
         app:maxLines="4"

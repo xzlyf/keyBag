@@ -81,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:hint="请输入..."
-                app:hintColor="@color/secTextColor"
+                app:hintColor="@color/secondary_text"
                 app:label="密钥"
                 app:mode="vertical"
                 app:textColor="@color/category_text_2" />
@@ -136,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:hint="请输入..."
-                app:hintColor="@color/secTextColor"
+                app:hintColor="@color/secondary_text"
                 app:label="公钥"
                 app:mode="vertical"
                 app:textColor="@color/category_text_2" />
@@ -146,7 +146,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:hint="请输入..."
-                app:hintColor="@color/secTextColor"
+                app:hintColor="@color/secondary_text"
                 app:label="私钥"
                 app:mode="vertical"
                 app:textColor="@color/category_text_2" />

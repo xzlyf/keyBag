@@ -103,6 +103,7 @@ public class DataSendActivity extends BaseActivity {
 				Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.launch_max);
 				Bitmap qrCode = ZxingUtils.createImage(getQrCode(host, port), 400, 400, logo);
 				Glide.with(mContext).asBitmap().load(qrCode).into(imageQr);
+				//Glide.with(mContext).load(qrCode).into(imageQr);
 			}
 
 			@Override

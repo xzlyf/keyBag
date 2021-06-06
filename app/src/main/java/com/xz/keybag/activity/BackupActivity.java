@@ -18,8 +18,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
-import com.xz.keybag.sql.cipher.DBHelper;
-import com.xz.keybag.sql.cipher.DBManager;
+import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.ColorUtil;
 
 import java.util.ArrayList;

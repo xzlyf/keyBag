@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:hint="在此输入新分类名"
-            app:hintColor="@color/secTextColor"
+            app:hintColor="@color/secondary_text"
             app:label="标签："
             app:lines="1"
             app:maxLength="8"

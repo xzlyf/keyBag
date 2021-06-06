@@ -4,7 +4,7 @@
     android:layout_width="@dimen/dp_250"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:background="@color/colorText"
+    android:background="@color/white"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical">

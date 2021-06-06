@@ -22,29 +22,51 @@
         android:roundIcon="@drawable/lanuch_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ToolActivity"></activity>
-        <activity android:name=".activity.RandomActivity" />
-        <activity android:name=".activity.AboutActivity" />
-        <activity android:name=".activity.CategoryManagerActivity" />
+        <activity
+            android:name=".activity.ToolActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.RandomActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AboutActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CategoryManagerActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.SocketService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.DataReceiveActivity" />
+        <activity
+            android:name=".activity.DataReceiveActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.ServerSocketService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.DataSendActivity" />
-        <activity android:name=".activity.BackupActivity" />
-        <activity android:name=".zxing.activity.CaptureActivity" />
-        <activity android:name=".activity.ModifyActivity" />
-        <activity android:name=".activity.QRCodeActivity" />
-        <activity android:name=".activity.LoginSettingActivity" />
+        <activity
+            android:name=".activity.DataSendActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.BackupActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zxing.activity.CaptureActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ModifyActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.QRCodeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LoginSettingActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
@@ -65,6 +87,7 @@
         </activity>
         <activity
             android:name=".activity.MainActivity"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <provider
