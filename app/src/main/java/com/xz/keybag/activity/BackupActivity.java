@@ -1,7 +1,12 @@
 package com.xz.keybag.activity;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -16,11 +21,24 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
+import com.xz.keybag.constant.Local;
+import com.xz.keybag.entity.Datum;
+import com.xz.keybag.entity.OldKeyEntity;
+import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.ColorUtil;
+import com.xz.keybag.utils.FileUtils;
+import com.xz.keybag.utils.IOUtil;
+import com.xz.keybag.utils.PermissionsUtils;
+import com.xz.utils.TimeUtil;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +57,7 @@ public class BackupActivity extends BaseActivity {
 
 	public static final int HANDLER_REFRESH_PIE_DATA = 0x123456;
 	private DBManager db;
+	private ImportDataThread importDataThread;
 
 	private Handler mHandler = new Handler(new Handler.Callback() {
 		@Override
@@ -71,7 +90,7 @@ public class BackupActivity extends BaseActivity {
 		initPieChart();
 	}
 
-	@OnClick({R.id.tv_back, R.id.tv_send, R.id.tv_receive})
+	@OnClick({R.id.tv_back, R.id.tv_send, R.id.tv_receive, R.id.tv_import_old})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
 			case R.id.tv_back:
@@ -83,6 +102,81 @@ public class BackupActivity extends BaseActivity {
 			case R.id.tv_receive:
 				startActivity(new Intent(mContext, DataReceiveActivity.class));
 				break;
+			case R.id.tv_import_old:
+				PermissionsUtils.getInstance().chekPermissions(this,
+						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+						new PermissionsUtils.IPermissionsResult() {
+							@Override
+							public void passPermissons() {
+								importOld();
+							}
+
+							@Override
+							public void forbitPermissons() {
+								AlertDialog finallyDialog = new AlertDialog.Builder(BackupActivity.this)
+										.setMessage("App需要此权限,\n否则无法找到文件")
+										.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+											}
+										})
+										.create();
+								finallyDialog.show();
+
+							}
+						});
+				break;
+		}
+	}
+
+	//接收返回值
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+			case Local.REQ_OPEN_DOCUMENT:
+				if (resultCode == Activity.RESULT_OK && data != null) {
+					//当单选选了一个文件后返回
+					if (data.getData() != null) {
+						Uri uri = data.getData();
+						String filePath = FileUtils.getRealPath(this, uri);
+						handlerOldData(filePath);
+					}
+				}
+				break;
+		}
+	}
+
+
+	/**
+	 * 导入旧版本（v1.5）的数据
+	 */
+	private void importOld() {
+		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		//不限制选取类型
+		intent.setType("text/plain");
+		try {
+			startActivityForResult(intent, Local.REQ_OPEN_DOCUMENT);
+		} catch (Exception e) {
+			sToast("请先安装一个文件管理器，否者不能找到文件");
+		}
+
+	}
+
+
+	/**
+	 * 处理导入的旧版本数据
+	 */
+	private void handlerOldData(String filePath) {
+		if (importDataThread == null) {
+			importDataThread = new ImportDataThread(filePath);
+			importDataThread.start();
+		} else {
+			if (importDataThread.isAlive()){
+				sToast("正在运行，请勿重复点击");
+			}
 		}
 	}
 
@@ -173,6 +267,89 @@ public class BackupActivity extends BaseActivity {
 			msg.what = HANDLER_REFRESH_PIE_DATA;
 			msg.obj = pieData;
 			mHandler.sendMessage(msg);
+		}
+	}
+
+
+	/**
+	 * 线程写入数据
+	 */
+	private class ImportDataThread extends Thread {
+		private File pathFile;
+
+		ImportDataThread(String filePath) {
+			pathFile = new File(filePath);
+
+		}
+
+		@Override
+		public void run() {
+			if (!pathFile.exists()) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						sToast("文件不存在");
+					}
+				});
+				return;
+			}
+			FileReader fileReader = null;
+			StringBuilder sBuff;
+			List<OldKeyEntity> list;
+			Gson gson = new Gson();
+			try {
+				fileReader = new FileReader(pathFile);
+				char[] buf = new char[1024];
+				int num;
+				sBuff = new StringBuilder();
+				while ((num = fileReader.read(buf)) != -1) {
+					sBuff.append(buf, 0, num);
+				}
+				list = gson.fromJson(sBuff.toString(), new TypeToken<List<OldKeyEntity>>() {
+				}.getType());
+			} catch (IOException e) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						sToast("这不是我想要的数据>_<");
+					}
+				});
+				e.printStackTrace();
+				return;
+			} finally {
+				IOUtil.closeAll(fileReader);
+			}
+
+			//开始写入数据库
+			Project project;
+			Datum datum;
+			for (int i = 0; i < list.size(); i++) {
+				project = new Project();
+				datum = new Datum();
+				datum.setProject(list.get(i).getT1());
+				datum.setAccount(list.get(i).getT2());
+				datum.setPassword(list.get(i).getT3());
+				datum.setRemark(list.get(i).getT4());
+				datum.setCategory("APP");
+				project.setDatum(datum);
+				long l;
+				try {
+					l = Long.parseLong(list.get(i).getT5());
+				} catch (NumberFormatException e) {
+					l = System.currentTimeMillis();
+				}
+				project.setCreateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
+				project.setUpdateDate(TimeUtil.getSimMilliDate("yyyy年MM月dd HH:mm:ss", l));
+				db.insertProject(project);
+			}
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					sToast("导入成功");
+				}
+			});
+
 		}
 	}
 

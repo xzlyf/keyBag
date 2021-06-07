@@ -47,12 +47,6 @@
 
 
     <TextView
-        style="@style/secret_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要备份" />
-
-    <TextView
         android:id="@+id/tv_send"
         style="@style/secret_textView"
         android:layout_width="match_parent"
@@ -65,5 +59,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="我要接收" />
+
+    <View style="@style/split_line" />
+
+    <TextView
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="明文导出密码" />
+
+    <TextView
+        android:id="@+id/tv_import_old"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入旧版数据" />
 
 </LinearLayout>
