@@ -1,11 +1,13 @@
 package com.xz.keybag.constant;
 
+import android.os.Environment;
+
 import com.xz.keybag.entity.Admin;
 
 public class Local {
 
-
-
+	//外置存储目录
+	//public static final String BASE_EXTERNAL_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keybag";
 	public static final String PACKAGE_NAME = "com.xz.keybag";
 	public static final String WeChat = "小泽干货铺";
 	public static final String WeChat_URL = "http://weixin.qq.com/r/SziRicLEyp_1rYbq921Z";

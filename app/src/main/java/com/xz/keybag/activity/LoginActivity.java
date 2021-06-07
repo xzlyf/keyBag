@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -29,7 +31,16 @@ import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.DBHelper;
 import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.DeviceUniqueUtils;
+import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.PermissionsUtils;
+import com.xz.keybag.utils.UUIDUtil;
+import com.xz.utils.hardware.SystemInfoUtil;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import butterknife.BindView;
 
@@ -65,6 +76,7 @@ public class LoginActivity extends BaseActivity {
 	private String configId;
 	private final long[] VIBRATE_ERROR = new long[]{0, 80, 80, 80};
 	private final int VIBRATE_CLICK = 50;
+	private boolean noFingerprint = false;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -103,6 +115,7 @@ public class LoginActivity extends BaseActivity {
 				inputLayout2.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
+				noFingerprint = true;
 			} else {
 				//初始化指纹模块
 				initFingerprint();
@@ -160,17 +173,7 @@ public class LoginActivity extends BaseActivity {
 				new PermissionsUtils.IPermissionsResult() {
 					@Override
 					public void passPermissons() {
-						// TODO: 2021/6/7 现在 Android 10已近无法获取设备imei id 了 现在解决方案是
-						/*
-						 * 现在的解决方案是 参考连接：https://www.jianshu.com/p/477c7b5d58e3
-						 * 如果Android10以上 -> 在设备的外部目录创建UUID，只要用户没有手动删除该文件UUID一直存在。
-						 *
-						 * 如果Android10以下，获取设备IMEI
-						 *     如果没有获取到IMEI -> 在设备外部目录创建UUIID
-						 *
-						 * 如果考虑IMEI是私密信息，可以对IMEI做MD5再返回。
-						 */
-						deviceId = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
+						deviceId = getDeviceUnique();
 						String old = db.queryIdentity();
 						if (old != null) {
 							if (!old.equals(deviceId)) {
@@ -312,6 +315,7 @@ public class LoginActivity extends BaseActivity {
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
 				Local.mAdmin.setFingerprint(Local.FINGERPRINT_STATE_NONSUPPORT);
+				noFingerprint = true;
 
 			}
 
@@ -432,6 +436,82 @@ public class LoginActivity extends BaseActivity {
 			Keyframe.ofFloat(1.0f, 0f)
 	);
 
+	/**
+	 * 获取设备唯一标识
+	 * android 29开始 不再能获取imei
+	 * 现在思路是低于29的照常获取imei
+	 * 大于29的通过在外置私有目录创建一个文件保存uuid作为唯一标识
+	 * 但是用户卸载后标识会被删除
+	 *
+	 * @return
+	 */
+	private String getDeviceUnique() {
+		String devices = "";
+		int version = SystemInfoUtil.getSystemVersionCode();
+		if (version >= Build.VERSION_CODES.Q) {
+			File extPath = getExternalFilesDir("IMEI");
+			if (extPath == null) {
+				return "not found sd card";
+			}
+			if (!extPath.exists()) {
+				boolean mkdir = extPath.mkdir();
+				if (!mkdir) {
+					return "-1";
+				}
+			}
+			extPath = new File(extPath, "imei");
+
+			if (extPath.exists()) {
+				devices = read(extPath);
+			} else {
+				devices = write(extPath);
+			}
+
+		} else {
+			devices = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
+		}
+
+		Logger.d("imei:" + devices);
+		return devices;
+	}
+
+	/**
+	 * 读取imei文件
+	 */
+	private String read(File extPath) {
+		String imei = null;
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(extPath));
+			imei = reader.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+			imei = "imei read error";
+		} finally {
+			IOUtil.closeAll(reader);
+		}
+		return imei;
+	}
+
+	/**
+	 * 写入imei文件
+	 */
+	private String write(File extPath) {
+		String imei = UUIDUtil.getStrUUID();
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(extPath);
+			writer.write(imei);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			imei = "imei write error";
+		} finally {
+			IOUtil.closeAll(writer);
+		}
+
+		return imei;
+	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -443,7 +523,11 @@ public class LoginActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		if (inputLayout.getVisibility() == View.VISIBLE) {
-			inputLayout.setVisibility(View.GONE);
+			if (noFingerprint) {
+				super.onBackPressed();
+			} else {
+				inputLayout.setVisibility(View.GONE);
+			}
 		} else {
 			super.onBackPressed();
 		}
