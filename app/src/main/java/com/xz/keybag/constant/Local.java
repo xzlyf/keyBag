@@ -7,7 +7,7 @@ import com.xz.keybag.entity.Admin;
 public class Local {
 
 	//外置存储目录
-	//public static final String BASE_EXTERNAL_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keybag";
+	public static final String BASE_EXTERNAL_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keybag";
 	public static final String PACKAGE_NAME = "com.xz.keybag";
 	public static final String WeChat = "小泽干货铺";
 	public static final String WeChat_URL = "http://weixin.qq.com/r/SziRicLEyp_1rYbq921Z";
@@ -32,6 +32,7 @@ public class Local {
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
 	public static final int REQ_MAKE_PWD = 11003; // // 打开随机密码生成界面
 	public static final int REQ_OPEN_DOCUMENT = 11004; // // 打开安卓原生文件选择器
+	public static final int REQ_OPEN_DOCUMENT_2 = 11005; // // 打开安卓原生文件选择器
 
 	//Activity启动模式
 	public static final int START_MODE_LOGIN_MODE = 0x14764185;

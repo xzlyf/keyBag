@@ -5,18 +5,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.adapter.AppListAdapter;
 import com.xz.keybag.base.BaseDialog;
@@ -25,7 +22,6 @@ import com.xz.keybag.entity.AppInfo;
 import com.xz.keybag.utils.AppInfoUtils;
 import com.xz.utils.SpacesItemDecorationVertical;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,6 +57,7 @@ public class AppListDialog extends BaseDialog {
 
 		readThread = new ReadThread(mContext);
 		readThread.start();
+		// TODO: 2021/6/7 当很多应用时读取过慢，读取过程中不能点击
 	}
 
 	private void initView() {

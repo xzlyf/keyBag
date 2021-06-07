@@ -23,6 +23,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -38,6 +39,7 @@ import com.xz.utils.TimeUtil;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +59,9 @@ public class BackupActivity extends BaseActivity {
 
 	public static final int HANDLER_REFRESH_PIE_DATA = 0x123456;
 	private DBManager db;
+	private ImportOldDataThread importOldDataThread;
 	private ImportDataThread importDataThread;
+	private ExportTextDataThread exportTextDataThread;
 
 	private Handler mHandler = new Handler(new Handler.Callback() {
 		@Override
@@ -88,9 +92,18 @@ public class BackupActivity extends BaseActivity {
 		changeStatusBarTextColor();
 		db = DBManager.getInstance(this);
 		initPieChart();
+
 	}
 
-	@OnClick({R.id.tv_back, R.id.tv_send, R.id.tv_receive, R.id.tv_import_old})
+	/**
+	 * 初始化图表
+	 */
+	private void initPieChart() {
+		new PieChartDataRead().start();
+	}
+
+	@OnClick({R.id.tv_back, R.id.tv_send, R.id.tv_receive, R.id.tv_import_old, R.id.tv_export_text,
+			R.id.tv_import_new})
 	public void onViewClick(View v) {
 		switch (v.getId()) {
 			case R.id.tv_back:
@@ -103,7 +116,7 @@ public class BackupActivity extends BaseActivity {
 				startActivity(new Intent(mContext, DataReceiveActivity.class));
 				break;
 			case R.id.tv_import_old:
-				PermissionsUtils.getInstance().chekPermissions(this,
+				PermissionsUtils.getInstance().chekPermissions(mContext,
 						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
 						new PermissionsUtils.IPermissionsResult() {
 							@Override
@@ -127,8 +140,57 @@ public class BackupActivity extends BaseActivity {
 							}
 						});
 				break;
+			case R.id.tv_export_text:
+				PermissionsUtils.getInstance().chekPermissions(mContext,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						new PermissionsUtils.IPermissionsResult() {
+							@Override
+							public void passPermissons() {
+								exportText();
+							}
+
+							@Override
+							public void forbitPermissons() {
+								AlertDialog finallyDialog = new AlertDialog.Builder(BackupActivity.this)
+										.setMessage("App需要此权限,\n否则无法写出文件")
+										.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+											}
+										})
+										.create();
+								finallyDialog.show();
+							}
+						});
+				break;
+			case R.id.tv_import_new:
+				PermissionsUtils.getInstance().chekPermissions(mContext,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						new PermissionsUtils.IPermissionsResult() {
+							@Override
+							public void passPermissons() {
+								importNew();
+							}
+
+							@Override
+							public void forbitPermissons() {
+								AlertDialog finallyDialog = new AlertDialog.Builder(BackupActivity.this)
+										.setMessage("App需要此权限,\n否则无法读取文件")
+										.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+											}
+										})
+										.create();
+								finallyDialog.show();
+							}
+						});
+				break;
 		}
 	}
+
 
 	//接收返回值
 	@Override
@@ -145,6 +207,49 @@ public class BackupActivity extends BaseActivity {
 					}
 				}
 				break;
+			case Local.REQ_OPEN_DOCUMENT_2:
+				if (resultCode == Activity.RESULT_OK && data != null) {
+					//当单选选了一个文件后返回
+					if (data.getData() != null) {
+						Uri uri = data.getData();
+						String filePath = FileUtils.getRealPath(this, uri);
+						handlerData(filePath);
+					}
+				}
+				break;
+		}
+	}
+
+	/**
+	 * 导入明文数据
+	 */
+	private void importNew() {
+		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		//不限制选取类型
+		intent.setType("*/*");
+		try {
+			startActivityForResult(intent, Local.REQ_OPEN_DOCUMENT_2);
+		} catch (Exception e) {
+			sToast("请先安装一个文件管理器，否者不能找到文件");
+		}
+	}
+
+	/**
+	 * 处理导入新版的数据
+	 */
+	private void handlerData(String filePath) {
+		if (importDataThread == null) {
+			importDataThread = new ImportDataThread(filePath);
+			importDataThread.start();
+			showLoading("请稍后，正在处理", true, null);
+
+		} else {
+			if (importDataThread.isAlive()) {
+				sToast("正在运行，请勿重复点击");
+			} else {
+				importDataThread = null;
+			}
 		}
 	}
 
@@ -156,7 +261,7 @@ public class BackupActivity extends BaseActivity {
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 		//不限制选取类型
-		intent.setType("text/plain");
+		intent.setType("*/*");
 		try {
 			startActivityForResult(intent, Local.REQ_OPEN_DOCUMENT);
 		} catch (Exception e) {
@@ -170,21 +275,36 @@ public class BackupActivity extends BaseActivity {
 	 * 处理导入的旧版本数据
 	 */
 	private void handlerOldData(String filePath) {
-		if (importDataThread == null) {
-			importDataThread = new ImportDataThread(filePath);
-			importDataThread.start();
+		if (importOldDataThread == null) {
+			importOldDataThread = new ImportOldDataThread(filePath);
+			importOldDataThread.start();
+			showLoading("请稍后，正在处理", true, null);
+
 		} else {
-			if (importDataThread.isAlive()){
+			if (importOldDataThread.isAlive()) {
 				sToast("正在运行，请勿重复点击");
+			} else {
+				importOldDataThread = null;
 			}
 		}
 	}
 
+
 	/**
-	 * 初始化图表
+	 * 导出明文密码
 	 */
-	private void initPieChart() {
-		new PieChartDataRead().start();
+	private void exportText() {
+		if (exportTextDataThread == null) {
+			exportTextDataThread = new ExportTextDataThread();
+			exportTextDataThread.start();
+			showLoading("请稍后，正在处理", true, null);
+		} else {
+			if (exportTextDataThread.isAlive()) {
+				sToast("正在运行，请勿重复点击");
+			} else {
+				exportTextDataThread = null;
+			}
+		}
 	}
 
 
@@ -272,12 +392,12 @@ public class BackupActivity extends BaseActivity {
 
 
 	/**
-	 * 线程写入数据
+	 * 线程写入数据 旧版本数据
 	 */
-	private class ImportDataThread extends Thread {
+	private class ImportOldDataThread extends Thread {
 		private File pathFile;
 
-		ImportDataThread(String filePath) {
+		ImportOldDataThread(String filePath) {
 			pathFile = new File(filePath);
 
 		}
@@ -288,6 +408,7 @@ public class BackupActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						disLoading();
 						sToast("文件不存在");
 					}
 				});
@@ -307,10 +428,11 @@ public class BackupActivity extends BaseActivity {
 				}
 				list = gson.fromJson(sBuff.toString(), new TypeToken<List<OldKeyEntity>>() {
 				}.getType());
-			} catch (IOException e) {
+			} catch (Exception e) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						disLoading();
 						sToast("这不是我想要的数据>_<");
 					}
 				});
@@ -346,6 +468,7 @@ public class BackupActivity extends BaseActivity {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					disLoading();
 					sToast("导入成功");
 				}
 			});
@@ -353,4 +476,117 @@ public class BackupActivity extends BaseActivity {
 		}
 	}
 
+	/**
+	 * 导出明文密码
+	 */
+	private class ExportTextDataThread extends Thread {
+		@Override
+		public void run() {
+			File outFile = new File(Local.BASE_EXTERNAL_DIRECTORY);
+			if (!outFile.exists()) {
+				boolean mkdir = outFile.mkdir();
+				if (!mkdir) {
+					return;
+				}
+			}
+			List<Project> projects = db.queryProject();
+			outFile = new File(outFile, String.valueOf(System.currentTimeMillis()));
+			final String finalPath = outFile.getAbsolutePath();
+			FileWriter fw = null;
+			try {
+				fw = new FileWriter(outFile);
+				Gson gson = new Gson();
+				char[] buff;
+				buff = gson.toJson(projects).toCharArray();
+				fw.write(buff);
+				fw.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				IOUtil.closeAll(fw);
+			}
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					disLoading();
+					new AlertDialog.Builder(mContext)
+							.setMessage("已导出\n" + finalPath)
+							.setPositiveButton("好的", null)
+							.create()
+							.show();
+				}
+			});
+
+		}
+	}
+
+	/**
+	 * 线程写入数据 新版本
+	 */
+	private class ImportDataThread extends Thread {
+		private File pathFile;
+
+		ImportDataThread(String filePath) {
+			pathFile = new File(filePath);
+
+		}
+
+		@Override
+		public void run() {
+			if (!pathFile.exists()) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						disLoading();
+						sToast("文件不存在");
+					}
+				});
+				return;
+			}
+			FileReader fileReader = null;
+			StringBuilder sBuff;
+			List<Project> list;
+			Gson gson = new Gson();
+			try {
+				fileReader = new FileReader(pathFile);
+				char[] buf = new char[1024];
+				int num;
+				sBuff = new StringBuilder();
+				while ((num = fileReader.read(buf)) != -1) {
+					sBuff.append(buf, 0, num);
+				}
+				list = gson.fromJson(sBuff.toString(), new TypeToken<List<Project>>() {
+				}.getType());
+			} catch (Exception e) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						disLoading();
+						sToast("这不是我想要的数据>_<");
+					}
+				});
+				e.printStackTrace();
+				return;
+			} finally {
+				IOUtil.closeAll(fileReader);
+			}
+
+
+			for (int i = 0; i < list.size(); i++) {
+				db.insertProject(list.get(i));
+			}
+
+			// TODO: 2021/6/7 导入 db
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					disLoading();
+					sToast("导入成功");
+				}
+			});
+
+		}
+	}
 }
