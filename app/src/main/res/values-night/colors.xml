@@ -5,16 +5,48 @@
     <color name="primary_light">#00BCD4</color>
     <color name="colorAccent">#8BC34A</color>
     <color name="primary_text">#FFFFFF</color>
-    <color name="secondary_text">#E2E2E2</color>
+    <color name="secondary_text">#D1D1D1</color>
     <color name="icons">#FFFFFF</color>
-    <color name="divider">#424242</color>
+    <color name="divider">#2B2B2B</color>
     <color name="nav_background">#2B2B2B</color>
-    <color name="item_white">#444444</color>
-    <color name="tips_color">#292929</color>
-    <color name="edit_background">#535353</color>
+    <color name="item_white">#505050</color>
+    <color name="tips_color">#505050</color>
+    <color name="edit_background">#EEEEEE</color>
     <color name="category_background">#2B2B2B</color>
     <color name="category_icon">#5E5E5E</color>
     <color name="category_text">#FFFFFF</color>
-    <color name="category_text_2">#FFFFFF</color>
+    <color name="category_text_2">#fff</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color><!-- 透明色 -->
+    <color name="INFO_COLOR">#3F51B5</color>
+    <color name="orange">#f8b62d</color>
+    <color name="primary">#4CAF50</color>
+    <color name="deep_gray">#afaeae</color>
+    <color name="background_home">#2B2B2B</color>
+    <color name="edit_focus_false">#505050</color>
+    <color name="edit_focus_true">#505050</color>
+    <color name="split_view">#505050</color>
+
+    <!-- QRCode scanner color begin -->
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="result_view">#B0000000</color>
+    <color name="viewfinder_frame">#90FFFFFF</color>
+    <color name="result_point_color">#C0089CFF</color>
+    <color name="laser_color">#00BCD4</color>
+    <color name="corner_color">#00BCD4</color>
+
+    <!--密钥修改页面漫画黑底颜色-->
+    <color name="secret_layout_dark">#5A5A5A</color>
+
+    <!--扫描按钮渐变色-->
+    <color name="btn_scan_white">#FFFFFF</color>
+    <color name="btn_scan_start">#FFFFFF</color>
+    <color name="btn_scan_center">#FFFFFF</color>
+    <color name="btn_scan_end">#A4B3BF</color>
+
+    <!--加载对话框的那个动画-->
+    <color name="triangle">#aa72d572</color>
+    <color name="circle">#aa738ffe</color>
+    <color name="rect">#aae84e40</color>
 
 </resources>

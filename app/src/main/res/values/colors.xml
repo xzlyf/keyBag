@@ -23,6 +23,9 @@
     <color name="primary">#4CAF50</color>
     <color name="deep_gray">#afaeae</color>
     <color name="background_home">#F3F3F3</color>
+    <color name="edit_focus_false">#ECECEC</color>
+    <color name="edit_focus_true">#ECECEC</color>
+    <color name="split_view">#CFCFCF</color>
 
     <!-- QRCode scanner color begin -->
     <color name="viewfinder_mask">#60000000</color>
