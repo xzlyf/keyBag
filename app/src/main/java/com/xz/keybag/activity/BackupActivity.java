@@ -578,7 +578,6 @@ public class BackupActivity extends BaseActivity {
 				db.insertProject(list.get(i));
 			}
 
-			// TODO: 2021/6/7 导入 db
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {

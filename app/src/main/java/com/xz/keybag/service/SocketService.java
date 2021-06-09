@@ -25,8 +25,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 public class SocketService extends Service {
@@ -138,7 +136,7 @@ public class SocketService extends Service {
 				verifyBuff.append(Local.PROTOCOL_SPLIT);
 				verifyBuff.append(System.currentTimeMillis());
 				dos.writeUTF(RSA.publicEncrypt(verifyBuff.toString(), RSA.getPublicKey(Local.publicKey)));
-			} catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				IOUtil.closeAll(dos, socket);
 				callBack.message("验证失败");
@@ -163,8 +161,8 @@ public class SocketService extends Service {
 				fileOut = new DataOutputStream(new BufferedOutputStream(new BufferedOutputStream(new FileOutputStream(savePath))));
 				len = dis.readLong();
 
-				callBack.message("文件的长度为:" + len + "\n");
-				callBack.message("开始接收文件!" + "\n");
+				//callBack.message("文件的长度为:" + len + "\n");
+				callBack.message("开始接收!" + "\n");
 
 				while (true) {
 					int read = 0;
@@ -175,10 +173,10 @@ public class SocketService extends Service {
 					if (read == -1) {
 						break;
 					}
-					callBack.message("文件接收了" + (passedlen * 100 / len) + "%\n");
+					callBack.message("接收了" + (passedlen * 100 / len) + "%\n");
 					fileOut.write(buf, 0, read);
 				}
-				callBack.message("接收完成，文件存为" + savePath + "\n");
+				//callBack.message("接收完成，文件存为" + savePath + "\n");
 				cachePath = savePath;
 				fileOut.close();
 			} catch (Exception e) {
