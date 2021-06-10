@@ -91,7 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="分类管理"
-                app:icon_src="@mipmap/ic_move" />
+                app:icon_src="@mipmap/ic_category" />
 
             <LinearLayout
                 android:layout_width="match_parent"
