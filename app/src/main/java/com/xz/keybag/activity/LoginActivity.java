@@ -99,7 +99,7 @@ public class LoginActivity extends BaseActivity {
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-		if (mode != Local.START_MODE_LOGIN_MODE) {
+		if (mode == Local.START_MODE_LOGIN_MODE) {
 			//initSql
 			DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
 			db = DBManager.getInstance(this);
@@ -109,7 +109,7 @@ public class LoginActivity extends BaseActivity {
 			initLogin();
 			//登录配置
 			initLoginConfig();
-		} else {
+		} else if (mode == Local.START_MODE_SECRET_SETTING) {
 			//用户是否开启指纹登录
 			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
 				inputLayout2.setVisibility(View.GONE);
@@ -120,6 +120,8 @@ public class LoginActivity extends BaseActivity {
 				//初始化指纹模块
 				initFingerprint();
 			}
+		} else {
+			finish();
 		}
 
 
@@ -330,13 +332,13 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
-		if (mode == Local.START_MODE_LOGIN_MODE) {
+		if (mode == Local.START_MODE_SECRET_SETTING) {
 			startActivity(new Intent(mContext, LoginSettingActivity.class));
 			finish();
 			return;
 		}
 		updateLoginConfig();
-		startActivity(new Intent(mContext, MainActivity.class));
+		startActivity(new Intent(mContext, HomeActivity.class));
 		overridePendingTransition(R.anim.translation_finish, R.anim.translation_create);
 		new Handler().postDelayed(new Runnable() {
 			@Override

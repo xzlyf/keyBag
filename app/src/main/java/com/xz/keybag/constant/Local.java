@@ -35,6 +35,7 @@ public class Local {
 	public static final int REQ_OPEN_DOCUMENT_2 = 11005; // // 打开安卓原生文件选择器
 
 	//Activity启动模式
+	public static final int START_MODE_SECRET_SETTING= 0x14764184;
 	public static final int START_MODE_LOGIN_MODE = 0x14764185;
 	public static final int START_MODE_RANDOM = 0x14764186;
 
