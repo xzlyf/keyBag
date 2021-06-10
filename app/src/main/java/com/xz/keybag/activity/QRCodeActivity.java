@@ -44,7 +44,7 @@ public class QRCodeActivity extends BaseActivity {
 		}
 
 		mLight = getLight(this);
-		Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.launch_max);
+		Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.launch_corner);
 		Bitmap qrCode = ZxingUtils.createImage(qrSt, 400, 400, logo);
 		Glide.with(this).asBitmap().load(qrCode).into(imageQr);
 
