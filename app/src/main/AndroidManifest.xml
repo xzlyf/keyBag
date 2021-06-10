@@ -78,6 +78,7 @@
             android:theme="@style/AppHomeTheme" />
         <activity
             android:name=".activity.LoginPassActivity"
+            android:theme="@style/AppHomeTheme"
             android:screenOrientation="portrait" />
 
         <activity

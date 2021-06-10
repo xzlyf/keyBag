@@ -63,7 +63,6 @@ public class LoginActivity extends BaseActivity {
 	@BindView(R.id.tv_input_tips)
 	TextView tvInputTips;
 
-	private int MAX_NUM = 4;
 	private FingerprintHelper fingerprintHelper;
 	//震动幅度
 	private float shakeDegrees = 3f;
@@ -137,11 +136,11 @@ public class LoginActivity extends BaseActivity {
 			@Override
 			public void clickNum(String num) {
 				playVibration();
-				if (etPwd.getText().toString().trim().length() == MAX_NUM - 1) {
+				if (etPwd.getText().toString().trim().length() == Local.PWD_COUNT - 1) {
 					etPwd.append(num);
 					checkPwd();
 					return;
-				} else if (etPwd.getText().toString().trim().length() >= MAX_NUM) {
+				} else if (etPwd.getText().toString().trim().length() >= Local.PWD_COUNT) {
 					return;
 				}
 				etPwd.append(num);

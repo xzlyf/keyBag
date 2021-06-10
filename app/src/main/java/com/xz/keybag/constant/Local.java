@@ -14,6 +14,7 @@ public class Local {
 
 	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
 	public static String SLOGAN = "";//当前slogan
+	public static final int PWD_COUNT = 4;//密码位数
 
 	//二维码协议头
 	public static final String PROTOCOL_SPLIT = "@";//分割符号
@@ -35,7 +36,7 @@ public class Local {
 	public static final int REQ_OPEN_DOCUMENT_2 = 11005; // // 打开安卓原生文件选择器
 
 	//Activity启动模式
-	public static final int START_MODE_SECRET_SETTING= 0x14764184;
+	public static final int START_MODE_SECRET_SETTING = 0x14764184;
 	public static final int START_MODE_LOGIN_MODE = 0x14764185;
 	public static final int START_MODE_RANDOM = 0x14764186;
 
