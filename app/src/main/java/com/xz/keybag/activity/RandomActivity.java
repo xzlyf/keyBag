@@ -74,7 +74,6 @@ public class RandomActivity extends BaseActivity {
 				tvKeep.setVisibility(View.VISIBLE);
 			}
 		}
-		changeStatusBarTextColor();
 		copyUtil = new CopyUtil(mContext);
 		mRandom = new Random();
 		charList = new ArrayList<>();

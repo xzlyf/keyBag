@@ -10,9 +10,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseDialog;
+import com.xz.keybag.constant.Local;
 import com.xz.utils.KeyBoardUtil;
 
 public class PasswordInputDialog extends BaseDialog {
@@ -43,17 +43,6 @@ public class PasswordInputDialog extends BaseDialog {
 		mVerifyProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-				if (seekBar.getProgress() >= seekBar.getMax() && !TextUtils.isEmpty(mEtInput.getText().toString().trim())) {
-					seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.check_pass));
-					seekBar.setThumbOffset(seekBar.getMax() + 50);
-					seekBar.setProgress(seekBar.getMax());
-					seekBar.setEnabled(false);
-					mTvTop.setVisibility(View.VISIBLE);
-					mEtInput.setEnabled(false);
-					if (mOnClickListener != null) {
-						mOnClickListener.onClick(PasswordInputDialog.this, mEtInput.getText().toString().trim());
-					}
-				}
 			}
 
 			@Override
@@ -70,7 +59,25 @@ public class PasswordInputDialog extends BaseDialog {
 						seekBar.setThumbOffset(0);
 						seekBar.setProgress(0);
 						Toast.makeText(mContext, "密码不能为空", Toast.LENGTH_SHORT).show();
+						return;
 					}
+					if (mEtInput.getText().toString().trim().length() < Local.PWD_COUNT) {
+						seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
+						seekBar.setThumbOffset(0);
+						seekBar.setProgress(0);
+						Toast.makeText(mContext, "密码需要满足" + Local.PWD_COUNT + "位", Toast.LENGTH_SHORT).show();
+						return;
+					}
+					seekBar.setThumb(mContext.getResources().getDrawable(R.mipmap.check_pass));
+					seekBar.setThumbOffset(seekBar.getMax() + 50);
+					seekBar.setProgress(seekBar.getMax());
+					seekBar.setEnabled(false);
+					mTvTop.setVisibility(View.VISIBLE);
+					mEtInput.setEnabled(false);
+					if (mOnClickListener != null) {
+						mOnClickListener.onClick(PasswordInputDialog.this, mEtInput.getText().toString().trim());
+					}
+
 				} else {
 					seekBar.setProgress(0);
 				}

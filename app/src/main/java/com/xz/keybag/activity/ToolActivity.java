@@ -77,7 +77,6 @@ public class ToolActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
 		copyUtil = new CopyUtil(this);
 		nonType();
 		spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, algorithmArray));

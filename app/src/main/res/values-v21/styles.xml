@@ -2,7 +2,17 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+        <!-- 通用样式 状态栏黑字白底  夜间模式 黑底白字 -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@color/nav_background</item>
+        <item name="android:windowLightStatusBar">@bool/status_auto_dark</item>
+    </style>
+    <style name="AppHomeTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- 主页和登录页专用样式 -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

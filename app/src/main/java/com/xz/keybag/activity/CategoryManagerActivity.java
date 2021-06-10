@@ -45,7 +45,6 @@ public class CategoryManagerActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
 		db = DBManager.getInstance(this);
 		initRecycler();
 	}

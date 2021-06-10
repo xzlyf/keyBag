@@ -8,10 +8,12 @@ import android.os.IBinder;
 import android.os.Looper;
 
 import com.google.gson.Gson;
+import com.xz.keybag.constant.Local;
 import com.xz.keybag.entity.Project;
 import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.StorageUtil;
+import com.xz.keybag.utils.lock.RSA;
 import com.xz.utils.MD5Util;
 
 import java.io.BufferedInputStream;
@@ -202,8 +204,16 @@ public class ServerSocketService extends Service {
 					callBack.message("有设备已接入");
 					dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 					String verify = dis.readUTF();
+					String[] split;
+					//rsa验证
+					try {
+						verify = RSA.privateDecrypt(verify, RSA.getPrivateKey(Local.privateKey));
+						split = verify.split("@");
+					} catch (Exception e) {
+						//rsa解密失败 验证失败
+						split = new String[]{"@"};//让它进入“设备验证不通过的提示”
+					}
 					//校验信息
-					String[] split = verify.split("@");
 					if (split.length == 1) {
 						callBack.message("设备验证不通过\n重新等待接入...");
 						dis.close();

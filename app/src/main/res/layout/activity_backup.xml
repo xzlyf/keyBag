@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/nav_background"
     tools:context=".activity.BackupActivity">
 
     <LinearLayout
@@ -47,12 +48,6 @@
 
 
     <TextView
-        style="@style/secret_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要备份" />
-
-    <TextView
         android:id="@+id/tv_send"
         style="@style/secret_textView"
         android:layout_width="match_parent"
@@ -65,5 +60,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="我要接收" />
+
+    <View style="@style/split_line" />
+
+    <TextView
+        android:id="@+id/tv_export_text"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导出明文密码" />
+
+    <TextView
+        android:id="@+id/tv_import_new"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入明文数据" />
+
+    <TextView
+        android:id="@+id/tv_import_old"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入明文数据（v1.5）" />
 
 </LinearLayout>

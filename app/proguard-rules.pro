@@ -88,10 +88,15 @@
 # 保留R下面的资源
 -keep class **.R$* {*;}
 
+# sqlcipher混淆配置
+-keep class net.sqlcipher.** { *; }
+-keep class net.sqlcipher.database.* { *; }
+
 # 保留本地native方法不被混淆
 -keepclasseswithmembernames class * {
     native <methods>;
 }
+
 
 # 保留在Activity中的方法参数是view的方法，
 # 这样以来我们在layout中写的onClick就不会被影响

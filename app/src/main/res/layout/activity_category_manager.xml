@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/nav_background"
     tools:context=".activity.CategoryManagerActivity">
 
     <LinearLayout
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_25"
         android:layout_marginTop="@dimen/dp_10"
-        android:background="#CFCFCF"
+        android:background="@color/split_view"
         android:gravity="center_vertical"
         android:paddingStart="@dimen/dp_5"
         android:paddingEnd="@dimen/dp_5"
@@ -96,7 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_25"
         android:layout_marginTop="@dimen/dp_10"
-        android:background="#CFCFCF"
+        android:background="@color/split_view"
         android:gravity="center_vertical"
         android:paddingStart="@dimen/dp_5"
         android:paddingEnd="@dimen/dp_5"

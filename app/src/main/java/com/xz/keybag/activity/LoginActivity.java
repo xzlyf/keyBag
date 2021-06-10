@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -31,7 +31,16 @@ import com.xz.keybag.jni.NativeUtils;
 import com.xz.keybag.sql.DBHelper;
 import com.xz.keybag.sql.DBManager;
 import com.xz.keybag.utils.DeviceUniqueUtils;
+import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.PermissionsUtils;
+import com.xz.keybag.utils.UUIDUtil;
+import com.xz.utils.hardware.SystemInfoUtil;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import butterknife.BindView;
 
@@ -54,7 +63,6 @@ public class LoginActivity extends BaseActivity {
 	@BindView(R.id.tv_input_tips)
 	TextView tvInputTips;
 
-	private int MAX_NUM = 4;
 	private FingerprintHelper fingerprintHelper;
 	//震动幅度
 	private float shakeDegrees = 3f;
@@ -65,6 +73,9 @@ public class LoginActivity extends BaseActivity {
 	private boolean isSaveUnlockTime = false;
 	private long newLoginTime;
 	private String configId;
+	private final long[] VIBRATE_ERROR = new long[]{0, 80, 80, 80};
+	private final int VIBRATE_CLICK = 50;
+	private boolean noFingerprint = false;
 
 	@Override
 	public boolean homeAsUpEnabled() {
@@ -87,7 +98,7 @@ public class LoginActivity extends BaseActivity {
 		//震动服务
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-		if (mode != Local.START_MODE_LOGIN_MODE) {
+		if (mode == Local.START_MODE_LOGIN_MODE) {
 			//initSql
 			DBHelper.DB_PWD = NativeUtils.signatureParams("KeyBag_Secret");//生成数据库密码
 			db = DBManager.getInstance(this);
@@ -97,16 +108,19 @@ public class LoginActivity extends BaseActivity {
 			initLogin();
 			//登录配置
 			initLoginConfig();
-		} else {
+		} else if (mode == Local.START_MODE_SECRET_SETTING) {
 			//用户是否开启指纹登录
 			if (!Local.mAdmin.getFingerprint().equals(Local.FINGERPRINT_STATE_OPEN)) {
 				inputLayout2.setVisibility(View.GONE);
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
+				noFingerprint = true;
 			} else {
 				//初始化指纹模块
 				initFingerprint();
 			}
+		} else {
+			finish();
 		}
 
 
@@ -122,11 +136,11 @@ public class LoginActivity extends BaseActivity {
 			@Override
 			public void clickNum(String num) {
 				playVibration();
-				if (etPwd.getText().toString().trim().length() == MAX_NUM - 1) {
+				if (etPwd.getText().toString().trim().length() == Local.PWD_COUNT - 1) {
 					etPwd.append(num);
 					checkPwd();
 					return;
-				} else if (etPwd.getText().toString().trim().length() >= MAX_NUM) {
+				} else if (etPwd.getText().toString().trim().length() >= Local.PWD_COUNT) {
 					return;
 				}
 				etPwd.append(num);
@@ -160,7 +174,7 @@ public class LoginActivity extends BaseActivity {
 				new PermissionsUtils.IPermissionsResult() {
 					@Override
 					public void passPermissons() {
-						deviceId = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
+						deviceId = getDeviceUnique();
 						String old = db.queryIdentity();
 						if (old != null) {
 							if (!old.equals(deviceId)) {
@@ -302,6 +316,7 @@ public class LoginActivity extends BaseActivity {
 				inputLayout.setVisibility(View.VISIBLE);
 				inputType.setVisibility(View.GONE);
 				Local.mAdmin.setFingerprint(Local.FINGERPRINT_STATE_NONSUPPORT);
+				noFingerprint = true;
 
 			}
 
@@ -316,13 +331,13 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void killMySelf() {
 		//判断模式，打开对应的活动
-		if (mode == Local.START_MODE_LOGIN_MODE) {
+		if (mode == Local.START_MODE_SECRET_SETTING) {
 			startActivity(new Intent(mContext, LoginSettingActivity.class));
 			finish();
 			return;
 		}
 		updateLoginConfig();
-		startActivity(new Intent(mContext, MainActivity.class));
+		startActivity(new Intent(mContext, HomeActivity.class));
 		overridePendingTransition(R.anim.translation_finish, R.anim.translation_create);
 		new Handler().postDelayed(new Runnable() {
 			@Override
@@ -387,7 +402,7 @@ public class LoginActivity extends BaseActivity {
 	 */
 	private void playErrState(View v) {
 		ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(v, rotateValuesHolder);
-		objectAnimator.setDuration(1500);
+		objectAnimator.setDuration(1000);
 		objectAnimator.start();
 	}
 
@@ -395,18 +410,14 @@ public class LoginActivity extends BaseActivity {
 	 * 数字点击震动效果
 	 */
 	private void playVibration() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-			vibrator.vibrate(VibrationEffect.EFFECT_CLICK);
-		} else {
-			vibrator.vibrate(30);
-		}
+		vibrator.vibrate(VIBRATE_CLICK);
 	}
 
 	/**
 	 * 错误震动
 	 */
 	private void playErrorVibration() {
-		vibrator.vibrate(2000);
+		vibrator.vibrate(VIBRATE_ERROR, -1);
 	}
 
 	/**
@@ -426,6 +437,82 @@ public class LoginActivity extends BaseActivity {
 			Keyframe.ofFloat(1.0f, 0f)
 	);
 
+	/**
+	 * 获取设备唯一标识
+	 * android 29开始 不再能获取imei
+	 * 现在思路是低于29的照常获取imei
+	 * 大于29的通过在外置私有目录创建一个文件保存uuid作为唯一标识
+	 * 但是用户卸载后标识会被删除
+	 *
+	 * @return
+	 */
+	private String getDeviceUnique() {
+		String devices = "";
+		int version = SystemInfoUtil.getSystemVersionCode();
+		if (version >= Build.VERSION_CODES.Q) {
+			File extPath = getExternalFilesDir("IMEI");
+			if (extPath == null) {
+				return "not found sd card";
+			}
+			if (!extPath.exists()) {
+				boolean mkdir = extPath.mkdir();
+				if (!mkdir) {
+					return "-1";
+				}
+			}
+			extPath = new File(extPath, "imei");
+
+			if (extPath.exists()) {
+				devices = read(extPath);
+			} else {
+				devices = write(extPath);
+			}
+
+		} else {
+			devices = DeviceUniqueUtils.getPhoneSign(LoginActivity.this);
+		}
+
+		Logger.d("imei:" + devices);
+		return devices;
+	}
+
+	/**
+	 * 读取imei文件
+	 */
+	private String read(File extPath) {
+		String imei = null;
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(extPath));
+			imei = reader.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+			imei = "imei read error";
+		} finally {
+			IOUtil.closeAll(reader);
+		}
+		return imei;
+	}
+
+	/**
+	 * 写入imei文件
+	 */
+	private String write(File extPath) {
+		String imei = UUIDUtil.getStrUUID();
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(extPath);
+			writer.write(imei);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			imei = "imei write error";
+		} finally {
+			IOUtil.closeAll(writer);
+		}
+
+		return imei;
+	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -437,7 +524,11 @@ public class LoginActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		if (inputLayout.getVisibility() == View.VISIBLE) {
-			inputLayout.setVisibility(View.GONE);
+			if (noFingerprint) {
+				super.onBackPressed();
+			} else {
+				inputLayout.setVisibility(View.GONE);
+			}
 		} else {
 			super.onBackPressed();
 		}

@@ -50,7 +50,6 @@ public class DataReceiveActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
 		bindSocketService();
 	}
 

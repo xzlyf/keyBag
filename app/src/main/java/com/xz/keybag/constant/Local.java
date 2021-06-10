@@ -1,17 +1,20 @@
 package com.xz.keybag.constant;
 
+import android.os.Environment;
+
 import com.xz.keybag.entity.Admin;
 
 public class Local {
 
-
-
+	//外置存储目录
+	public static final String BASE_EXTERNAL_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keybag";
 	public static final String PACKAGE_NAME = "com.xz.keybag";
 	public static final String WeChat = "小泽干货铺";
 	public static final String WeChat_URL = "http://weixin.qq.com/r/SziRicLEyp_1rYbq921Z";
 
 	public static final String DEFAULT_SLOGAN = "你个大头虾\n成日忘记密码";//默认slogan
 	public static String SLOGAN = "";//当前slogan
+	public static final int PWD_COUNT = 4;//密码位数
 
 	//二维码协议头
 	public static final String PROTOCOL_SPLIT = "@";//分割符号
@@ -29,8 +32,11 @@ public class Local {
 	//Request参数
 	public static final int REQ_QR_CODE = 11002; // // 打开扫描界面请求码
 	public static final int REQ_MAKE_PWD = 11003; // // 打开随机密码生成界面
+	public static final int REQ_OPEN_DOCUMENT = 11004; // // 打开安卓原生文件选择器
+	public static final int REQ_OPEN_DOCUMENT_2 = 11005; // // 打开安卓原生文件选择器
 
 	//Activity启动模式
+	public static final int START_MODE_SECRET_SETTING = 0x14764184;
 	public static final int START_MODE_LOGIN_MODE = 0x14764185;
 	public static final int START_MODE_RANDOM = 0x14764186;
 
