@@ -67,7 +67,6 @@ public class ModifyActivity extends BaseActivity {
 	@Override
 	public void initData() {
 		newSecretLayout.setVisibility(View.GONE);
-		changeStatusBarTextColor();
 		String qrSt = getIntent().getStringExtra(Local.INTENT_EXTRA_QR_CODE);
 		if (TextUtils.isEmpty(qrSt)) {
 			finish();

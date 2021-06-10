@@ -89,7 +89,7 @@ public class BackupActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
+		//changeStatusBarTextColor(getColor(R.color.nav_background));
 		db = DBManager.getInstance(this);
 		initPieChart();
 

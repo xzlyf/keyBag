@@ -55,7 +55,6 @@ public class DataSendActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
 		bindSocketService();
 	}
 

@@ -90,7 +90,6 @@ public class LoginSettingActivity extends BaseActivity {
 			return;
 		}
 		db = DBManager.getInstance(this);
-		changeStatusBarTextColor();
 		Glide.with(this).asGif().load(R.drawable.animaiton_unlock_dark).into(bannerView);
 		initState();
 		swFingerprint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

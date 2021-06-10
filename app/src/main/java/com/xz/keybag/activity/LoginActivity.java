@@ -124,7 +124,7 @@ public class LoginActivity extends BaseActivity {
 
 
 		//todo  测试模式：关闭密码验证
-		killMySelf();
+		//killMySelf();
 	}
 
 	private void initView() {

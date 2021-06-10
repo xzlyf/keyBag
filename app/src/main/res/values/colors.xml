@@ -26,6 +26,7 @@
     <color name="edit_focus_false">#ECECEC</color>
     <color name="edit_focus_true">#ECECEC</color>
     <color name="split_view">#CFCFCF</color>
+    <item name="status_auto_dark" type="bool">true</item>
 
     <!-- QRCode scanner color begin -->
     <color name="viewfinder_mask">#60000000</color>

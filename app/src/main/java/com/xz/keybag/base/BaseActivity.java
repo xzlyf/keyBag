@@ -298,6 +298,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 	 * 改变状态栏字体颜色
 	 */
 	protected void changeStatusBarTextColor() {
+		changeStatusBarTextColor(Color.TRANSPARENT);
+
+	}
+	/**
+	 * 改变状态栏字体颜色
+	 */
+	protected void changeStatusBarTextColor(int color) {
 		Window window = getWindow();
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
 			window.getDecorView().setSystemUiVisibility(View.VISIBLE);
@@ -305,7 +312,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 				//透明底，黑色字
 				window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-				window.setStatusBarColor(Color.TRANSPARENT);
+				window.setStatusBarColor(color);
 
 			} else {
 				//黑色底，白色字
@@ -314,7 +321,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 				window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
 			}
 		}
-
 	}
 
 	/**

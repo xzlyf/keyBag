@@ -40,7 +40,6 @@ public class AboutActivity extends BaseActivity {
 
 	@Override
 	public void initData() {
-		changeStatusBarTextColor();
 		copyUtil = new CopyUtil(mContext);
 		//获取app图标
 		Drawable appIcon = AppInfoUtils.getAppIcon(mContext, Local.PACKAGE_NAME);
