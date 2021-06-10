@@ -57,7 +57,6 @@ public class AppListDialog extends BaseDialog {
 
 		readThread = new ReadThread(mContext);
 		readThread.start();
-		// TODO: 2021/6/7 当很多应用时读取过慢，读取过程中不能点击
 	}
 
 	private void initView() {
@@ -119,19 +118,24 @@ public class AppListDialog extends BaseDialog {
 					@Override
 					public void run() {
 						int curr = (int) (((float) finalI / (float) total) * 100);
-						mProgressBar.setProgress(curr);
-						mAdapter.refreshSingle(allApp.get(finalI));
+						if (AppListDialog.this.isShowing()) {
+							mProgressBar.setProgress(curr);
+							mAdapter.refreshSingle(allApp.get(finalI));
+						}
+
 					}
 				});
-				SystemClock.sleep(60);
+				SystemClock.sleep(10);
 			}
 			if (!isStop) {
 				//隐藏进度条
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						mProgressBar.setProgress(100);
-						mProgressBar.setVisibility(View.INVISIBLE);
+						if (AppListDialog.this.isShowing()) {
+							mProgressBar.setProgress(100);
+							mProgressBar.setVisibility(View.INVISIBLE);
+						}
 					}
 				});
 			}

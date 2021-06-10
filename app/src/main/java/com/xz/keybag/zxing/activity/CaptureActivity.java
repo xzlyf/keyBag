@@ -247,7 +247,6 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 		inactivityTimer.onActivity();
 		playBeepSoundAndVibrate();
 		String resultString = result.getText();
-		//FIXME
 		if (TextUtils.isEmpty(resultString)) {
 			Toast.makeText(CaptureActivity.this, "Scan failed!", Toast.LENGTH_SHORT).show();
 		} else {

@@ -69,9 +69,11 @@
             android:name=".activity.LoginSettingActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:theme="@style/AppHomeTheme"
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:theme="@style/AppHomeTheme"
             android:name=".activity.DetailActivity"
             android:screenOrientation="portrait" />
         <activity
