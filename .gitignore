@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 release
+.idea
+codeStyles
+/.idea/codeStyles/Project.xml
