@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_key"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/btn_category_key"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:paddingStart="6dp"
+    android:paddingTop="3dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="3dp"
+    android:text="软件"
+    android:textColor="@color/category_text"
+    android:textSize="14sp" />

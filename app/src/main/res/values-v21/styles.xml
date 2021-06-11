@@ -2,7 +2,17 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+        <!-- 通用样式 状态栏黑字白底  夜间模式 黑底白字 -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@color/nav_background</item>
+        <item name="android:windowLightStatusBar">@bool/status_auto_dark</item>
+    </style>
+    <style name="AppHomeTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- 主页和登录页专用样式 -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -11,6 +21,13 @@
         <item name="android:statusBarColor">@color/colorPrimary</item>
     </style>
 
+    <!--适用于imageview.textview可点击的样式-->
+    <style name="img_onclick_yuanxing">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@drawable/btn_yuanxin_common</item>
+    </style>
 
     <style name="menu_btn" parent="TextAppearance.AppCompat.Widget.Button">
         <item name="android:background">?android:attr/selectableItemBackground</item>
@@ -33,4 +50,39 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="secret_textView">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="icon_textView">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <!--自定义命名空间-->
+        <item name="icon_paddingStart">10dp</item>
+    </style>
+
+
+    <!--分割线 切割线 样式-->
+    <style name="split_line">
+        <item name="android:background">#D1D1D1</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
 </resources>

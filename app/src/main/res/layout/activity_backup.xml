@@ -1,163 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/nav_background"
     tools:context=".activity.BackupActivity">
 
-
     <LinearLayout
-
-        android:id="@+id/select_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/divider"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/transparent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_send"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_20"
-                android:layout_weight="1"
-                android:background="@drawable/btn_rect_1"
-                android:text="发送"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btn_receive"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_20"
-                android:layout_weight="1"
-                android:background="@drawable/btn_rect_2"
-                android:text="接收"
-                android:textColor="@color/white" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/tv_back"
+            style="@style/img_onclick_yuanxing"
+            android:layout_width="@dimen/dp_35"
+            android:layout_height="@dimen/dp_35"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:padding="@dimen/dp_5"
+            android:src="@mipmap/ic_back"
+            android:tint="@color/primary_text" />
 
         <TextView
-            android:id="@+id/label_tips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_20"
-            android:background="@drawable/background_yuanjiao_3"
-            android:paddingStart="5dp"
-            android:paddingEnd="10dp"
-            android:text="！在同一个WIFI环境下进行操作"
+            android:layout_marginStart="@dimen/dp_5"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:text="数据搬家"
             android:textColor="@color/primary_text"
-            android:visibility="gone" />
+            android:textSize="@dimen/sp_16" />
+
     </LinearLayout>
 
 
-
-    <LinearLayout
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pie_chart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/img_down"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_25"
-            android:focusable="true"
-            android:clickable="true"
-            android:src="@drawable/ic_down" />
-        <LinearLayout
-            android:id="@+id/input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/dp_40"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/dp_20"
-                android:background="@drawable/background_yuanjiao_3"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
-                android:text="！输入IP端口连接发送端 "
-                android:textColor="@color/primary_text"
-                android:visibility="visible" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <com.xz.widget.textview.IpEditView
-                    android:id="@+id/et_ip"
-                    android:layout_width="@dimen/dp_220"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=":"
-                    android:textColor="@color/primary_text"
-                    android:textSize="22sp" />
-
-                <EditText
-                    android:id="@+id/et_port"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:inputType="numberSigned"
-                    android:maxLength="5"
-                    android:maxLines="1" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_connect"
-                android:layout_width="@dimen/dp_100"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_40"
-                android:layout_marginBottom="@dimen/dp_10"
-                android:background="@drawable/btn_connect"
-                android:text="连接"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btn_break"
-                android:layout_width="@dimen/dp_100"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_40"
-                android:layout_marginBottom="@dimen/dp_10"
-                android:background="@drawable/btn_break"
-                android:text="断开"
-                android:textColor="@color/white"
-                android:visibility="gone" />
+        android:layout_height="@dimen/dp_180"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/dp_10" />
 
 
-        </LinearLayout>
+    <TextView
+        android:id="@+id/tv_send"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="我要发送" />
 
-        <ScrollView
-            android:id="@+id/scroll_msg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never">
+    <TextView
+        android:id="@+id/tv_receive"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="我要接收" />
 
-            <TextView
-                android:id="@+id/tv_msg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:overScrollMode="never" />
-        </ScrollView>
-    </LinearLayout>
+    <View style="@style/split_line" />
+
+    <TextView
+        android:id="@+id/tv_export_text"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导出明文密码" />
+
+    <TextView
+        android:id="@+id/tv_import_new"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入明文数据" />
+
+    <TextView
+        android:id="@+id/tv_import_old"
+        style="@style/secret_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入明文数据（v1.5）" />
 
 </LinearLayout>

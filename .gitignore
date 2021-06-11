@@ -14,5 +14,9 @@
 .cxx
 release
 .idea
+<<<<<<< HEAD
 codeStyles
 /.idea/codeStyles/Project.xml
+=======
+/.idea
+>>>>>>> 90b711af0c14fe28356f6b8d0992b4bc19ec4f2d
