@@ -15,8 +15,8 @@ android {
         applicationId "com.xz.keybag"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 22
-        versionName "2.0"
+        versionCode 23
+        versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
