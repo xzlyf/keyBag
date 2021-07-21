@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/nav_background"
+    android:orientation="vertical"
     tools:context=".activity.BackupActivity">
 
     <LinearLayout
@@ -82,6 +82,7 @@
         style="@style/secret_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="导入明文数据（v1.5）" />
+        android:text="导入明文数据（v1.5）"
+        android:visibility="gone" />
 
 </LinearLayout>

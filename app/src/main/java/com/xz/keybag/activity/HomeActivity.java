@@ -57,8 +57,6 @@ public class HomeActivity extends BaseActivity {
 	Switch modeSwitch;
 	@BindView(R.id.category_view)
 	RecyclerView categoryRecycler;
-	@BindView(R.id.tv_login_date)
-	TextView tvLoginTime;
 	@BindView(R.id.tv_slogan)
 	TextView tvSlogan;
 
@@ -98,13 +96,6 @@ public class HomeActivity extends BaseActivity {
 	}
 
 	private void initState() {
-		long loginTime;
-		try {
-			loginTime = Long.parseLong(Local.mAdmin.getLastLoginTime());
-			tvLoginTime.setText(String.format("上次登录：\n%s", TimeUtil.getSimMilliDate("yyyy年MM月dd日 HH:mm:ss", loginTime)));
-		} catch (NumberFormatException e) {
-			tvLoginTime.setText("上次登录：异常");
-		}
 		isNight = PreferencesUtilV2.getBoolean(Local.SHARD_BOOLEAN_MODE, false);
 		modeSwitch.setChecked(isNight);
 		if (isNight) {
@@ -256,7 +247,7 @@ public class HomeActivity extends BaseActivity {
 				share_intent.setAction(Intent.ACTION_SEND);
 				share_intent.setType("text/plain");
 				share_intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
-				share_intent.putExtra(Intent.EXTRA_TEXT, "[钥匙包]是一款省心安全简洁的密码记录App,拥有有好的使用界面和一些小工具。欢迎关注[" + Local.WeChat + "]订阅号获取最新版本下载。");
+				share_intent.putExtra(Intent.EXTRA_TEXT, "[钥匙包]是一款省心安全简洁的密码记录App,拥有有好的使用界面和一些小工具。前往酷安应用删除下载\"https://www.coolapk.com/apk/com.xz.keybag\"，可以微信关注[" + Local.WeChat + "]订阅号获取最新版本下载。");
 				share_intent = Intent.createChooser(share_intent, "分享");
 				startActivity(share_intent);
 				break;

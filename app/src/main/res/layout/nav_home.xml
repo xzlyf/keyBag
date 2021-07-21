@@ -32,21 +32,14 @@
             android:ellipsize="end"
             android:maxLength="64"
             android:maxLines="4"
-            android:text="你个大头虾\n成日忘记密码"
+            android:text="钥匙包\n记录密码好帮手"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_18"
             android:textStyle="bold"
+            android:layout_marginBottom="@dimen/dp_10"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_login_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/dp_5"
-            android:text="上次登录："
-            android:textColor="@color/white"
-            android:textStyle="bold" />
 
     </LinearLayout>
 

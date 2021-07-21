@@ -3,11 +3,11 @@ package com.xz.keybag.activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.constant.Local;
@@ -25,6 +25,8 @@ public class AboutActivity extends BaseActivity {
 	ImageView imageLaunch;
 	@BindView(R.id.tv_version)
 	TextView tvVersion;
+	@BindView(R.id.ic_wechat)
+	ImageView imageWechat;
 
 	private CopyUtil copyUtil;
 
@@ -41,18 +43,19 @@ public class AboutActivity extends BaseActivity {
 	@Override
 	public void initData() {
 		copyUtil = new CopyUtil(mContext);
-		//获取app图标
-		//Drawable appIcon = AppInfoUtils.getAppIcon(mContext, Local.PACKAGE_NAME);
-		//if (appIcon != null) {
-		//	imageLaunch.setImageDrawable(appIcon);
-		//}
-		imageLaunch.setImageResource(R.drawable.lanuch_round);
 		//获取版本
 		String appVersion = AppInfoUtils.getAppVersion(mContext, Local.PACKAGE_NAME);
 		if (appVersion != null) {
 			tvVersion.setText(String.format("v%s", appVersion));
 		}
 
+
+		Glide.with(mContext)
+				.load(R.drawable.lanuch_round)
+				.into(imageLaunch);
+		Glide.with(mContext)
+				.load(R.mipmap.ic_wechat)
+				.into(imageWechat);
 	}
 
 

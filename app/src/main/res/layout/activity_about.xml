@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:overScrollMode="never"
     android:background="@color/nav_background"
+    android:overScrollMode="never"
     tools:context=".activity.AboutActivity">
 
     <LinearLayout
@@ -51,8 +51,7 @@
             android:layout_width="@dimen/dp_100"
             android:layout_height="@dimen/dp_100"
             android:layout_gravity="center"
-            android:layout_margin="25dp"
-            android:src="@drawable/lanuch_round" />
+            android:layout_margin="25dp" />
 
         <TextView
             android:id="@+id/tv_version"
@@ -63,7 +62,6 @@
             android:textColor="@color/primary_text"
             android:textSize="@dimen/sp_16" />
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,6 +70,33 @@
                 \n\n[钥匙包]采用了AES、SHA256和RSA多种加密算法混合加密数据，即使数据被盗取，仍可起到很大程度的保护功能。
                 \n\n同时[钥匙包]将会持续更新版本迭代，相关下载需要您手动前往下载。"
             android:textColor="@color/secondary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_30"
+            android:text="现已开源"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/sp_22" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_30"
+            android:autoLink="web"
+            android:text="https://github.com/xzlyf/keyBag"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/sp_18" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_30"
+            android:layout_marginEnd="@dimen/dp_25"
+            android:layout_marginBottom="@dimen/dp_30"
+            android:text="欢迎给[钥匙包]添瓦加砖，对于合适的添加\n我们会合并分支，给予发布。"
+            android:textColor="@color/secondary_text" />
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -91,13 +116,13 @@
             android:textSize="@dimen/sp_18" />
 
         <ImageView
+            android:id="@+id/ic_wechat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_30"
             android:layout_marginEnd="@dimen/dp_30"
             android:adjustViewBounds="true"
-            android:contentDescription="微信搜一搜：小泽干货铺"
-            android:src="@mipmap/ic_wechat" />
+            android:contentDescription="微信搜一搜：小泽干货铺" />
 
         <com.xz.keybag.custom.IconTextView
             android:layout_width="wrap_content"
