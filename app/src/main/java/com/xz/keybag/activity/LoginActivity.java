@@ -91,6 +91,7 @@ public class LoginActivity extends BaseActivity {
 	public void initData() {
 		//Logger.w("签名：" + AppInfoUtils.getPackageSign(this, false));
 		//Logger.w("sign加密：" + NativeUtils.signatureParams("utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation"));
+
 		if (getIntent() != null) {
 			mode = getIntent().getIntExtra("mode", 0);
 		}
@@ -106,7 +107,7 @@ public class LoginActivity extends BaseActivity {
 			initIdentity();
 			//登录初始化
 			initLogin();
-			//登录配置
+			//查询登录配置
 			initLoginConfig();
 		} else if (mode == Local.START_MODE_SECRET_SETTING) {
 			//用户是否开启指纹登录
@@ -123,11 +124,14 @@ public class LoginActivity extends BaseActivity {
 			finish();
 		}
 
-
 		//关闭密码验证
-		if (!TextUtils.equals(Local.mAdmin.getConfig().getLoginSwitch(), Local.CONFIG_LOGIN_OPEN)) {
-			killMySelf();
+		if (Local.mAdmin != null) {
+			if (!TextUtils.equals(Local.mAdmin.getConfig().getLoginSwitch(), Local.CONFIG_LOGIN_OPEN)) {
+				killMySelf();
+			}
 		}
+
+
 	}
 
 	private void initView() {
