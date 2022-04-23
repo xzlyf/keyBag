@@ -10,6 +10,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseDialog;
 import com.xz.keybag.constant.Local;
@@ -21,6 +22,10 @@ public class PasswordInputDialog extends BaseDialog {
 	private SlidingVerification mVerifyProgress;
 	private TextView mTvTop;
 	private int MAX_NUM = 4;
+	private TextView mTitle;
+	private TextView mContent;
+	private TextView mCancel;
+	private PassDialogListener mCancelListener;
 
 	public PasswordInputDialog(Context context) {
 		super(context);
@@ -39,6 +44,9 @@ public class PasswordInputDialog extends BaseDialog {
 	private void initView() {
 		mEtInput = findViewById(R.id.et_input);
 		mTvTop = findViewById(R.id.tv_top);
+		mTitle = findViewById(R.id.tv_title);
+		mContent = findViewById(R.id.tv_content);
+		mCancel = findViewById(R.id.tv_cancel);
 		mVerifyProgress = findViewById(R.id.verify_progress);
 		mVerifyProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
@@ -84,7 +92,6 @@ public class PasswordInputDialog extends BaseDialog {
 			}
 		});
 
-
 		mEtInput.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -105,9 +112,57 @@ public class PasswordInputDialog extends BaseDialog {
 			}
 		});
 
+		mCancel.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mCancelListener!=null){
+					mCancelListener.onClick(PasswordInputDialog.this,"");
+				}
+			}
+		});
 
 	}
 
+	public void setTitle(String title) {
+		if (mTitle != null) {
+			mTitle.setText(title);
+		}
+	}
+
+	public void setContent(String content) {
+		if (mContent != null) {
+			mContent.setText(content);
+		}
+	}
+
+	public void cleanStatus() {
+		if (mVerifyProgress != null) {
+			mVerifyProgress.setThumb(mContext.getResources().getDrawable(R.mipmap.seekbar_thumb));
+			mVerifyProgress.setThumbOffset(0);
+			mVerifyProgress.setProgress(0);
+			mVerifyProgress.setEnabled(true);
+			mTvTop.setVisibility(View.GONE);
+			mEtInput.setEnabled(true);
+		}
+	}
+
+	/**
+	 * 设置取消按钮，并监听剪辑时间
+	 * 不设置不显示
+	 *
+	 * @param tx       按钮名字
+	 * @param listener 监听事件
+	 */
+	public void setOnCancelLickListener( String tx, PassDialogListener listener) {
+		if (mCancel == null) {
+			return;
+		}
+		mCancel.setVisibility(View.VISIBLE);
+		mCancel.setFocusable(true);
+		mCancel.setClickable(true);
+		mCancel.setText(tx);
+		mCancelListener = listener;
+	}
 
 	public void setOnClickListener(PassDialogListener listener) {
 		mOnClickListener = listener;

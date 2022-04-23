@@ -9,6 +9,7 @@ public class AdminConfig {
 	private long loginTimestamp;
 	private long unlockTimestamp;
 	private String publicPwd;//密码明文显示
+	private String loginSwitch;//开启/关闭密码登录
 
 
 	public String getId() {
@@ -49,5 +50,13 @@ public class AdminConfig {
 
 	public void setPublicPwd(String publicPwd) {
 		this.publicPwd = publicPwd;
+	}
+
+	public String getLoginSwitch() {
+		return loginSwitch;
+	}
+
+	public void setLoginSwitch(String loginSwitch) {
+		this.loginSwitch = loginSwitch;
 	}
 }

@@ -1,47 +1,36 @@
 package com.xz.keybag.activity;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.orhanobut.logger.Logger;
 import com.xz.keybag.R;
 import com.xz.keybag.base.BaseActivity;
 import com.xz.keybag.base.utils.PreferencesUtilV2;
 import com.xz.keybag.constant.Local;
-import com.xz.keybag.entity.Datum;
-import com.xz.keybag.entity.OldKeyEntity;
-import com.xz.keybag.entity.Project;
+import com.xz.keybag.custom.PasswordInputDialog;
 import com.xz.keybag.sql.DBManager;
-import com.xz.keybag.utils.FileUtils;
-import com.xz.keybag.utils.IOUtil;
 import com.xz.keybag.utils.PermissionsUtils;
 import com.xz.keybag.utils.lock.DES;
 import com.xz.keybag.utils.lock.RSA;
-import com.xz.utils.TimeUtil;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -65,10 +54,14 @@ public class LoginSettingActivity extends BaseActivity {
 	Switch swForgetPass;
 	@BindView(R.id.sw_pwd_public)
 	Switch swPwdPublic;
+	@BindView(R.id.sw_pwd_close)
+	Switch swLoginSwitch;
 	@BindView(R.id.slogan_save)
 	TextView tvSloganSave;
 	@BindView(R.id.et_slogan)
 	EditText etSlogan;
+	@BindView(R.id.pass_view)
+	LinearLayout passView;
 
 	private DBManager db;
 	private AlertDialog dialog;
@@ -124,6 +117,76 @@ public class LoginSettingActivity extends BaseActivity {
 				}
 			}
 		});
+		swLoginSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				//如果不是用户按下的就不往下执行
+				if (!buttonView.isPressed()) {
+					return;
+				}
+				if (isChecked) {
+
+					PasswordInputDialog pwdInputDialog = new PasswordInputDialog(mContext);
+					pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
+						@Override
+						public void onClick(PasswordInputDialog dialog, String st) {
+							int i = db.updateLogin(Local.mAdmin.getLoginPwd(), st);
+							if (i>0){
+								sToast("已开启登录验证");
+								db.updateLoginSwitch(Local.mAdmin.getConfig().getId(), Local.CONFIG_LOGIN_OPEN);
+								passView.setVisibility(View.VISIBLE);
+								swLoginSwitch.setChecked(true);
+							}else{
+								swLoginSwitch.setChecked(false);
+								sToast("设置失败，请退出重试！");
+							}
+							dialog.dismiss();
+
+						}
+					});
+					pwdInputDialog.create();
+					pwdInputDialog.setOnCancelLickListener("取消 ", new PasswordInputDialog.PassDialogListener() {
+						@Override
+						public void onClick(PasswordInputDialog dialog, String st) {
+							dialog.dismiss();
+							swLoginSwitch.setChecked(false);
+						}
+					});
+					pwdInputDialog.setTitle("用户须知");
+					pwdInputDialog.setContent("设置登录密码可以提升[钥匙包]安全保障。\n用户需要牢记登陆密码，忘记将无法进入[钥匙包]噢！\n\n输入新的登录密码继续：");
+					pwdInputDialog.show();
+				} else {
+					PasswordInputDialog pwdInputDialog = new PasswordInputDialog(mContext);
+					pwdInputDialog.setOnClickListener(new PasswordInputDialog.PassDialogListener() {
+						@Override
+						public void onClick(PasswordInputDialog dialog, String st) {
+							//验证登录密码
+							if (st.equals(Local.mAdmin.getLoginPwd())) {
+								db.updateLoginSwitch(Local.mAdmin.getConfig().getId(), Local.CONFIG_LOGIN_SHUT);
+								dialog.dismiss();
+								swLoginSwitch.setChecked(false);
+								passView.setVisibility(View.GONE);
+							} else {
+								dialog.cleanStatus();
+								sToast("密码验证失败");
+								swLoginSwitch.setChecked(true);
+							}
+						}
+					});
+					pwdInputDialog.create();
+					pwdInputDialog.setOnCancelLickListener("取消 ", new PasswordInputDialog.PassDialogListener() {
+						@Override
+						public void onClick(PasswordInputDialog dialog, String st) {
+							dialog.dismiss();
+							swLoginSwitch.setChecked(true);
+						}
+					});
+					pwdInputDialog.setTitle("谨慎操作");
+					pwdInputDialog.setContent("取消登录密码后，[钥匙包]将不再提供有效防护。\n任何人都可轻易访问到[钥匙包]，请谨慎操作。\n\n输入登录密码完成操作！");
+					pwdInputDialog.show();
+				}
+			}
+		});
 		etSlogan.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -163,6 +226,13 @@ public class LoginSettingActivity extends BaseActivity {
 		//密码明文显示
 		if (TextUtils.equals(Local.mAdmin.getConfig().getPublicPwd(), Local.CONFIG_PUBLIC_PWD_OPEN)) {
 			swPwdPublic.setChecked(true);
+		}
+		//密码登录开关
+		if (TextUtils.equals(Local.mAdmin.getConfig().getLoginSwitch(), Local.CONFIG_LOGIN_OPEN)) {
+			swLoginSwitch.setChecked(true);
+			passView.setVisibility(View.VISIBLE);
+		} else {
+			passView.setVisibility(View.GONE);
 		}
 		//标语slogan
 		String slogan = PreferencesUtilV2.getString(Local.SHARD_SLOGAN, Local.DEFAULT_SLOGAN);
@@ -257,7 +327,6 @@ public class LoginSettingActivity extends BaseActivity {
 		Local.SLOGAN = slogan;
 		sToast("已保存");
 	}
-
 
 
 }

@@ -78,23 +78,30 @@
             android:layout_height="wrap_content"
             android:text="分享密钥" />
 
-        <View style="@style/split_line" />
 
-        <TextView
-            android:id="@+id/tv_login"
-            style="@style/secret_textView"
+        <LinearLayout
+            android:id="@+id/pass_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="进入密码" />
+            android:orientation="vertical">
+            <View style="@style/split_line" />
 
-        <Switch
-            android:id="@+id/sw_fingerprint"
-            style="@style/secret_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:text="指纹登录" />
+            <TextView
+                android:id="@+id/tv_login"
+                style="@style/secret_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="进入密码" />
 
+            <Switch
+                android:id="@+id/sw_fingerprint"
+                style="@style/secret_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:text="指纹登录" />
+
+        </LinearLayout>
         <View style="@style/split_line" />
 
         <Switch
@@ -138,6 +145,27 @@
             android:paddingStart="@dimen/dp_20"
             android:singleLine="true"
             android:text="开启后主页的密码将会使用'*'号代替"
+            android:textIsSelectable="false"
+            android:textSize="12sp" />
+
+        <Switch
+            android:id="@+id/sw_pwd_close"
+            style="@style/secret_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:paddingBottom="0dp"
+            android:text="开启登录验证" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:maxLines="1"
+            android:padding="@dimen/dp_5"
+            android:paddingStart="@dimen/dp_20"
+            android:singleLine="true"
+            android:text="关闭后进入APP时将跳过密码验证。谨慎操作！"
             android:textIsSelectable="false"
             android:textSize="12sp" />
 

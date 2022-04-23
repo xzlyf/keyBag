@@ -71,31 +71,6 @@
                 \n\n同时[钥匙包]将会持续更新版本迭代，相关下载需要您手动前往下载。"
             android:textColor="@color/secondary_text" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
-            android:text="现已开源"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/sp_22" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
-            android:autoLink="web"
-            android:text="https://github.com/xzlyf/keyBag"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/sp_18" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
-            android:layout_marginEnd="@dimen/dp_25"
-            android:layout_marginBottom="@dimen/dp_30"
-            android:text="欢迎给[钥匙包]添瓦加砖，对于合适的添加\n我们会合并分支，给予发布。"
-            android:textColor="@color/secondary_text" />
 
 
         <TextView

@@ -2,9 +2,16 @@ package com.xz.keybag.sql;
 
 import android.content.Context;
 
+import com.xz.keybag.constant.Local;
+import com.xz.keybag.entity.Category;
+
+import net.sqlcipher.Cursor;
 import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author czr
@@ -13,7 +20,7 @@ import net.sqlcipher.database.SQLiteOpenHelper;
  */
 public class DBHelper extends SQLiteOpenHelper {
 	private static final String TAG = "DBHelper";
-	private static final int DB_VERSION = 1;   // 数据库版本
+	private static final int DB_VERSION = 2;   // 数据库版本
 	private static final String DB_KEYBAG = "keybag_db";//数据库名
 	public static String DB_PWD;//数据库密码
 	static String TABLE_COMMON = "common";// 表名
@@ -37,6 +44,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	static String FIELD_CONFIG_P2 = "login_time";//上次登录日期 时间戳
 	static String FIELD_CONFIG_P3 = "last_unlock_time";//上次登录日期 时间戳
 	static String FIELD_CONFIG_P4 = "pwd_public";//密码明文显示
+	static String FIELD_CONFIG_P5 = "login_switch";//密码登录开关
 
 
 	DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -80,7 +88,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				FIELD_CONFIG_P1 + " text , " +
 				FIELD_CONFIG_P2 + " text , " +
 				FIELD_CONFIG_P3 + " text , " +
-				FIELD_CONFIG_P4 + " text " +
+				FIELD_CONFIG_P4 + " text , " +
+				FIELD_CONFIG_P5 + " text " +
 				");";
 
 		try {
@@ -96,6 +105,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		System.out.println("============数据库更新==========" + oldVersion + "=" + newVersion + "=");
 
+		switch (oldVersion) {
+			case 1:
+				db.execSQL("ALTER TABLE " + TABLE_CONFIG + " ADD " + FIELD_CONFIG_P5 + " text");
+				db.execSQL("UPDATE " + TABLE_CONFIG + " SET " + FIELD_CONFIG_P5 + " = '" + Local.CONFIG_LOGIN_OPEN+"'");
+			default:
+				break;
+		}
 	}
 }

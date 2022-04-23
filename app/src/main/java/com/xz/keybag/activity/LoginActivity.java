@@ -124,8 +124,10 @@ public class LoginActivity extends BaseActivity {
 		}
 
 
-		//todo  测试模式：关闭密码验证
-		//killMySelf();
+		//关闭密码验证
+		if (!TextUtils.equals(Local.mAdmin.getConfig().getLoginSwitch(), Local.CONFIG_LOGIN_OPEN)) {
+			killMySelf();
+		}
 	}
 
 	private void initView() {
@@ -249,6 +251,8 @@ public class LoginActivity extends BaseActivity {
 				}
 			});
 			pwdInputDialog.create();
+			pwdInputDialog.setTitle("设置密码");
+			pwdInputDialog.setContent("App需要设置一个登录密码，\n以确保数据安全性。\n请用户务必记住密码，\nApp不提供找回密码的服务");
 			pwdInputDialog.show();
 		} else if (loginState.equals(Local.PASSWORD_STATE_SUCCESS)) {
 			//用户是否开启指纹登录

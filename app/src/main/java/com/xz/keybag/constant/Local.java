@@ -57,6 +57,8 @@ public class Local {
 	public static final String CONFIG_FORGET_SHUT = "shut";//关闭密码防忘记
 	public static final String CONFIG_PUBLIC_PWD_OPEN = "open";//密码明文显示开启
 	public static final String CONFIG_PUBLIC_PWD_SHUT = "shut";//密码明文显示关闭
+	public static final String CONFIG_LOGIN_OPEN= "OPEN";//开启密码登录
+	public static final String CONFIG_LOGIN_SHUT= "shut";//关闭密码登录
 
 	//user
 	public static Admin mAdmin;

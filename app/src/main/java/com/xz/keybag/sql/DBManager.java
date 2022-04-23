@@ -43,6 +43,7 @@ import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P1;
 import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P2;
 import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P3;
 import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P4;
+import static com.xz.keybag.sql.DBHelper.FIELD_CONFIG_P5;
 import static com.xz.keybag.sql.DBHelper.FIELD_DBASE_P1;
 import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K1;
 import static com.xz.keybag.sql.DBHelper.FIELD_SECRET_K2;
@@ -259,6 +260,7 @@ public class DBManager {
 		config.setId(UUIDUtil.getStrUUID());
 		config.setForgetPass(Local.CONFIG_FORGET_OPEN);
 		config.setPublicPwd(Local.CONFIG_PUBLIC_PWD_SHUT);
+		config.setLoginSwitch(Local.CONFIG_LOGIN_OPEN);
 		admin.setConfig(config);
 		Local.mAdmin = admin;
 		//6.存入数据库
@@ -625,6 +627,7 @@ public class DBManager {
 			config.setLoginTimestamp(ConvertUtils.convertStingToLong(cursor.getString(2), 1000));
 			config.setUnlockTimestamp(ConvertUtils.convertStingToLong(cursor.getString(3), 1000));
 			config.setPublicPwd(cursor.getString(4));
+			config.setLoginSwitch(cursor.getString(5));
 			Local.mAdmin.setConfig(config);
 		}
 		cursor.close();
@@ -704,6 +707,22 @@ public class DBManager {
 		Local.mAdmin.getConfig().setPublicPwd(state);
 		db.close();
 	}
+
+	/**
+	 * 更新登录密码开关
+	 */
+	public void updateLoginSwitch(String id, String state) {
+		StringBuilder whereBuffer = new StringBuilder();
+		whereBuffer.append(FIELD_CONFIG_P0).append(" = ").append("'").append(id).append("'");
+		ContentValues cv = new ContentValues();
+		cv.put(FIELD_CONFIG_P5, state);
+		//获取写数据库
+		SQLiteDatabase db = dbHelper.getWritableDatabase(DBHelper.DB_PWD);
+		db.update(TABLE_CONFIG, cv, whereBuffer.toString(), null);
+		Local.mAdmin.getConfig().setLoginSwitch(state);
+		db.close();
+	}
+
 
 
 }
